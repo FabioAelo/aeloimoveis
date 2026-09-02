@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Aelo Imóveis — compra, venda e aluguel de imóveis em Lauro de Freitas e região.">
+<title>Aelo Imóveis | Encontre seu próximo imóvel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo" href="#"><span>AELO</span><small>IMÓVEIS</small></a>
+    <nav>
+      <a href="#imoveis">Imóveis</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#sobre">A Aelo</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <a class="btn btn-outline" href="https://wa.me/5571999999999" target="_blank">Fale no WhatsApp</a>
+    <button class="menu" aria-label="Abrir menu">☰</button>
+  </div>
+
+<a class="announce-nav" href="#anuncie">Anuncie seu imóvel</a>
+</header>
+
+
+<section class="premium-hero">
+  <div class="premium-inner">
+    <div class="eyebrow">AELO IMÓVEIS</div>
+    <h1>O imóvel certo para o seu <span>próximo capítulo.</span></h1>
+    <p>Compra, venda, aluguel e investimentos com atendimento próximo e estratégia.</p>
+    <div class="hero-actions"><a href="#imoveis" class="premium-btn">Encontrar meu imóvel</a><a href="#anuncie" class="premium-btn outline">Anuncie seu imóvel</a></div>
+  </div>
+</section>
+<div class="premium-search" id="imoveis">
+  <div class="search-tabs"><button class="active" data-mode="Venda">Comprar</button><button data-mode="Aluguel">Alugar</button></div>
+  <div class="search-fields">
+    <select id="pType"><option value="">Tipo de imóvel</option><option>Apartamento</option><option>Casa</option><option>Terreno</option><option>Comercial</option></select>
+    <input id="pLocation" placeholder="Cidade ou bairro">
+    <select id="pPrice"><option value="">Valor máximo</option><option value="300000">R$ 300 mil</option><option value="500000">R$ 500 mil</option><option value="800000">R$ 800 mil</option><option value="1000000">R$ 1 milhão</option></select>
+    <button id="pSearch">Buscar</button>
+  </div>
+  <small id="pResult"></small>
+</div>
+
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <p class="eyebrow">AELO IMÓVEIS • BAHIA</p>
+    <h1>O imóvel certo para<br><em>a próxima fase da sua vida.</em></h1>
+    <p class="hero-text">Encontre casas, apartamentos, terrenos e oportunidades de investimento em Lauro de Freitas e região.</p>
+    <div class="search-card">
+      <div class="search-tabs">
+        <button class="active" data-purpose="Comprar">Comprar</button>
+        <button data-purpose="Alugar">Alugar</button>
+      </div>
+      <div class="search-grid">
+        <label>O que você procura?
+          <select id="type"><option>Todos os imóveis</option><option>Casa</option><option>Apartamento</option><option>Terreno</option><option>Comercial</option></select>
+        </label>
+        <label>Localização
+          <input id="location" placeholder="Ex.: Lauro de Freitas">
+        </label>
+        <label>Faixa de preço
+          <select id="price"><option>Qualquer valor</option><option>Até R$ 300 mil</option><option>R$ 300–600 mil</option><option>R$ 600 mil–1 milhão</option><option>Acima de R$ 1 milhão</option></select>
+        </label>
+        <button class="btn btn-gold search-btn" onclick="searchProperties()">Buscar imóveis</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="imoveis" class="section">
+  <div class="container">
+    <div class="section-head">
+      <div><p class="eyebrow dark">DESTAQUES</p><h2>Imóveis em destaque</h2></div>
+      <a class="text-link" href="#imoveis">Ver todos →</a>
+    </div>
+    <div id="propertyGrid" class="property-grid"></div>
+  </div>
+</section>
+
+<section id="servicos" class="services">
+  <div class="container">
+    <div class="section-head light">
+      <div><p class="eyebrow">SOLUÇÕES AELO</p><h2>Mais do que encontrar imóveis.</h2></div>
+    </div>
+    <div class="service-grid">
+      <article><div class="icon">⌂</div><h3>Comprar</h3><p>Encontre seu novo lar com atendimento próximo e orientação em todas as etapas.</p><a href="#contato">Quero comprar →</a></article>
+      <article><div class="icon">▣</div><h3>Vender</h3><p>Divulgue seu imóvel com estratégia, apresentação profissional e atendimento personalizado.</p><a href="#contato">Quero vender →</a></article>
+      <article><div class="icon">↗</div><h3>Investir</h3><p>Identifique oportunidades imobiliárias e tome decisões com mais segurança.</p><a href="#contato">Quero investir →</a></article>
+      <article><div class="icon">★</div><h3>Avaliar</h3><p>Solicite uma avaliação e descubra o potencial comercial do seu imóvel.</p><a href="#contato">Avaliar imóvel →</a></article>
+    </div>
+  </div>
+</section>
+
+<section id="sobre" class="about">
+  <div class="container about-grid">
+    <div class="about-photo"></div>
+    <div>
+      <p class="eyebrow dark">AELO IMÓVEIS</p>
+      <h2>Seu negócio imobiliário começa com confiança.</h2>
+      <p>Atendimento humano, conhecimento do mercado local e foco em encontrar uma solução que faça sentido para cada cliente.</p>
+      <div class="stats"><div><strong>+</strong><span>Atendimento personalizado</span></div><div><strong>01</strong><span>Parceiro na negociação</span></div><div><strong>360°</strong><span>Suporte no processo</span></div></div>
+      <a class="btn btn-dark" href="#contato">Conheça a Aelo</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container cta-inner">
+    <div><p class="eyebrow">TEM UM IMÓVEL?</p><h2>Vamos transformar seu imóvel em uma oportunidade.</h2></div>
+    <a class="btn btn-gold" href="#contato">Anunciar meu imóvel</a>
+  </div>
+</section>
+
+
+<section class="announce-section" id="anuncie">
+  <div class="announce-copy"><div class="eyebrow dark">ANUNCIE SEU IMÓVEL</div><h2>Seu imóvel merece uma apresentação à altura.</h2>
+  <p>Envie os dados básicos e fale diretamente com a Aelo pelo WhatsApp.</p>
+  <ul><li>Avaliação e posicionamento</li><li>Divulgação profissional</li><li>Atendimento aos interessados</li><li>Suporte na negociação</li></ul></div>
+  <form id="ownerForm" class="owner-form"><input id="ownerName" required placeholder="Seu nome"><input id="ownerPhone" required placeholder="WhatsApp">
+  <select id="ownerType" required><option value="">Tipo do imóvel</option><option>Apartamento</option><option>Casa</option><option>Terreno</option><option>Comercial</option></select>
+  <input id="ownerLocation" placeholder="Cidade / bairro"><select id="ownerPurpose" required><option value="">Objetivo</option><option>Vender</option><option>Alugar</option><option>Avaliar</option></select>
+  <textarea id="ownerMsg" rows="4" placeholder="Conte um pouco sobre o imóvel"></textarea><button class="premium-btn" type="submit">Enviar pelo WhatsApp</button></form>
+</section>
+<section id="contato class="contact">
+  <div class="container contact-grid">
+    <div><p class="eyebrow dark">FALE CONOSCO</p><h2>Vamos conversar sobre seu próximo imóvel?</h2><p>Preencha o formulário ou fale diretamente pelo WhatsApp.</p><a class="whatsapp" href="https://wa.me/5571999999999" target="_blank">WhatsApp • Atendimento</a></div>
+    <form onsubmit="sendLead(event)">
+      <input required id="name" placeholder="Seu nome">
+      <input required id="phone" placeholder="WhatsApp / telefone">
+      <select id="interest"><option>Quero comprar</option><option>Quero alugar</option><option>Quero vender</option><option>Quero avaliar meu imóvel</option><option>Quero investir</option></select>
+      <textarea id="message" rows="4" placeholder="Como podemos ajudar?"></textarea>
+      <button class="btn btn-dark" type="submit">Enviar solicitação</button>
+    </form>
+  </div>
+</section>
+
+</main>
+<footer class="premium-footer"><img src="logo-aelo-imoveis.png" alt="Aelo Imóveis"><div>Compra • Venda • Aluguel • Investimentos</div><div>Instagram: @aeloimoveis • CRECI: inserir número</div></footer>
+
+<footer><div class="container footer"><div class="logo"><span>AELO</span><small>IMÓVEIS</small></div><p>Compra • Venda • Aluguel • Investimentos</p><p>© 2026 Aelo Imóveis. Todos os direitos reservados.</p></div></footer>
+<a class="float-whatsapp" href="https://wa.me/5571999999999" target="_blank" aria-label="WhatsApp">✆</a>
+<script src="script.js"></script>
+</body>
+</html>
