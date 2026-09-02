@@ -15,3 +15,36 @@ body{font-family:"DM Sans",sans-serif}
 .premium-footer{background:#050e19;color:#9aa5b1;padding:30px 4%;display:flex;gap:35px;align-items:center;justify-content:center;font-size:11px}.premium-footer img{width:140px}
 @media(max-width:800px){.announce-nav{display:none}.search-fields{grid-template-columns:1fr 1fr}.announce-section{grid-template-columns:1fr}.premium-footer{flex-direction:column}.premium-hero{min-height:680px}}
 @media(max-width:520px){.premium-inner{padding-top:80px}.premium-hero h1{font-size:43px}.hero-actions{flex-direction:column}.premium-search{margin:-45px auto 0}.search-fields{grid-template-columns:1fr}.announce-section{padding-top:80px}.announce-section h2{font-size:35px}}
+/* ================================
+   LOGO AELO IMÓVEIS
+   ================================ */
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.logo img {
+  display: block;
+  width: 115px;
+  height: auto;
+  max-height: 48px;
+  object-fit: contain;
+}
+
+/* Centralização e tamanho no celular */
+@media (max-width: 768px) {
+  .logo {
+    width: 120px;
+    height: 55px;
+  }
+
+  .logo img {
+    width: 95px;
+    max-height: 42px;
+  }
+}
