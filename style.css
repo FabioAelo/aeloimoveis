@@ -39,8 +39,8 @@ body{font-family:"DM Sans",sans-serif}
 /* Centralização e tamanho no celular */
 @media (max-width: 768px) {
   .logo {
-    width: 120px;
-    height: 55px;
+    width: 150px;
+    height: 60px;
   }
 
   .logo img {
