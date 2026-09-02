@@ -23,8 +23,8 @@ body{font-family:"DM Sans",sans-serif}
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 30px;
+  width: 120px;
+  height: 60px;
   flex-shrink: 0;
 }
 
@@ -39,7 +39,7 @@ body{font-family:"DM Sans",sans-serif}
 /* Centralização e tamanho no celular */
 @media (max-width: 768px) {
   .logo {
-    width: 150px;
+    width: 1200px;
     height: 60px;
   }
 
