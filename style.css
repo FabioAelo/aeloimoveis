@@ -25,37 +25,81 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; }
 
 /* Top Bar */
 .top-bar {
-  background: var(--primary-dark);
-  color: var(--gray-200);
-  font-size: 0.85rem;
+  background: #0A1C33;
+  color: #E2E8F0;
+  font-size: 0.82rem;
   padding: 8px 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1001;
 }
-.top-bar-info span { margin-right: 15px; display: inline-flex; gap: 6px; align-items: center; }
-.top-bar-info i { color: var(--accent); }
-.creci-badge { background: rgba(197, 160, 89, 0.2); color: var(--accent); padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+
+.top-bar-info span {
+  margin-right: 15px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.top-bar-info i {
+  color: #C5A059;
+}
+
+.creci-badge {
+  background: rgba(197, 160, 89, 0.2);
+  color: #C5A059;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
 /* Header & Nav */
 .header {
   position: sticky;
   top: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
+  background: #FFFFFF; /* Fundo branco sólido para dar total visibilidade à logo */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 1000;
-  border-bottom: 1px solid var(--gray-200);
+  padding: 10px 0;
 }
+
 .nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 5%;
+  padding: 0 5%;
 }
-.logo img { height: 45px; display: block; }
-nav a { margin: 0 12px; text-decoration: none; color: var(--dark); font-weight: 500; transition: var(--transition); }
-nav a:hover { color: var(--accent); }
+
+/* Ajuste de tamanho e destaque da logo */
+.logo img {
+  height: 65px; /* Aumentado para dar destaque */
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #0F2A4A; /* Texto escuro para contraste no fundo claro */
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  color: #C5A059;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
 .btn {
   display: inline-flex;
