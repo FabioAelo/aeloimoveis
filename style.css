@@ -57,17 +57,125 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; }
   white-space: nowrap;
 }
 
-/* Header & Nav com Super Destaque na Logo */
-.header {
+/* Header Centralizado com Super Destaque */
+.header-centered {
   position: sticky;
   top: 0;
   background: #FFFFFF;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border-bottom: 2px solid #C5A059; /* Linha dourada discreta abaixo do cabeçalho */
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  border-bottom: 3px solid #C5A059; /* Faixa dourada elegante */
   z-index: 1000;
-  padding: 12px 0;
+  padding: 15px 0;
 }
 
+.nav-centered {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+}
+
+/* Lado Esquerdo - Links */
+.nav-left {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+}
+
+.nav-left a {
+  text-decoration: none;
+  color: #0F2A4A;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.nav-left a:hover {
+  color: #C5A059;
+}
+
+/* Logo Central Evidente e Ampliada */
+.logo-hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 0 30px;
+}
+
+.logo-hero img {
+  height: 120px; /* Logo grande e impositora */
+  width: auto;
+  max-width: 320px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.12));
+  transition: transform 0.3s ease;
+}
+
+.logo-hero img:hover {
+  transform: scale(1.04);
+}
+
+/* Lado Direito - Botão de Ação */
+.header-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1;
+}
+
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  color: #0F2A4A;
+  cursor: pointer;
+}
+
+/* Ajustes para Celular e Tablet */
+@media (max-width: 992px) {
+  .header-centered {
+    padding: 10px 0;
+  }
+
+  .nav-centered {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav-left {
+    display: none; /* Esconde menu padrão no mobile */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #FFFFFF;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    gap: 15px;
+  }
+
+  .nav-left.active {
+    display: flex;
+  }
+
+  .logo-hero {
+    padding: 0;
+  }
+
+  .logo-hero img {
+    height: 75px; /* Tamanho ajustado para não quebrar a tela do celular */
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
 .nav {
   display: flex;
   justify-content: space-between;
