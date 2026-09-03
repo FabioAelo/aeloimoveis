@@ -1,87 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!-- Header Centralizado Premium -->
-<header class="header header-centered">
-  <div class="container nav-centered">
-    
-    <!-- Menu Lado Esquerdo -->
-    <nav class="nav-left" aria-label="Navegação principal" id="mainNav">
-      <a href="#imoveis">Imóveis</a>
-      <a href="#servicos">Serviços</a>
-      <a href="#sobre">A Aelo</a>
-      <a href="#anuncie">Anuncie</a>
-      <a href="#contato">Contato</a>
-    </nav>
-
-    <!-- Logo Central e Evidente -->
-    <a class="logo-hero" href="#" aria-label="Aelo Imóveis">
-      <img src="logo-aelo-imoveis.png" alt="Aelo Imóveis">
-    </a>
-
-    <!-- Ações Lado Direito -->
-    <div class="header-actions-right">
-      <a class="btn btn-gold" href="https://wa.me/5571992961212" target="_blank" rel="noopener">
-        <i class="fa-brands fa-whatsapp"></i> Fale no WhatsApp
-      </a>
-      <button class="menu-toggle" aria-label="Abrir menu" type="button" onclick="document.getElementById('mainNav').classList.toggle('active')">☰</button>
-    </div>
-
-  </div>
-</header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aelo Imóveis — compra, venda, aluguel e investimentos em Lauro de Freitas e região.">
+  <title>Aelo Imóveis | Encontre seu próximo imóvel</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
-  <!-- Barra Topo / Credenciamento -->
+  <!-- Topo Credenciais -->
   <div class="top-bar">
-    <div class="top-bar-info">
-      <span><i class="fa-solid fa-location-dot"></i> Lauro de Freitas e Região - BA</span>
-      <span><i class="fa-solid fa-phone"></i> (71) 99296-1212</span>
-      <span><i class="fa-solid fa-envelope"></i> fabioaeloimoveis@gmail.com</span>
-    </div>
-    <div>
-      <span class="creci-badge">CRECI-BA 31100 • CNAI 56127</span>
-    </div>
-  </div>
-<!-- Header -->
-<header class="header">
-  <div class="container nav">
-    <a class="logo" href="#" aria-label="Aelo Imóveis">
-      <img src="logo-aelo-imoveis.png" alt="Aelo Imóveis">
-    </a>
-
-    <nav aria-label="Navegação principal" id="mainNav">
-      <a href="#imoveis">Imóveis</a>
-      <a href="#servicos">Serviços</a>
-      <a href="#sobre">A Aelo</a>
-      <a href="#anuncie">Anuncie</a>
-      <a href="#contato">Contato</a>
-    </nav>
-
-    <div class="header-actions">
-      <a class="btn btn-outline" href="https://wa.me/5571992961212" target="_blank" rel="noopener">
-        <i class="fa-brands fa-whatsapp"></i> Fale no WhatsApp
-      </a>
-      <button class="menu" aria-label="Abrir menu" type="button" onclick="document.getElementById('mainNav').classList.toggle('active')">☰</button>
+    <div class="container top-bar-content">
+      <div class="top-contacts">
+        <span><i class="fa-solid fa-location-dot"></i> Lauro de Freitas e Região - BA</span>
+        <span><i class="fa-solid fa-phone"></i> (71) 99296-1212</span>
+        <span><i class="fa-solid fa-envelope"></i> fabioaeloimoveis@gmail.com</span>
+      </div>
+      <div class="top-creci">
+        CRECI-BA 31100 • CNAI 56127
+      </div>
     </div>
   </div>
-</header>
+
+  <!-- Cabeçalho Principal com Logo Centralizada em Destaque Absoluto -->
+  <header class="main-header">
+    <div class="container header-container">
+      
+      <!-- LOGO CENTRALIZADA E GRANDE -->
+      <div class="brand-hero">
+        <a href="#">
+          <img src="logo-aelo-imoveis.png" alt="Aelo Imóveis" class="site-logo">
+        </a>
+      </div>
+
+      <!-- Barra de Navegação -->
+      <div class="nav-bar">
+        <button class="mobile-toggle" aria-label="Abrir Menu" onclick="document.getElementById('navMenu').classList.toggle('active')">
+          <i class="fa-solid fa-bars"></i> Menu
+        </button>
+
+        <nav id="navMenu" class="nav-menu">
+          <a href="#imoveis">Imóveis</a>
+          <a href="#servicos">Serviços</a>
+          <a href="#sobre">A Aelo</a>
+          <a href="#anuncie">Anuncie seu Imóvel</a>
+          <a href="#contato">Contato</a>
+        </nav>
+
+        <a href="https://wa.me/5571992961212" target="_blank" rel="noopener" class="btn-whatsapp-header">
+          <i class="fa-brands fa-whatsapp"></i> Fale no WhatsApp
+        </a>
+      </div>
+
+    </div>
+  </header>
 
   <main>
-    <!-- Hero Section com Busca Dinâmica -->
-    <section class="hero">
+    <!-- Hero / Busca -->
+    <section class="hero-section">
       <div class="hero-overlay"></div>
-      <div class="container hero-content">
-        <p class="eyebrow">AELO IMÓVEIS • BAHIA</p>
+      <div class="container hero-body">
+        <p class="eyebrow-tag">AELO IMÓVEIS • BAHIA</p>
         <h1>O imóvel certo para<br><em>a próxima fase da sua vida.</em></h1>
-        <p class="hero-text">Encontre casas, apartamentos, terrenos e oportunidades de investimento em Lauro de Freitas e região com suporte especializado.</p>
+        <p class="hero-sub">Encontre casas, apartamentos, terrenos e oportunidades de investimento em Lauro de Freitas e região.</p>
 
-        <div class="search-card" id="imoveis">
+        <!-- Card de Busca Dinâmica -->
+        <div class="search-box" id="imoveis">
           <div class="search-tabs">
             <button class="active" data-purpose="Comprar" type="button">Comprar</button>
             <button data-purpose="Alugar" type="button">Alugar</button>
           </div>
 
-          <div class="search-grid">
-            <label>Tipo de imóvel
+          <div class="search-fields">
+            <div class="field-group">
+              <label for="type">O que procura?</label>
               <select id="type">
                 <option value="">Todos os imóveis</option>
                 <option value="Casa">Casa</option>
@@ -89,13 +87,15 @@
                 <option value="Terreno">Terreno</option>
                 <option value="Comercial">Comercial</option>
               </select>
-            </label>
+            </div>
 
-            <label>Localização
-              <input id="location" placeholder="Ex.: Lauro de Freitas">
-            </label>
+            <div class="field-group">
+              <label for="location">Localização</label>
+              <input id="location" type="text" placeholder="Ex.: Lauro de Freitas">
+            </div>
 
-            <label>Faixa de preço
+            <div class="field-group">
+              <label for="price">Faixa de preço</label>
               <select id="price">
                 <option value="">Qualquer valor</option>
                 <option value="300000">Até R$ 300 mil</option>
@@ -103,139 +103,178 @@
                 <option value="1000000">R$ 600 mil–1 milhão</option>
                 <option value="+1000000">Acima de R$ 1 milhão</option>
               </select>
-            </label>
+            </div>
 
-            <button class="btn btn-gold search-btn" onclick="searchProperties()" type="button">
-              <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            <button class="btn-search" onclick="searchProperties()" type="button">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar Imóveis
             </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Vitrine de Imóveis (Grid renderizado pelo script.js) -->
-    <section class="section">
+    <!-- Oportunidades -->
+    <section class="section-padding">
       <div class="container">
-        <div class="section-head">
+        <div class="section-title-wrap">
           <div>
-            <p class="eyebrow dark">OPORTUNIDADES</p>
-            <h2>Imóveis em Destaque</h2>
+            <p class="eyebrow-dark">DESTAQUES</p>
+            <h2>Imóveis em destaque</h2>
           </div>
-          <a class="text-link" href="#imoveis">Ver todos →</a>
+          <a class="link-arrow" href="#imoveis">Ver todos os imóveis →</a>
         </div>
         <div id="propertyGrid" class="property-grid"></div>
       </div>
     </section>
 
     <!-- Serviços -->
-    <section id="servicos" class="services">
+    <section id="servicos" class="services-section">
       <div class="container">
-        <div class="section-head light">
+        <div class="section-title-wrap light">
           <div>
-            <p class="eyebrow">SOLUÇÕES AELO</p>
+            <p class="eyebrow-tag">SOLUÇÕES AELO</p>
             <h2>Mais do que encontrar imóveis.</h2>
           </div>
         </div>
 
-        <div class="service-grid">
-          <article><div class="icon"><i class="fa-solid fa-house"></i></div><h3>Comprar</h3><p>Encontre seu novo lar com atendimento próximo e orientação em todas as etapas.</p><a href="#contato">Quero comprar →</a></article>
-          <article><div class="icon"><i class="fa-solid fa-bullhorn"></i></div><h3>Vender</h3><p>Divulgue seu imóvel com estratégia, apresentação profissional e atendimento personalizado.</p><a href="#contato">Quero vender →</a></article>
-          <article><div class="icon"><i class="fa-solid fa-chart-line"></i></div><h3>Investir</h3><p>Identifique oportunidades imobiliárias e tome decisões com mais segurança.</p><a href="#contato">Quero investir →</a></article>
-          <article><div class="icon"><i class="fa-solid fa-file-signature"></i></div><h3>Avaliar</h3><p>Avaliação técnica rigorosa NBR 14.653 por perito credenciado (CNAI 56127).</p><a href="#contato">Avaliar imóvel →</a></article>
+        <div class="services-grid">
+          <article class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-house-chimney"></i></div>
+            <h3>Comprar</h3>
+            <p>Encontre seu novo lar com atendimento próximo e orientação em todas as etapas.</p>
+            <a href="#contato">Quero comprar →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-handshake"></i></div>
+            <h3>Vender</h3>
+            <p>Divulgue seu imóvel com estratégia, apresentação profissional e atendimento personalizado.</p>
+            <a href="#contato">Quero vender →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>Investir</h3>
+            <p>Identifique oportunidades imobiliárias e tome decisões com mais segurança.</p>
+            <a href="#contato">Quero investir →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-award"></i></div>
+            <h3>Avaliar</h3>
+            <p>Avaliação mercadológica e técnica com credenciamento pericial CNAI 56127.</p>
+            <a href="#contato">Avaliar imóvel →</a>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- Sobre -->
-    <section id="sobre" class="about">
+    <section id="sobre" class="section-padding">
       <div class="container about-grid">
-        <div class="about-photo"></div>
-        <div>
-          <p class="eyebrow dark">AELO IMÓVEIS</p>
+        <div class="about-image-card"></div>
+        <div class="about-content">
+          <p class="eyebrow-dark">AELO IMÓVEIS</p>
           <h2>Seu negócio imobiliário começa com confiança.</h2>
           <p>Atendimento humano, conhecimento do mercado local e foco em encontrar uma solução que faça sentido para cada cliente.</p>
 
-          <div class="stats">
-            <div><strong>+</strong><span>Atendimento personalizado</span></div>
-            <div><strong>01</strong><span>Parceiro na negociação</span></div>
-            <div><strong>360°</strong><span>Suporte no processo</span></div>
+          <div class="stats-row">
+            <div class="stat-item"><strong>+</strong><span>Atendimento personalizado</span></div>
+            <div class="stat-item"><strong>01</strong><span>Parceiro na negociação</span></div>
+            <div class="stat-item"><strong>360°</strong><span>Suporte no processo</span></div>
           </div>
 
-          <a class="btn btn-dark" href="#contato">Conheça a Aelo</a>
+          <a class="btn-dark" href="#contato">Conheça a Aelo</a>
         </div>
       </div>
     </section>
 
-    <!-- Anuncie seu Imóvel -->
+    <!-- Anuncie seu imóvel -->
     <section class="announce-section" id="anuncie">
-      <div class="announce-copy">
-        <p class="eyebrow dark">ANUNCIE SEU IMÓVEL</p>
-        <h2>Seu imóvel merece uma apresentação à altura.</h2>
-        <p>Envie os dados básicos e fale diretamente com a Aelo pelo WhatsApp.</p>
-        <ul>
-          <li>Avaliação e posicionamento mercadológico</li>
-          <li>Divulgação profissional direcionada</li>
-          <li>Atendimento exclusivo aos interessados</li>
-          <li>Suporte completo na negociação</li>
-        </ul>
-      </div>
+      <div class="container announce-grid">
+        <div class="announce-info">
+          <p class="eyebrow-dark">ANUNCIE SEU IMÓVEL</p>
+          <h2>Seu imóvel merece uma apresentação à altura.</h2>
+          <p>Envie os dados básicos e fale diretamente com a Aelo pelo WhatsApp.</p>
+          <ul class="check-list">
+            <li><i class="fa-solid fa-check"></i> Avaliação e posicionamento mercadológico</li>
+            <li><i class="fa-solid fa-check"></i> Divulgação profissional direcionada</li>
+            <li><i class="fa-solid fa-check"></i> Atendimento exclusivo aos interessados</li>
+            <li><i class="fa-solid fa-check"></i> Suporte completo na negociação</li>
+          </ul>
+        </div>
 
-      <form id="ownerForm" class="owner-form">
-        <input id="ownerName" required placeholder="Seu nome">
-        <input id="ownerPhone" required placeholder="WhatsApp">
-        <select id="ownerType" required>
-          <option value="">Tipo do imóvel</option>
-          <option>Apartamento</option><option>Casa</option><option>Terreno</option><option>Comercial</option>
-        </select>
-        <input id="ownerLocation" placeholder="Cidade / bairro">
-        <select id="ownerPurpose" required>
-          <option value="">Objetivo</option><option>Vender</option><option>Alugar</option><option>Avaliar</option>
-        </select>
-        <textarea id="ownerMsg" rows="3" placeholder="Conte um pouco sobre o imóvel"></textarea>
-        <button class="premium-btn" type="submit">Enviar pelo WhatsApp</button>
-      </form>
+        <form id="ownerForm" class="owner-form-card">
+          <input id="ownerName" required placeholder="Seu nome">
+          <input id="ownerPhone" required placeholder="WhatsApp">
+          <select id="ownerType" required>
+            <option value="">Tipo do imóvel</option>
+            <option>Apartamento</option>
+            <option>Casa</option>
+            <option>Terreno</option>
+            <option>Comercial</option>
+          </select>
+          <input id="ownerLocation" placeholder="Cidade / bairro">
+          <select id="ownerPurpose" required>
+            <option value="">Objetivo</option>
+            <option>Vender</option>
+            <option>Alugar</option>
+            <option>Avaliar</option>
+          </select>
+          <textarea id="ownerMsg" rows="3" placeholder="Conte um pouco sobre o imóvel"></textarea>
+          <button class="btn-gold-submit" type="submit">Enviar pelo WhatsApp</button>
+        </form>
+      </div>
     </section>
 
     <!-- Contato -->
-    <section id="contato" class="contact">
+    <section id="contato" class="section-padding bg-light">
       <div class="container contact-grid">
-        <div>
-          <p class="eyebrow dark">FALE CONOSCO</p>
+        <div class="contact-details">
+          <p class="eyebrow-dark">FALE CONOSCO</p>
           <h2>Vamos conversar sobre seu próximo imóvel?</h2>
-          <p>Entre em contato para comprar, vender, alugar ou avaliar seu imóvel.</p>
+          <p>Entre em contato com a Aelo Imóveis para comprar, vender, alugar ou avaliar seu imóvel.</p>
 
-          <div class="contact-info">
+          <div class="info-blocks">
             <p><strong>Telefone / WhatsApp:</strong><br>(71) 99296-1212</p>
             <p><strong>E-mail:</strong><br><a href="mailto:fabioaeloimoveis@gmail.com">fabioaeloimoveis@gmail.com</a></p>
             <p><strong>CRECI-BA:</strong> 31100<br><strong>CNAI:</strong> 56127</p>
           </div>
 
-          <a class="whatsapp" href="https://wa.me/5571992961212" target="_blank" rel="noopener">WhatsApp • Atendimento</a>
+          <a class="btn-whatsapp-direct" href="https://wa.me/5571992961212" target="_blank" rel="noopener">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp • Atendimento
+          </a>
         </div>
 
-        <form onsubmit="sendLead(event)">
+        <form class="contact-form" onsubmit="sendLead(event)">
           <input required id="name" placeholder="Seu nome">
           <input required id="phone" placeholder="WhatsApp / telefone">
           <select id="interest">
-            <option>Quero comprar</option><option>Quero alugar</option><option>Quero vender</option><option>Quero avaliar meu imóvel</option><option>Quero investir</option>
+            <option>Quero comprar</option>
+            <option>Quero alugar</option>
+            <option>Quero vender</option>
+            <option>Quero avaliar meu imóvel</option>
+            <option>Quero investir</option>
           </select>
           <textarea id="message" rows="4" placeholder="Como podemos ajudar?"></textarea>
-          <button class="btn btn-dark" type="submit">Enviar solicitação</button>
+          <button class="btn-dark" type="submit">Enviar solicitação</button>
         </form>
       </div>
     </section>
   </main>
 
-  <footer class="premium-footer">
-    <div class="footer-inner">
-      <img src="logo-aelo-imoveis.png" alt="Aelo Imóveis">
-      <div><strong>AELO IMÓVEIS</strong><span>Compra • Venda • Aluguel • Investimentos</span></div>
-      <div><span>CRECI-BA 31100 • CNAI 56127</span><span>(71) 99296-1212</span><span>fabioaeloimoveis@gmail.com</span></div>
+  <!-- Rodapé -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <img src="logo-aelo-imoveis.png" alt="Aelo Imóveis" class="footer-logo">
+      <p class="footer-tagline"><strong>AELO IMÓVEIS</strong> — Compra • Venda • Aluguel • Investimentos</p>
+      <p class="footer-creci">CRECI-BA 31100 • CNAI 56127 | (71) 99296-1212 | fabioaeloimoveis@gmail.com</p>
       <div class="footer-copy">© 2026 Aelo Imóveis. Todos os direitos reservados.</div>
     </div>
   </footer>
 
-  <a class="float-whatsapp" href="https://wa.me/5571992961212" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <!-- Flutuante WhatsApp -->
+  <a class="whatsapp-float" href="https://wa.me/5571992961212" target="_blank" rel="noopener" aria-label="WhatsApp">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
