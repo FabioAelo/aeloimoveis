@@ -23,7 +23,7 @@ body {
 
 h1, h2, h3 { font-family: 'Playfair Display', serif; }
 
-/* Top Bar */
+/* Top Bar - Ajustada e sem sobreposição */
 .top-bar {
   background: #0A1C33;
   color: #E2E8F0;
@@ -34,7 +34,7 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; }
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
-  z-index: 1001;
+  z-index: 1002;
 }
 
 .top-bar-info span {
@@ -57,14 +57,15 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; }
   white-space: nowrap;
 }
 
-/* Header & Nav */
+/* Header & Nav com Super Destaque na Logo */
 .header {
   position: sticky;
   top: 0;
-  background: #FFFFFF; /* Fundo branco sólido para dar total visibilidade à logo */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-bottom: 2px solid #C5A059; /* Linha dourada discreta abaixo do cabeçalho */
   z-index: 1000;
-  padding: 10px 0;
+  padding: 12px 0;
 }
 
 .nav {
@@ -74,19 +75,33 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; }
   padding: 0 5%;
 }
 
-/* Ajuste de tamanho e destaque da logo */
-.logo img {
-  height: 65px; /* Aumentado para dar destaque */
-  width: auto;
-  display: block;
-  object-fit: contain;
+/* Destaque Máximo na Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  padding-right: 20px;
 }
 
+.logo img {
+  height: 85px; /* Tamanho ampliado para destaque total */
+  width: auto;
+  max-width: 280px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.08)); /* Sombra suave para sobressair */
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.03); /* Leve efeito ao passar o mouse */
+}
+
+/* Navegação ajustada ao lado da logo */
 nav a {
-  margin: 0 15px;
+  margin: 0 12px;
   text-decoration: none;
-  color: #0F2A4A; /* Texto escuro para contraste no fundo claro */
-  font-weight: 600;
+  color: #0F2A4A;
+  font-weight: 700;
   font-size: 0.95rem;
   transition: all 0.3s ease;
 }
@@ -98,7 +113,7 @@ nav a:hover {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .btn {
