@@ -1,9 +1,10 @@
-AELO IMÓVEIS V4 — PROTÓTIPO INTEGRADO
-Coloque os arquivos na raiz do repositório GitHub:
-index.html, style.css, script.js e a pasta assets.
+AELO IMÓVEIS — V4 GITHUB FINAL
 
-Esta versão integra a home + catálogo + detalhes em uma única experiência.
-Os imóveis e imagens atuais são demonstração. Antes da publicação, substituir por dados reais
-e configurar o número oficial do WhatsApp.
+Arquivos prontos para enviar diretamente para a raiz da branch principal do repositório.
 
-Próxima etapa: painel administrativo e banco de dados para cadastrar imóveis sem editar código.
+- index.html
+- estilo.css
+- script.js
+- logo-aelo-imoveis.png
+
+IMPORTANTE: substitua os arquivos atuais com estes quatro arquivos. Não é necessário alterar a configuração do GitHub Pages: ela deve continuar em principal / (raiz).
