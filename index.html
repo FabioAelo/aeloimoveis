@@ -1,326 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AELO Imóveis | Avaliações & Perícias Imobiliárias</title>
-  <style>
-    :root {
-      --bg-dark: #0a111e;
-      --card-bg: #131d2e;
-      --gold: #d4af37;
-      --gold-light: #f3e5ab;
-      --silver: #e0e0e0;
-      --text: #ffffff;
-      --accent: rgba(212, 175, 55, 0.15);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    header {
-      background-color: rgba(10, 17, 30, 0.95);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-      z-index: 100;
-      backdrop-filter: blur(5px);
-    }
-
-    .logo img {
-      height: 65px;
-    }
-
-    nav a {
-      color: var(--silver);
-      text-decoration: none;
-      margin-left: 1.5rem;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-
-    nav a:hover {
-      color: var(--gold);
-    }
-
-    .hero {
-      text-align: center;
-      padding: 5rem 1rem 4rem;
-      background: radial-gradient(circle, rgba(19, 29, 46, 1) 0%, rgba(10, 17, 30, 1) 100%);
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .hero p {
-      color: var(--silver);
-      font-size: 1.2rem;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 3rem 1rem;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 2rem;
-      color: var(--gold);
-      margin-bottom: 2.5rem;
-      position: relative;
-    }
-
-    .section-title::after {
-      content: '';
-      display: block;
-      width: 60px;
-      height: 2px;
-      background: var(--gold);
-      margin: 0.5rem auto 0;
-    }
-
-    /* Especialidades */
-    .specialties-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .specialty-card {
-      background-color: var(--card-bg);
-      padding: 2rem;
-      border-radius: 8px;
-      border: 1px solid var(--gold);
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
-
-    .specialty-card h3 {
-      color: var(--gold-light);
-      font-size: 1.4rem;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Formação Acadêmica */
-    .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .timeline-item {
-      background-color: var(--card-bg);
-      padding: 1.2rem 1.5rem;
-      border-radius: 6px;
-      border-left: 4px solid var(--gold);
-    }
-
-    .timeline-item h4 {
-      color: var(--gold);
-      font-size: 1.1rem;
-    }
-
-    .timeline-item p {
-      color: var(--silver);
-      font-size: 0.95rem;
-    }
-
-    /* Certificações Grid */
-    .cert-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-
-    .cert-item {
-      background-color: var(--card-bg);
-      padding: 1rem;
-      border-radius: 6px;
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .cert-item::before {
-      content: '✓';
-      color: var(--gold);
-      font-weight: bold;
-      margin-right: 10px;
-    }
-
-    /* Serviços (Atuação) */
-    .services-list {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      margin-top: 1rem;
-    }
-
-    .service-item {
-      background: var(--card-bg);
-      border: 1px solid var(--gold);
-      color: var(--gold-light);
-      padding: 0.8rem 2rem;
-      border-radius: 25px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .cta-section {
-      text-align: center;
-      padding: 4rem 1rem;
-      background-color: var(--card-bg);
-      border-top: 1px solid rgba(212, 175, 55, 0.2);
-    }
-
-    .btn {
-      display: inline-block;
-      background: linear-gradient(45deg, #d4af37, #f3e5ab);
-      color: #0a111e;
-      padding: 1rem 2.5rem;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 5px;
-      margin-top: 1.5rem;
-      font-size: 1.1rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-    }
-
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--silver);
-      font-size: 0.9rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aelo Imóveis — Negócios Imobiliários</title>
+<meta name="description" content="Aelo Imóveis — compra, venda, aluguel e investimentos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header class="topbar">
+  <a class="logo" href="#inicio"><img src="assets/logo-aelo.jpg" alt="Aelo Imóveis"></a>
+  <nav>
+    <a href="#imoveis">Comprar</a>
+    <a href="#imoveis">Alugar</a>
+    <a href="#servicos">Serviços</a>
+    <a href="#sobre">Aelo Imóveis</a>
+    <a href="#contato">Contato</a>
+  </nav>
+  <a class="outline" href="#contato">Tenho um imóvel</a>
+  <button class="menu" aria-label="Abrir menu">☰</button>
+</header>
 
-  <!-- Header / Navegação -->
-  <header>
-    <div class="logo">
-      <img src="logo-aelo-imoveis.png" alt="AELO Imóveis Logo">
+<section class="hero" id="inicio">
+  <div class="hero-shade"></div>
+  <div class="hero-copy">
+    <div class="kicker">AELO IMÓVEIS • NEGÓCIOS IMOBILIÁRIOS</div>
+    <h1>Onde bons negócios<br><em>encontram bons endereços.</em></h1>
+    <p>Compra, venda, aluguel e investimentos com uma experiência mais segura, próxima e estratégica.</p>
+  </div>
+
+  <div class="search">
+    <div class="tabs"><button class="active" data-purpose="Comprar">Comprar</button><button data-purpose="Alugar">Alugar</button><button data-purpose="Investir">Investir</button></div>
+    <div class="search-row">
+      <label><span>Localização</span><input id="location" placeholder="Cidade, bairro ou condomínio"></label>
+      <label><span>Tipo de imóvel</span><select id="type"><option>Todos</option><option>Apartamento</option><option>Casa</option><option>Comercial</option></select></label>
+      <label><span>Quartos</span><select><option>Qualquer</option><option>1+</option><option>2+</option><option>3+</option><option>4+</option></select></label>
+      <button id="searchBtn" class="gold">Encontrar imóvel</button>
     </div>
-    <nav>
-      <a href="#especialidades">Especialidades</a>
-      <a href="#formacao">Formação</a>
-      <a href="#certificacoes">Certificações</a>
-      <a href="#contato">Contato</a>
-    </nav>
-  </header>
+    <div id="searchMsg" class="search-msg"></div>
+  </div>
+</section>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h1>Perícia & Avaliação Imobiliária</h1>
-    <p>Segurança técnica, análises mercadológicas precisas e laudos periciais com alto rigor de documentação e conformidade legal.</p>
-  </section>
+<section class="trust">
+  <div><strong>Compra</strong><span>Encontre seu próximo imóvel</span></div>
+  <div><strong>Venda</strong><span>Valorize e divulgue seu patrimônio</span></div>
+  <div><strong>Aluguel</strong><span>Praticidade para morar ou investir</span></div>
+  <div><strong>Investimentos</strong><span>Decisões imobiliárias estratégicas</span></div>
+</section>
 
-  <!-- Especialidades -->
-  <section id="especialidades" class="container">
-    <h2 class="section-title">Especialidades</h2>
-    <div class="specialties-grid">
-      <div class="specialty-card">
-        <h3>Avaliação de Imóveis</h3>
-        <p>Determinação técnica do valor de mercado para fins de comercialização, inventários, garantias e análises judiciais/extrajudiciais.</p>
-      </div>
-      <div class="specialty-card">
-        <h3>Laudos Periciais</h3>
-        <p>Elaboração de pareceres técnicos com rigor metodológico, perícia judicial e fundamentação legal completa.</p>
-      </div>
-    </div>
+<section class="section" id="imoveis">
+  <div class="heading">
+    <div><span class="kicker gold-text">SELEÇÃO AELO</span><h2>Imóveis em destaque</h2></div>
+    <button class="ghost">Ver todos →</button>
+  </div>
+  <div class="property-grid">
+    <article class="card">
+      <div class="pic pic-a"><span>DESTAQUE</span></div>
+      <div class="card-content"><small>LAURO DE FREITAS • BA</small><h3>Luggo Vilas Parque</h3><p>Condomínio residencial</p><div class="meta"><span>Conhecer imóvel</span><b>↗</b></div></div>
+    </article>
+    <article class="card">
+      <div class="pic pic-b"></div>
+      <div class="card-content"><small>PATAMARES • SALVADOR</small><h3>Sensia Patamares</h3><p>Residencial contemporâneo</p><div class="meta"><span>Conhecer imóvel</span><b>↗</b></div></div>
+    </article>
+    <article class="card">
+      <div class="pic pic-c"></div>
+      <div class="card-content"><small>BAHIA</small><h3>Vista do Joanes</h3><p>Conforto e localização</p><div class="meta"><span>Conhecer imóvel</span><b>↗</b></div></div>
+    </article>
+  </div>
+</section>
 
-    <!-- Atuação Comercial -->
-    <div class="services-list">
-      <div class="service-item">COMPRA</div>
-      <div class="service-item">VENDA</div>
-      <div class="service-item">ALUGUEL</div>
-      <div class="service-item">INVESTIMENTOS</div>
-    </div>
-  </section>
+<section class="dark-section" id="servicos">
+  <div class="heading"><div><span class="kicker gold-text">EXPERIÊNCIA AELO</span><h2>Mais que imóveis.<br><em>Boas decisões.</em></h2></div></div>
+  <div class="service-grid">
+    <div><i>01</i><h3>Compra & venda</h3><p>Assessoria do primeiro contato à conclusão do negócio.</p></div>
+    <div><i>02</i><h3>Locação</h3><p>Encontre oportunidades para morar ou gerar renda.</p></div>
+    <div><i>03</i><h3>Investimentos</h3><p>Olhar estratégico para patrimônio e oportunidades.</p></div>
+    <div><i>04</i><h3>Avaliações & perícias</h3><p>Suporte técnico para decisões e operações imobiliárias.</p></div>
+  </div>
+</section>
 
-  <!-- Formação Acadêmica -->
-  <section id="formacao" class="container">
-    <h2 class="section-title">Formação Acadêmica</h2>
-    <div class="timeline">
-      <div class="timeline-item">
-        <h4>Pós-Graduação em Negócios Imobiliários</h4>
-        <p>Unime (Em andamento)</p>
-      </div>
-      <div class="timeline-item">
-        <h4>Pós-Graduação em Computação Forense e Perícia Digital</h4>
-        <p>Unime</p>
-      </div>
-      <div class="timeline-item">
-        <h4>Curso Superior em Gestão de Redes de Computadores</h4>
-        <p>Unifacs Laureate</p>
-      </div>
-    </div>
-  </section>
+<section class="split" id="sobre">
+  <div class="split-photo"></div>
+  <div class="split-copy">
+    <span class="kicker gold-text">A AELO</span>
+    <h2>Seu patrimônio merece uma imobiliária à altura.</h2>
+    <p>Aelo Imóveis — Negócios Imobiliários. Um posicionamento pensado para unir atendimento próximo, apresentação sofisticada e visão de patrimônio.</p>
+    <div class="points"><div><b>01</b><span>Atendimento personalizado</span></div><div><b>02</b><span>Negociação transparente</span></div><div><b>03</b><span>Visão de longo prazo</span></div></div>
+  </div>
+</section>
 
-  <!-- Certificações -->
-  <section id="certificacoes" class="container">
-    <h2 class="section-title">Certificações & Qualificações Técnicas</h2>
-    <div class="cert-grid">
-      <div class="cert-item">Curso Avaliação Imóveis – IBREP (CNAI)</div>
-      <div class="cert-item">Perito Judicial – CNDP (Reg: 3976/2025)</div>
-      <div class="cert-item">Perito Judicial – CRECI</div>
-      <div class="cert-item">Perito Judicial – EducaWeb</div>
-      <div class="cert-item">Avaliação e Perícia de Imóveis – Anhanguera</div>
-      <div class="cert-item">Documentação Imobiliária – CRECI</div>
-      <div class="cert-item">Regularização de Imóveis – Rebouças & Bulhões Adv.</div>
-      <div class="cert-item">Sistema Registral e Notarial Arquivo – CRECI</div>
-      <div class="cert-item">Noções Básicas de Negociação – CRECI</div>
-      <div class="cert-item">Fotografia Imobiliária – CRECI</div>
-      <div class="cert-item">Projetos Arquitetônicos – Grupo Repom</div>
-      <div class="cert-item">Projetos Elétricos – Grupo Repom</div>
-      <div class="cert-item">Drones: Conceito, Legislação e Operação</div>
-      <div class="cert-item">Direito Cibernético – Educaweb</div>
-      <div class="cert-item">Segurança da Informação – AILOS</div>
-    </div>
-  </section>
+<section class="contact" id="contato">
+  <div><span class="kicker">FALE COM A AELO</span><h2>Vamos encontrar<br>o próximo passo.</h2><p>Procura um imóvel ou quer colocar o seu no mercado? Fale com a nossa equipe.</p></div>
+  <div class="contact-card">
+    <div><small>ATENDIMENTO</small><strong>Lauro de Freitas • Bahia</strong></div>
+    <div><small>WEBSITE</small><strong>www.aeloimoveis.com</strong></div>
+    <a class="gold" href="mailto:contato@aeloimoveis.com">Entrar em contato →</a>
+  </div>
+</section>
 
-  <!-- Chamada para Ação / Contato -->
-  <section id="contato" class="cta-section">
-    <h2>Solicite um Laudo ou Consultoria</h2>
-    <p>Agende um atendimento técnico e garanta a melhor avaliação para o seu patrimônio.</p>
-    <a href="https://wa.me/5500000000000" class="btn" target="_blank">Entrar em Contato pelo WhatsApp</a>
-  </section>
-
-  <!-- Rodapé -->
-  <footer>
-    <p>&copy; 2026 AELO Imóveis. Todos os direitos reservados.</p>
-  </footer>
-
+<footer>
+  <div class="footer-logo"><img src="assets/logo-aelo.jpg" alt="Aelo Imóveis"><p>Compra • Venda • Aluguel • Investimentos</p></div>
+  <div><small>MENU</small><a href="#inicio">Início</a><a href="#imoveis">Imóveis</a><a href="#servicos">Serviços</a><a href="#sobre">Sobre</a></div>
+  <div><small>CONTATO</small><p>Lauro de Freitas • Bahia</p><p>contato@aeloimoveis.com</p></div>
+  <div><small>ONLINE</small><a href="https://www.aeloimoveis.com" target="_blank">www.aeloimoveis.com</a></div>
+</footer>
+<div class="copy">© 2026 Aelo Imóveis • Negócios Imobiliários</div>
+<script src="script.js"></script>
 </body>
 </html>
