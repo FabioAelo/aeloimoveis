@@ -13,15 +13,15 @@
 html{scroll-behavior:smooth}
 body{margin:0;font-family:"DM Sans",Arial,sans-serif;color:var(--ink);background:#fff}
 a{text-decoration:none;color:inherit}
-.site-header{height:228px;background:var(--navy);color:#fff;position:relative;z-index:20}
-.header-inner{max-width:1500px;height:100%;margin:auto;padding:0 56px;display:grid;grid-template-columns:1fr 260px 1fr;align-items:center;gap:30px}
+.site-header{height:285px;background:var(--navy);color:#fff;position:relative;z-index:20}
+.header-inner{max-width:1500px;height:100%;margin:auto;padding:0 56px;display:grid;grid-template-columns:1fr 360px 1fr;align-items:center;gap:30px}
 .nav{display:flex;align-items:center;gap:42px;font-weight:500}
 .nav-left{justify-content:flex-end}
 .nav-right{justify-content:flex-start}
 .nav a{opacity:.94;transition:.2s}
 .nav a:hover{color:var(--gold-light)}
-.brand{width:260px;height:220px;display:flex;align-items:center;justify-content:center;position:relative}
-.brand img{max-width:240px;max-height:210px;object-fit:contain}
+.brand{width:360px;height:280px;display:flex;align-items:center;justify-content:center;position:relative}
+.brand img{width:270px;height:270px;max-width:none;max-height:none;object-fit:contain;object-fit:contain}
 .brand-fallback{display:none;text-align:center;font-family:Georgia,serif;font-size:58px;letter-spacing:10px;color:#f4f4f4}
 .brand-fallback small{display:block;font:500 12px "DM Sans";letter-spacing:7px;color:var(--gold)}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:2px;font-weight:700;transition:.25s;border:1px solid transparent}
@@ -86,9 +86,9 @@ footer{padding:30px 6vw;display:flex;justify-content:space-between;background:#0
 .modal-meta{display:flex;gap:15px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;margin:22px 0}
 .modal-close{position:absolute;right:15px;top:10px;border:0;background:#fff;border-radius:50%;font-size:30px;width:42px;height:42px;cursor:pointer;z-index:2}
 @media(max-width:1000px){
-  .site-header{height:150px}.header-inner{grid-template-columns:1fr 180px 1fr;padding:0 25px}.brand{width:180px;height:145px}.brand img{max-width:175px;max-height:140px}.nav{gap:18px;font-size:14px}.btn-header{padding:0 14px}
+  .site-header{height:205px}.header-inner{grid-template-columns:1fr 270px 1fr;padding:0 25px}.brand{width:180px;height:145px}.brand img{max-width:175px;max-height:140px}.nav{gap:18px;font-size:14px}.btn-header{padding:0 14px}
   .hero{min-height:560px}.quick-links{grid-template-columns:repeat(2,1fr)}.quick-links>a:nth-child(2){border-right:0}.property-grid{grid-template-columns:repeat(2,1fr)}.services{grid-template-columns:1fr;gap:45px}.about{grid-template-columns:1fr;gap:10px}
 }
 @media(max-width:700px){
-  .site-header{height:92px}.header-inner{display:flex;justify-content:space-between;padding:0 18px}.nav{display:none}.brand{width:170px;height:90px}.brand img{max-width:160px;max-height:84px}.menu-toggle{display:block}.hero-content{margin-left:25px;margin-right:25px;padding:65px 0}.hero h1{font-size:48px}.hero-copy{font-size:16px}.quick-links{grid-template-columns:1fr}.quick-links>a{border-right:0;border-bottom:1px solid var(--line);min-height:90px}.section,.services,.about,.contact{padding:70px 25px}.section-heading{display:block}.section-heading>p{margin-top:20px}.property-grid{grid-template-columns:1fr}.modal-card{grid-template-columns:1fr}.modal-card>img{min-height:230px;height:230px}.modal-body{padding:28px}.contact{display:block}.contact .btn{margin-top:25px}footer{padding:25px;display:block}footer span{display:block;margin:5px 0}
+  .site-header{height:118px}.header-inner{display:flex;justify-content:space-between;padding:0 18px}.nav{display:none}.brand{width:170px;height:90px}.brand img{max-width:160px;max-height:84px}.menu-toggle{display:block}.hero-content{margin-left:25px;margin-right:25px;padding:65px 0}.hero h1{font-size:48px}.hero-copy{font-size:16px}.quick-links{grid-template-columns:1fr}.quick-links>a{border-right:0;border-bottom:1px solid var(--line);min-height:90px}.section,.services,.about,.contact{padding:70px 25px}.section-heading{display:block}.section-heading>p{margin-top:20px}.property-grid{grid-template-columns:1fr}.modal-card{grid-template-columns:1fr}.modal-card>img{min-height:230px;height:230px}.modal-body{padding:28px}.contact{display:block}.contact .btn{margin-top:25px}footer{padding:25px;display:block}footer span{display:block;margin:5px 0}
 }
