@@ -1,0 +1,9 @@
+AELO IMÓVEIS V4 — PROTÓTIPO INTEGRADO
+Coloque os arquivos na raiz do repositório GitHub:
+index.html, style.css, script.js e a pasta assets.
+
+Esta versão integra a home + catálogo + detalhes em uma única experiência.
+Os imóveis e imagens atuais são demonstração. Antes da publicação, substituir por dados reais
+e configurar o número oficial do WhatsApp.
+
+Próxima etapa: painel administrativo e banco de dados para cadastrar imóveis sem editar código.
