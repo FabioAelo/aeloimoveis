@@ -92,3 +92,30 @@ footer{padding:30px 6vw;display:flex;justify-content:space-between;background:#0
 @media(max-width:700px){
   .site-header{height:118px}.header-inner{display:flex;justify-content:space-between;padding:0 18px}.nav{display:none}.brand{width:170px;height:90px}.brand img{max-width:160px;max-height:84px}.menu-toggle{display:block}.hero-content{margin-left:25px;margin-right:25px;padding:65px 0}.hero h1{font-size:48px}.hero-copy{font-size:16px}.quick-links{grid-template-columns:1fr}.quick-links>a{border-right:0;border-bottom:1px solid var(--line);min-height:90px}.section,.services,.about,.contact{padding:70px 25px}.section-heading{display:block}.section-heading>p{margin-top:20px}.property-grid{grid-template-columns:1fr}.modal-card{grid-template-columns:1fr}.modal-card>img{min-height:230px;height:230px}.modal-body{padding:28px}.contact{display:block}.contact .btn{margin-top:25px}footer{padding:25px;display:block}footer span{display:block;margin:5px 0}
 }
+
+/* V7 — identidade premium: cabeçalho preto e aplicação limpa da marca */
+:root{
+  --navy:#08090b;
+  --navy-2:#0d1014;
+  --gold:#d8a33a;
+  --gold-light:#f0c45b;
+}
+.site-header{height:156px;background:#08090b;border-bottom:1px solid rgba(216,163,58,.18)}
+.header-inner{max-width:1500px;height:100%;padding:0 50px;grid-template-columns:1fr 250px 1fr;gap:28px}
+.nav{gap:38px}
+.nav a{font-size:15px;letter-spacing:.2px}
+.brand{width:250px;height:156px;overflow:hidden;align-items:flex-start}
+.brand img{width:230px;height:auto;max-width:none;max-height:none;object-fit:contain;margin-top:-2px}
+.btn-header{margin-left:4px}
+.services{background:#08090b}
+footer{background:#050607}
+.about{background:#f3f1eb;grid-template-columns:.75fr 1.25fr;align-items:center}
+.about-brand{display:flex;justify-content:center;align-items:center}
+.about-brand img{width:min(360px,100%);height:auto;display:block}
+.about>div:last-child>p:last-child{font-size:20px;line-height:1.8;color:#5e6875;margin:30px 0 0}
+@media(max-width:1000px){
+  .site-header{height:132px}.header-inner{grid-template-columns:1fr 205px 1fr;padding:0 25px}.brand{width:205px;height:132px}.brand img{width:190px}.nav{gap:18px;font-size:14px}.btn-header{padding:0 14px}
+}
+@media(max-width:700px){
+  .site-header{height:92px}.header-inner{display:flex;justify-content:space-between;padding:0 18px}.brand{width:155px;height:92px}.brand img{width:150px;margin-top:-2px}.menu-toggle{display:block}.about{grid-template-columns:1fr;gap:30px}.about-brand img{width:280px}
+}
