@@ -117,5 +117,26 @@ footer{background:#050607}
   .site-header{height:132px}.header-inner{grid-template-columns:1fr 205px 1fr;padding:0 25px}.brand{width:205px;height:132px}.brand img{width:190px}.nav{gap:18px;font-size:14px}.btn-header{padding:0 14px}
 }
 @media(max-width:700px){
-  .site-header{height:92px}.header-inner{display:flex;justify-content:space-between;padding:0 18px}.brand{width:155px;height:92px}.brand img{width:150px;margin-top:-2px}.menu-toggle{display:block}.about{grid-template-columns:1fr;gap:30px}.about-brand img{width:280px}
+  .site-header{height:92px}
+  .header-inner{display:flex;justify-content:space-between;align-items:center;padding:0 18px;position:relative}
+  .nav{display:none}
+  .brand{width:130px;height:92px;overflow:hidden;align-items:center;justify-content:flex-start}
+  .brand img{width:122px;height:auto;max-width:none;max-height:none;margin:0;display:block}
+  .menu-toggle{display:flex;width:46px;height:46px;padding:10px;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;position:relative;z-index:42}
+  .menu-toggle span{display:block;width:26px;height:2px;background:#fff;transition:.25s;border-radius:2px}
+  .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .mobile-menu{position:absolute;top:92px;left:0;right:0;background:rgba(8,9,11,.98);border-top:1px solid rgba(216,163,58,.2);box-shadow:0 18px 35px rgba(0,0,0,.3);padding:10px 18px 18px;display:flex;flex-direction:column;gap:2px;transform:translateY(-12px);opacity:0;visibility:hidden;pointer-events:none;transition:.25s;z-index:40}
+  .mobile-menu.open{transform:translateY(0);opacity:1;visibility:visible;pointer-events:auto}
+  .mobile-menu a{padding:15px 10px;color:#fff;font-size:16px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.08)}
+  .mobile-menu a:hover{color:var(--gold-light)}
+  .mobile-menu .mobile-menu-cta{margin-top:10px;background:var(--gold);color:#111;padding:14px 16px;border-bottom:0;text-align:center}
+  .about{grid-template-columns:1fr;gap:30px}.about-brand img{width:280px}
+  .hero{min-height:720px;background-position:center}
+  .hero-content{margin-left:25px;margin-right:25px;padding:65px 0}
+  .hero h1{font-size:48px}
+  .hero-copy{font-size:16px}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .btn{width:100%}
 }

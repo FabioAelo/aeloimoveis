@@ -1,10 +1,27 @@
-AELO IMÓVEIS — V4 GITHUB FINAL
+AELO IMÓVEIS — V8 / BANCO DE DADOS
 
-Arquivos prontos para enviar diretamente para a raiz da branch principal do repositório.
+O site agora pode buscar imóveis do Supabase. Sem configuração, ele continua exibindo os imóveis demonstrativos.
 
-- index.html
-- estilo.css
-- script.js
-- logo-aelo-imoveis.png
+1) Crie um projeto no Supabase.
+2) No SQL Editor, cole e execute database.sql.
+3) Em Authentication > Users, crie o usuário administrador com e-mail e senha.
+4) Abra Project Settings > API e copie a Project URL e a chave anon/publishable.
+5) Edite supabase-config.js:
+   url: "https://SEU-PROJETO.supabase.co"
+   anonKey: "SUA_CHAVE_ANON_OU_PUBLISHABLE"
+6) Publique todos os arquivos no mesmo repositório do GitHub Pages.
+7) Acesse admin.html, faça login e use “+ Novo imóvel”.
 
-IMPORTANTE: substitua os arquivos atuais com estes quatro arquivos. Não é necessário alterar a configuração do GitHub Pages: ela deve continuar em principal / (raiz).
+SEGURANÇA
+- Nunca use a chave service_role no navegador.
+- O banco usa RLS: imóveis são administrados pelo usuário autenticado que os criou.
+- O site público só mostra imóveis com is_published = true.
+
+FOTOS
+- O painel envia a foto para o Storage do Supabase no bucket property-images.
+- O banco grava a URL pública da foto.
+
+PRÓXIMA ETAPA RECOMENDADA
+- Restringir o cadastro de administradores a um único e-mail autorizado.
+- Adicionar galeria com várias fotos por imóvel.
+- Adicionar status vendido/alugado/reservado e formulário de leads.

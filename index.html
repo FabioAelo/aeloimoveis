@@ -25,10 +25,18 @@
       <nav class="nav nav-right" aria-label="Navegação institucional">
         <a href="#aelo">Aelo</a>
         <a href="#contato">Contato</a>
-        <a class="btn btn-gold btn-header" href="#imoveis">Anunciar imóvel</a>
+        <a class="btn btn-gold btn-header" href="admin.html">Anunciar imóvel</a>
       </nav>
 
-      <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+      <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
+
+      <nav class="mobile-menu" id="mobile-menu" aria-label="Menu mobile" aria-hidden="true">
+        <a href="#imoveis">Imóveis</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#aelo">Aelo</a>
+        <a href="#contato">Contato</a>
+        <a class="mobile-menu-cta" href="admin.html">Anunciar imóvel</a>
+      </nav>
     </div>
   </header>
 
@@ -59,7 +67,7 @@
           <p class="eyebrow">PORTFÓLIO AELO</p>
           <h2>Imóveis selecionados.</h2>
         </div>
-        <p>Uma seleção <strong>fictícia</strong> criada para apresentar como o catálogo da Aelo poderá funcionar.</p>
+        <p id="catalog-note">Imóveis selecionados pela Aelo. O catálogo é alimentado pelo painel administrativo.</p>
       </div>
 
       <div class="filters" role="group" aria-label="Filtrar imóveis">
@@ -125,6 +133,8 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

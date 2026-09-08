@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Painel | Aelo Imóveis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header class="admin-header"><a href="index.html" class="back">← Site</a><div class="admin-brand">AELO <small>PAINEL ADMINISTRATIVO</small></div><button id="logoutBtn" class="ghost hidden">Sair</button></header>
+<main class="wrap">
+<section id="setupWarning" class="notice hidden"></section>
+<section id="loginCard" class="card login-card">
+  <p class="eyebrow">ACESSO RESTRITO</p><h1>Entrar no painel.</h1><p>Use o e-mail e a senha do usuário administrador criado no Supabase.</p>
+  <form id="loginForm"><label>E-mail<input id="email" type="email" required autocomplete="username"></label><label>Senha<input id="password" type="password" required autocomplete="current-password"></label><button class="primary" type="submit">Entrar</button><p id="loginMsg" class="msg"></p></form>
+</section>
+<section id="dashboard" class="hidden">
+  <div class="dashboard-head"><div><p class="eyebrow">CATÁLOGO AELO</p><h1>Gerenciar imóveis.</h1></div><button id="newBtn" class="primary">+ Novo imóvel</button></div>
+  <div id="propertyList" class="admin-list"></div>
+</section>
+<section id="editor" class="card hidden">
+  <div class="editor-head"><div><p class="eyebrow">CADASTRO</p><h2 id="editorTitle">Novo imóvel</h2></div><button id="cancelBtn" class="ghost">Cancelar</button></div>
+  <form id="propertyForm" class="form-grid">
+    <input id="propertyId" type="hidden">
+    <label>Título<input id="title" required placeholder="Ex.: Casa Áurea"></label>
+    <label>Tipo<select id="type"><option value="venda">Venda</option><option value="aluguel">Aluguel</option><option value="investimento">Investimento</option></select></label>
+    <label>Localização<input id="location" required placeholder="Bairro • Cidade, UF"></label>
+    <label>Preço<input id="price" type="number" min="0" step="0.01" required placeholder="2480000"></label>
+    <label>Texto do preço<input id="priceLabel" placeholder="Opcional — ex.: R$ 2.480.000"></label>
+    <label>Quartos<input id="bedrooms" type="number" min="0" value="0"></label>
+    <label>Suítes<input id="suites" type="number" min="0" value="0"></label>
+    <label>Vagas<input id="parking" type="number" min="0" value="0"></label>
+    <label>Área (m²)<input id="area" type="number" min="0" step="0.01"></label>
+    <label class="full">Foto principal<input id="imageFile" type="file" accept="image/*"><small id="currentImage"></small></label>
+    <label class="full">Descrição<textarea id="description" rows="5" placeholder="Descrição do imóvel"></textarea></label>
+    <label class="check full"><input id="published" type="checkbox" checked> Publicar no site</label>
+    <div class="actions full"><button type="submit" class="primary">Salvar imóvel</button><span id="saveMsg" class="msg"></span></div>
+  </form>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js"></script>
+</body></html>
