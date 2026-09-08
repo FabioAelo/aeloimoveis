@@ -143,3 +143,68 @@ footer{background:#050607}
   .hero-actions{flex-direction:column;align-items:stretch}
   .hero-actions .btn{width:100%}
 }
+
+/* CORREÇÃO FINAL DA LOGO AELO IMÓVEIS */
+.site-header{
+altura: 170px;
+}
+
+.header-inner{
+altura: 100%;
+}
+
+.marca{
+largura: 260px;
+altura: 170px;
+overflow:visível;
+exibição:flex;
+alinhar-itens:centro;
+justificar-conteúdo:centro;
+}
+
+.marca img{
+largura: 230px;
+altura:automática;
+largura-máxima:nenhuma;
+altura máxima: 160px;
+objeto-ajustado:conter;
+margem:0;
+exibir:bloco;
+}
+
+@media(max-width:700px){
+.site-header{
+altura: 100px;
+}
+
+.header-inner{
+altura: 100%;
+exibição:flex;
+alinhar-itens:centro;
+justify-content:space-between;
+preenchimento:0 18px;
+}
+
+.marca{
+largura: 155px;
+altura: 100px;
+overflow:visível;
+exibição:flex;
+alinhar-itens:centro;
+justify-content:flex-start;
+}
+
+.marca img{
+largura: 145px;
+altura:automática;
+largura-máxima:nenhuma;
+altura máxima: 92px;
+objeto-ajustado:conter;
+margem:0;
+exibir:bloco;
+}
+}
+
+
+
+
