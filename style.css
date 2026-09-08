@@ -144,67 +144,64 @@ footer{background:#050607}
   .hero-actions .btn{width:100%}
 }
 
-/* CORREÇÃO FINAL DA LOGO AELO IMÓVEIS */
+/* FINAL LOGO FIX */
+
 .site-header{
-altura: 170px;
+  height:170px;
 }
 
 .header-inner{
-altura: 100%;
+  height:100%;
 }
 
-.marca{
-largura: 260px;
-altura: 170px;
-overflow:visível;
-exibição:flex;
-alinhar-itens:centro;
-justificar-conteúdo:centro;
+.brand{
+  width:260px;
+  height:170px;
+  overflow:visible;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.marca img{
-largura: 230px;
-altura:automática;
-largura-máxima:nenhuma;
-altura máxima: 160px;
-objeto-ajustado:conter;
-margem:0;
-exibir:bloco;
+.brand img{
+  width:230px;
+  height:auto;
+  max-width:none;
+  max-height:160px;
+  object-fit:contain;
+  margin:0;
+  display:block;
 }
 
 @media(max-width:700px){
-.site-header{
-altura: 100px;
+  .site-header{
+    height:100px;
+  }
+
+  .header-inner{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+  }
+
+  .brand{
+    width:155px;
+    height:100px;
+    overflow:visible;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+  }
+
+  .brand img{
+    width:145px;
+    height:auto;
+    max-width:none;
+    max-height:92px;
+    object-fit:contain;
+    margin:0;
+    display:block;
+  }
 }
-
-.header-inner{
-altura: 100%;
-exibição:flex;
-alinhar-itens:centro;
-justify-content:space-between;
-preenchimento:0 18px;
-}
-
-.marca{
-largura: 155px;
-altura: 100px;
-overflow:visível;
-exibição:flex;
-alinhar-itens:centro;
-justify-content:flex-start;
-}
-
-.marca img{
-largura: 145px;
-altura:automática;
-largura-máxima:nenhuma;
-altura máxima: 92px;
-objeto-ajustado:conter;
-margem:0;
-exibir:bloco;
-}
-}
-
-
-
-
