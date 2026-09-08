@@ -31,6 +31,7 @@ a{text-decoration:none;color:inherit}
 .btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.08)}
 .btn-header{min-height:48px;margin-left:6px}
 .menu-toggle{display:none;background:none;border:0;color:#fff;font-size:28px}
+.mobile-menu{display:none}
 .hero{min-height:630px;background-image:url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=88");background-size:cover;background-position:center;position:relative;color:#fff;display:flex;align-items:center}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,11,18,.88) 0%,rgba(5,11,18,.56) 43%,rgba(5,11,18,.08) 100%)}
 .hero-content{position:relative;z-index:1;max-width:720px;margin-left:max(6vw,60px);padding:80px 0}
@@ -127,11 +128,13 @@ footer{background:#050607}
   .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
   .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
   .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-  .mobile-menu{position:absolute;top:92px;left:0;right:0;background:rgba(8,9,11,.98);border-top:1px solid rgba(216,163,58,.2);box-shadow:0 18px 35px rgba(0,0,0,.3);padding:10px 18px 18px;display:flex;flex-direction:column;gap:2px;transform:translateY(-12px);opacity:0;visibility:hidden;pointer-events:none;transition:.25s;z-index:40}
+  .mobile-menu{display:flex;position:fixed;top:92px;left:0;right:0;background:rgba(8,9,11,.98);border-top:1px solid rgba(216,163,58,.2);box-shadow:0 18px 35px rgba(0,0,0,.3);padding:10px 18px 18px;flex-direction:column;gap:2px;transform:translateY(-12px);opacity:0;visibility:hidden;pointer-events:none;transition:.25s;z-index:40}
   .mobile-menu.open{transform:translateY(0);opacity:1;visibility:visible;pointer-events:auto}
   .mobile-menu a{padding:15px 10px;color:#fff;font-size:16px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.08)}
   .mobile-menu a:hover{color:var(--gold-light)}
   .mobile-menu .mobile-menu-cta{margin-top:10px;background:var(--gold);color:#111;padding:14px 16px;border-bottom:0;text-align:center}
+  .site-header{position:relative;z-index:100}
+  .mobile-menu{z-index:1000}
   .about{grid-template-columns:1fr;gap:30px}.about-brand img{width:280px}
   .hero{min-height:720px;background-position:center}
   .hero-content{margin-left:25px;margin-right:25px;padding:65px 0}
