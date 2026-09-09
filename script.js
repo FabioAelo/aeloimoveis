@@ -88,6 +88,8 @@ document.querySelectorAll(".filter").forEach(button => button.addEventListener("
   button.classList.add("active"); renderProperties(button.dataset.filter);
 }));
 document.querySelector(".modal-close").addEventListener("click", closeModal);
+const modalInterest = document.querySelector(".modal-interest");
+if (modalInterest) modalInterest.addEventListener("click", () => { closeModal(); });
 modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
