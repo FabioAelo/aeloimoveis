@@ -192,3 +192,29 @@ footer{background:#050607}
   .brand img{width:82px;height:82px;max-width:none;max-height:none;object-fit:contain;margin:0}
 }
 .event-2026-image{background-image:linear-gradient(rgba(8,9,11,.18),rgba(8,9,11,.18)),url("referencia-perfil.png");background-size:cover;background-position:center 83%}
+
+
+/* V17.1 — logo do cabeçalho: proporção integral, sem corte */
+.site-header{height:145px;overflow:visible}
+.header-inner{height:145px;grid-template-columns:1fr 190px 1fr;align-items:center;overflow:visible}
+.brand{width:190px;height:145px;overflow:visible;display:flex;align-items:center;justify-content:center}
+.brand img{display:block;width:175px;height:auto;max-width:none;max-height:140px;object-fit:contain;margin:0}
+@media(max-width:1000px){
+  .site-header{height:122px}
+  .header-inner{height:122px;grid-template-columns:1fr 160px 1fr}
+  .brand{width:160px;height:122px}
+  .brand img{width:148px;max-height:116px}
+}
+@media(max-width:700px){
+  .site-header{height:92px}
+  .header-inner{height:92px;display:flex;justify-content:space-between;align-items:center;padding:0 18px}
+  .brand{width:145px;height:92px;justify-content:center}
+  .brand img{width:115px;height:auto;max-height:86px}
+}
+
+
+/* V20 — serviço Corretor Avaliador */
+.service-evaluator h3 small{display:inline-block;margin-left:10px;color:var(--gold-light);font-size:.58em;font-weight:700;letter-spacing:.08em;vertical-align:middle}
+.service-details{grid-column:2;display:grid;gap:10px;margin-top:2px}
+.service-details p{margin:0;color:#b9c1cc;line-height:1.6}
+.service-details strong{color:#fff;font-weight:700}
