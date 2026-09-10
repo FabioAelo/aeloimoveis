@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fabio Aelo | Perfil Profissional — AELO Imóveis</title>
+  <meta name="description" content="Perfil profissional de Fabio Aelo, Corretor de Imóveis — CRECI 31.100 | CNAI 56.127.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=17">
+  <style>
+    .profile-hero{padding:70px max(6vw,50px);background:#f3f1eb;border-bottom:1px solid var(--line)}
+    .profile-hero-inner{max-width:1400px;margin:auto;display:grid;grid-template-columns:390px 1fr;gap:60px;align-items:center}
+    .profile-photo{background:#fff;border:1px solid var(--line);min-height:520px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+    .profile-photo img{width:100%;height:520px;object-fit:contain;object-position:center bottom;display:block}
+    .profile-copy h1{font:700 clamp(48px,5vw,76px)/1 "Playfair Display",Georgia,serif;margin:8px 0 8px;color:var(--navy)}
+    .profile-role{font-size:20px;font-weight:700;color:var(--navy);margin:0 0 20px}
+    .credentials{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 25px}.credential{padding:9px 14px;border:1px solid #d9c59b;background:#fff;font-weight:700;color:var(--navy)}
+    .profile-lead{font:600 26px/1.28 "Playfair Display",Georgia,serif;max-width:780px;margin:0 0 20px;color:var(--navy)}
+    .profile-copy p:not(.eyebrow):not(.profile-role):not(.profile-lead){color:var(--muted);line-height:1.75;max-width:820px}
+    .profile-section{padding:78px max(6vw,50px);background:#fff}.profile-section.alt{background:#faf9f5}.profile-inner{max-width:1400px;margin:auto}.profile-section h2{font:700 clamp(36px,4vw,54px)/1.1 "Playfair Display",Georgia,serif;margin:0 0 16px;color:var(--navy)}.section-intro{max-width:780px;color:var(--muted);line-height:1.7;font-size:18px;margin-bottom:38px}
+    .profile-card{border:1px solid var(--line);padding:30px;background:#fff}.timeline{display:grid;gap:0}.timeline-item{display:grid;grid-template-columns:90px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}.timeline-item:last-child{border-bottom:0}.year{font-weight:800;color:var(--gold);font-size:15px}.timeline-item strong{display:block;color:var(--navy);margin-bottom:5px}.timeline-item span{color:var(--muted);line-height:1.55}
+    .cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 35px;margin:0;padding:0}.cert-grid li{padding:9px 0;color:#3f4650;line-height:1.45;border-bottom:1px solid #eee;list-style:none;position:relative;padding-left:22px}.cert-grid li:before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:800}
+    .events-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.event{border:1px solid var(--line);padding:26px;background:#fff}.event h3{font:700 27px/1.2 "Playfair Display",Georgia,serif;color:var(--navy);margin:0 0 12px}.event p{color:var(--muted);line-height:1.65;margin:7px 0}.event-badge{display:inline-block;padding:7px 11px;background:#f3f1eb;color:var(--navy);font-weight:800;margin-bottom:15px}.event-2026{background:linear-gradient(135deg,#08090b,#161b22);color:#fff}.event-2026 h3,.event-2026 p{color:#fff}.event-2026 .event-badge{background:rgba(216,163,58,.16);color:#f0c45b}
+    .profile-contact{padding:78px max(6vw,50px);background:#08090b;color:#fff}.profile-contact-inner{max-width:1400px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:35px}.profile-contact h2{font:700 44px/1.1 "Playfair Display",Georgia,serif;margin:0 0 12px}.profile-contact p{color:#cbd2dc;line-height:1.65;margin:0}.profile-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.profile-links a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(216,163,58,.55);padding-bottom:3px}.profile-cta-actions{display:flex;flex-direction:column;align-items:flex-end;gap:13px}.profile-cta-actions .btn{white-space:nowrap}.curriculum-link{color:#d9b65b;text-decoration:none;font-weight:700}
+    @media(max-width:900px){.profile-hero-inner{grid-template-columns:1fr;gap:35px}.profile-photo{min-height:430px}.profile-photo img{height:430px}.cert-grid,.events-grid{grid-template-columns:1fr}.profile-contact-inner{flex-direction:column;align-items:flex-start}.profile-cta-actions{align-items:flex-start}}
+    @media(max-width:600px){.profile-hero,.profile-section,.profile-contact{padding-left:24px;padding-right:24px}.profile-hero{padding-top:45px}.profile-copy h1{font-size:50px}.profile-lead{font-size:22px}.timeline-item{grid-template-columns:70px 1fr}.profile-photo{min-height:360px}.profile-photo img{height:360px}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <nav class="nav nav-left" aria-label="Navegação principal">
+        <a href="index.html#imoveis">Imóveis</a><a href="index.html#servicos">Serviços</a>
+      </nav>
+      <a class="brand" href="index.html#inicio" aria-label="Aelo Imóveis — início"><img src="header-logo.png" alt="Aelo Imóveis"></a>
+      <nav class="nav nav-right" aria-label="Navegação institucional">
+        <a href="perfil.html">Sobre</a><a href="index.html#contato">Contato</a><a class="btn btn-gold btn-header" href="admin.html">Área do Corretor</a>
+      </nav>
+      <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
+      <nav class="mobile-menu" id="mobile-menu" aria-label="Menu mobile" aria-hidden="true">
+        <a href="index.html#imoveis">Imóveis</a><a href="index.html#servicos">Serviços</a><a href="perfil.html">Sobre o corretor</a><a href="index.html#contato">Contato</a><a class="mobile-menu-cta" href="admin.html">Área do Corretor</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="profile-hero">
+      <div class="profile-hero-inner">
+        <div class="profile-photo"><img src="foto-fabio-aelo.jpeg" alt="Fabio Aelo, Corretor de Imóveis"></div>
+        <div class="profile-copy">
+          <p class="eyebrow">PERFIL PROFISSIONAL</p>
+          <h1>Fabio Aelo</h1>
+          <p class="profile-role">Corretor de Imóveis</p>
+          <div class="credentials"><span class="credential">CRECI 31.100</span><span class="credential">CNAI 56.127</span><span class="credential">Lauro de Freitas • Camaçari e regiões</span></div>
+          <p class="profile-lead">Uma trajetória construída com experiência, conhecimento e aprendizado contínuo.</p>
+          <p>Minha atuação no mercado imobiliário é pautada pelo compromisso com o cliente, pela busca constante de conhecimento e pela atenção aos detalhes que fazem diferença em cada negociação.</p>
+          <p>Ofereço um atendimento próximo, transparente e responsável, sempre procurando compreender o objetivo de cada cliente e contribuir para a realização de um bom negócio.</p>
+          <div class="profile-links"><a href="https://www.instagram.com/fabioaeloimoveis/" target="_blank" rel="noopener">Instagram @fabioaeloimoveis</a></div>
+          <br>
+          <a class="btn btn-gold" href="https://wa.me/5571992961212" target="_blank" rel="noopener">Falar comigo no WhatsApp</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <div class="profile-inner">
+        <p class="eyebrow">FORMAÇÃO</p><h2>Formação acadêmica</h2>
+        <p class="section-intro">Conhecimento construído por meio da formação acadêmica e do aperfeiçoamento profissional.</p>
+        <div class="profile-card"><div class="timeline">
+          <div class="timeline-item"><div class="year">2026</div><div><strong>Pós-graduação em Negócios Imobiliários</strong></div></div>
+          <div class="timeline-item"><div class="year">2025</div><div><strong>Pós-graduação em Computação Forense e Perícia Digital</strong></div></div>
+          <div class="timeline-item"><div class="year">2012</div><div><strong>Curso Superior em Gestão de Redes de Computadores</strong></div></div>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="profile-section alt">
+      <div class="profile-inner">
+        <p class="eyebrow">APERFEIÇOAMENTO</p><h2>Certificações e cursos</h2>
+        <p class="section-intro">Uma formação complementar que reúne conhecimentos relacionados ao mercado imobiliário, avaliação, documentação, negociação, perícia, tecnologia e projetos.</p>
+        <div class="profile-card"><ul class="cert-grid">
+          <li>Inteligência Artificial — CRECI</li><li>Prevenção à Lavagem de Dinheiro — CRECI</li>
+          <li>Inferência Estatística para Avaliação Imobiliária — CRECI</li><li>Documentação Imobiliária — CRECI</li>
+          <li>Avaliação de Imóveis — IBREP (CNAI)</li><li>Noções Básicas de Negociação — CRECI</li>
+          <li>Fotografia Imobiliária — CRECI</li><li>Drones: Conceito, Legislação e Operação</li>
+          <li>Sistema Registral e Notarial — CRECI</li><li>Regularização de Imóveis — Rebolças & Bulhões Adv.</li>
+          <li>Direito Cibernético — Educaweb</li><li>Segurança da Informação — AILOS</li>
+          <li>Perito Judicial — CNDP (Registro CNDP: 3976/2025)</li><li>Perito Judicial — EducaWeb</li>
+          <li>Avaliação e Perícia de Imóveis — Faculdade Anhanguera</li><li>Projetos Arquitetônicos — Grupo Repom</li>
+          <li>Projetos Elétricos — Grupo Repom</li>
+        </ul></div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <div class="profile-inner">
+        <p class="eyebrow">PALESTRAS E EVENTOS</p><h2>Conhecimento também se constrói compartilhando experiências.</h2>
+        <p class="section-intro">Participações em eventos e encontros que agregam conhecimento e fortalecem a atuação no mercado imobiliário.</p>
+        <div class="events-grid">
+          <article class="event">
+            <span class="event-badge">2025 • PARTICIPAÇÃO</span>
+            <h3>Seminário Imobiliário 2025</h3>
+            <p><strong>11 e 12 de setembro de 2025</strong></p><p>Auditório do SENAI CIMATEC — Salvador/BA</p><p>Carga horária: 12 horas</p>
+            <a class="curriculum-link" href="certificado_evento_9.png" target="_blank" rel="noopener">Ver certificado →</a>
+          </article>
+          <article class="event event-2026">
+            <span class="event-badge">2026 • PARTICIPAÇÃO</span>
+            <h3>Seminário Imobiliário 2026</h3>
+            <p><strong>06 e 07 de agosto de 2026</strong></p><p>SENAI CIMATEC — Salvador/BA</p><p>“A era da co inteligência”</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-contact">
+      <div class="profile-contact-inner">
+        <div>
+          <p class="eyebrow">CONTATO PROFISSIONAL</p>
+          <h2>Vamos conversar?</h2>
+          <p>Estou à disposição para entender seu objetivo e ajudar você a tomar uma decisão imobiliária com mais segurança.</p>
+          <div class="profile-links"><a href="mailto:fabioaeloimoveis@gmail.com">fabioaeloimoveis@gmail.com</a><a href="https://www.instagram.com/fabioaeloimoveis/" target="_blank" rel="noopener">Instagram</a></div>
+        </div>
+        <div class="profile-cta-actions"><a class="btn btn-gold" href="https://wa.me/5571992961212" target="_blank" rel="noopener">Falar comigo no WhatsApp</a><a class="curriculum-link" href="curriculo-fabio-aelo-2026.pdf" target="_blank" rel="noopener">Ver currículo completo em PDF →</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><img src="header-logo.png" alt="Aelo Imóveis"></div>
+    <div class="footer-info"><span>© 2026 Aelo Imóveis</span><span>Corretor de Imóveis • CRECI 31.100 • CNAI 56.127</span></div>
+    <div class="footer-social"><a href="https://www.instagram.com/fabioaeloimoveis/" target="_blank" rel="noopener">Instagram</a></div>
+  </footer>
+
+  <script>
+    const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('#mobile-menu');
+    if(toggle&&menu){toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')==='true';toggle.setAttribute('aria-expanded',String(!open));menu.setAttribute('aria-hidden',String(open));menu.classList.toggle('open',!open)});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{toggle.setAttribute('aria-expanded','false');menu.setAttribute('aria-hidden','true');menu.classList.remove('open')}))}
+  </script>
+</body>
+</html>
