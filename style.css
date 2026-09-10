@@ -156,3 +156,21 @@ footer{background:#050607}
 .footer-social a{color:#fff;text-decoration:none;font-weight:600}
 .footer-social a:hover{color:var(--gold-light)}
 @media(max-width:700px){.site-footer{grid-template-columns:1fr;gap:14px;padding:24px 25px}.footer-brand img{width:145px}.footer-info{gap:5px}.footer-social{margin-top:2px}}
+
+/* Correção final do cabeçalho: logo inteira, sem corte */
+.site-header{height:125px;background:#08090b;border-bottom:1px solid rgba(216,163,58,.18)}
+.header-inner{height:100%;grid-template-columns:1fr 170px 1fr;align-items:center;padding:0 50px;gap:28px}
+.brand{width:170px;height:125px;overflow:visible;display:flex;align-items:center;justify-content:center}
+.brand img{width:145px;height:119px;max-width:none;max-height:none;object-fit:contain;display:block;margin:0}
+@media (max-width:1100px){
+  .site-header{height:118px}
+  .header-inner{grid-template-columns:1fr 150px 1fr;padding:0 25px}
+  .brand{width:150px;height:118px}
+  .brand img{width:138px;height:114px}
+}
+@media (max-width:700px){
+  .site-header{height:92px}
+  .header-inner{display:flex;justify-content:space-between;align-items:center;padding:0 18px;position:relative}
+  .brand{width:145px;height:92px;overflow:visible;align-items:center;justify-content:flex-start}
+  .brand img{width:140px;height:88px;max-width:none;max-height:none;object-fit:contain;margin:0;display:block}
+}
