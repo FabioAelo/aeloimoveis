@@ -28,3 +28,7 @@ PRÓXIMA ETAPA RECOMENDADA
 
 
 V25 — Assistente AELO com captação de leads. Execute leads.sql no SQL Editor do Supabase antes de testar o envio de contatos. O painel administrativo passa a exibir os leads recebidos.
+
+
+V26 — GESTÃO DE LEADS
+Após publicar os arquivos, execute no SQL Editor o conteúdo atualizado de leads.sql. A V26 adiciona status, observações e última interação aos leads e permite atualizar essas informações pelo painel administrativo.

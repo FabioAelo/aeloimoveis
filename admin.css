@@ -4,3 +4,15 @@
 #imageFile{padding:10px}.form-grid label small{font-weight:500;color:var(--muted);line-height:1.45}
 
 .leads-head{margin-top:55px;margin-bottom:22px}.leads-head h2{font:700 34px/1.1 "Playfair Display",Georgia,serif;margin:0 0 8px}.lead-admin{background:#fff;border:1px solid var(--line);padding:18px}.lead-admin h3{margin:0 0 5px;font:700 21px "Playfair Display",Georgia,serif}.lead-admin p{margin:4px 0;color:var(--muted);font-size:13px}.lead-admin .lead-interest{display:inline-block;margin-top:7px;padding:5px 9px;border-radius:999px;background:#fbf5e8;color:#8a5c10;font-size:11px;font-weight:800}.lead-admin time{float:right;color:#8a929d;font-size:11px}.lead-empty{background:#fff;border:1px dashed #d7dbe0;padding:20px;color:var(--muted)}
+
+
+/* V26 — gestão de leads */
+.leads-head{margin-top:42px}
+.lead-admin{position:relative}
+.lead-tools{margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb;display:grid;gap:12px}
+.lead-tools label{display:grid;gap:6px;font-weight:600;font-size:.9rem}
+.lead-tools select,.lead-tools textarea{width:100%;box-sizing:border-box;border:1px solid #d7dce3;border-radius:10px;padding:10px 12px;font:inherit;background:#fff;color:#0d2740}
+.lead-tools textarea{resize:vertical;min-height:70px}
+.lead-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.lead-actions a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid #d7dce3;border-radius:8px;color:#0d2740;background:#fff}
+.lead-actions a:hover{border-color:#d9a42b}

@@ -24,13 +24,47 @@ async function refresh() {
 async function refreshLeads() {
   const box = $("leadList");
   if (!box) return;
-  const { data, error } = await client.from("leads").select("*").order("created_at", { ascending:false }).limit(50);
-  if (error) { box.innerHTML = `<div class="lead-empty">Não foi possível carregar os leads: ${error.message}</div>`; return; }
+  const { data, error } = await client.from("leads").select("*").order("created_at", { ascending:false }).limit(100);
+  if (error) { box.innerHTML = `<div class="lead-empty">Não foi possível carregar os leads: ${escapeHtml(error.message)}</div>`; return; }
   box.innerHTML = data && data.length ? data.map(l => {
     const dt = l.created_at ? new Date(l.created_at).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"}) : "";
-    return `<article class="lead-admin"><time>${dt}</time><h3>${escapeHtml(l.name || "Sem nome")}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp || "—")}</p><p><strong>Região:</strong> ${escapeHtml(l.region || "Não informada")}</p><p><strong>Mensagem:</strong> ${escapeHtml(l.message || "—")}</p><span class="lead-interest">${escapeHtml(l.interest || "Atendimento")}</span></article>`;
+    const status = l.status || "novo";
+    const wa = String(l.whatsapp||"").replace(/\D/g,"");
+    const waUrl = wa ? `https://wa.me/55${wa}` : "#";
+    return `<article class="lead-admin">
+      <time>${dt}</time>
+      <h3>${escapeHtml(l.name || "Sem nome")}</h3>
+      <p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp || "—")}</p>
+      <p><strong>Região:</strong> ${escapeHtml(l.region || "Não informada")}</p>
+      <p><strong>Mensagem:</strong> ${escapeHtml(l.message || "—")}</p>
+      <span class="lead-interest">${escapeHtml(l.interest || "Atendimento")}</span>
+      <div class="lead-tools">
+        <label>Status
+          <select id="status-${l.id}">
+            <option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option>
+            <option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option>
+            <option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option>
+            <option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option>
+            <option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option>
+            <option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option>
+          </select>
+        </label>
+        <label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes || "")}</textarea></label>
+        <div class="lead-actions">
+          <button class="primary" onclick="saveLead('${l.id}')">Salvar lead</button>
+          ${wa ? `<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>` : ""}
+        </div>
+      </div>
+    </article>`;
   }).join("") : `<div class="lead-empty">Nenhum lead recebido ainda.</div>`;
 }
+window.saveLead = async id => {
+  const status = $("status-"+id)?.value || "novo";
+  const notes = $("notes-"+id)?.value.trim() || null;
+  const { error } = await client.from("leads").update({status, notes, last_contact_at: new Date().toISOString()}).eq("id", id);
+  if (error) return alert(error.message);
+  await refreshLeads();
+};
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
 
 async function start() {
