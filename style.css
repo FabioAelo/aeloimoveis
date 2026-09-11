@@ -335,3 +335,20 @@ footer{background:#050607}
     padding:8px 10px;
   }
 }
+
+/* V25.2 — Assistente AELO: rolagem e visibilidade mobile reforçadas */
+.aelo-chat{display:none !important;flex-direction:column !important;overflow:hidden !important;}
+.aelo-chat.open{display:flex !important;}
+.aelo-chat-messages{flex:0 0 150px !important;max-height:none !important;overflow-y:auto !important;overflow-x:hidden !important;}
+.aelo-chat-quick{flex:1 1 auto !important;min-height:0 !important;max-height:none !important;overflow-y:auto !important;overflow-x:hidden !important;display:block !important;}
+.aelo-chat-quick button{display:inline-block !important;margin:3px 2px !important;}
+.aelo-lead-card{width:100%;box-sizing:border-box;}
+.aelo-chat-form{flex:0 0 auto !important;position:relative !important;z-index:3 !important;}
+@media(max-width:600px){
+  .aelo-chat-launcher{display:flex !important;visibility:visible !important;opacity:1 !important;position:fixed !important;right:12px !important;bottom:max(12px,env(safe-area-inset-bottom)) !important;z-index:2147483646 !important;}
+  .aelo-chat{display:none !important;position:fixed !important;left:8px !important;right:8px !important;bottom:68px !important;width:auto !important;height:calc(100dvh - 84px) !important;max-height:calc(100dvh - 84px) !important;min-height:420px !important;z-index:2147483647 !important;}
+  .aelo-chat.open{display:flex !important;}
+  .aelo-chat-messages{flex:0 0 120px !important;height:120px !important;max-height:120px !important;overflow-y:auto !important;}
+  .aelo-chat-quick{flex:1 1 auto !important;min-height:0 !important;overflow-y:auto !important;overflow-x:hidden !important;-webkit-overflow-scrolling:touch !important;padding:8px 10px 10px !important;}
+  .aelo-chat-form{flex:0 0 56px !important;min-height:56px !important;}
+}
