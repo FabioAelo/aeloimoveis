@@ -292,3 +292,24 @@ footer{background:#050607}
     font-size:11px;
   }
 }
+
+/* V24.3 — Assistente AELO: nome visível no botão mobile */
+@media (max-width:600px){
+  .aelo-chat-launcher{
+    display:flex !important;
+    align-items:center;
+    gap:7px;
+    right:12px;
+    bottom:max(12px, env(safe-area-inset-bottom));
+    padding:10px 13px;
+    min-height:48px;
+    border-radius:999px;
+    font-size:12px;
+    line-height:1;
+  }
+  .aelo-chat-label{
+    display:inline !important;
+    white-space:nowrap;
+  }
+  .aelo-chat-icon{width:26px;height:26px;font-size:14px;flex:0 0 26px}
+}
