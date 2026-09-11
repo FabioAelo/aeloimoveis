@@ -41,3 +41,8 @@ on public.leads for update
 to authenticated
 using (true)
 with check (true);
+
+-- V27.1 — qualificação detalhada
+alter table public.leads add column if not exists bedrooms integer;
+
+grant update on table public.leads to authenticated;

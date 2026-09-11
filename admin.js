@@ -37,7 +37,7 @@ async function refreshLeads() {
     const wa = String(l.whatsapp||"").replace(/\D/g,"");
     const waUrl = wa ? `https://wa.me/55${wa}` : "#";
     const statusLabel={novo:'🟡 Novo',atendimento:'🔵 Em atendimento',visita:'🟢 Visita agendada',proposta:'🟣 Proposta',fechado:'✅ Negócio fechado',sem_interesse:'⚫ Sem interesse'}[status]||'🟡 Novo';
-    const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`].filter(Boolean).join(' • ');
+    const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`,Number(l.bedrooms)>0&&`🛏️ ${l.bedrooms}+ quartos`].filter(Boolean).join(' • ');
     return `<article class="lead-admin status-${status}">
       <time>${dt}</time>
       <h3>${escapeHtml(l.name || "Sem nome")}</h3>
@@ -45,6 +45,7 @@ async function refreshLeads() {
       <p><strong>Interesse:</strong> ${escapeHtml(l.interest || "Atendimento")}</p>
       ${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}
       <p><strong>Mensagem:</strong> ${escapeHtml(l.message || "—")}</p>
+      <p><strong>Origem:</strong> ${escapeHtml(l.source === 'site-chatbot' ? 'Assistente AELO' : (l.source || 'Site'))}</p>
       <span class="lead-interest">${escapeHtml(statusLabel)}</span>
       <div class="lead-tools">
         <label>Status
