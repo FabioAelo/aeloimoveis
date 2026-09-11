@@ -23,6 +23,11 @@ create table if not exists public.properties (
   updated_at timestamptz not null default now()
 );
 
+
+-- Galeria de até 10 fotos por imóvel. A primeira também fica em image_url para compatibilidade.
+alter table public.properties
+  add column if not exists gallery_urls jsonb not null default '[]'::jsonb;
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql

@@ -39,24 +39,37 @@ $("cancelBtn").addEventListener("click",()=>$("editor").classList.add("hidden"))
 
 function openEditor(p=null){
   $("editor").classList.remove("hidden"); $("dashboard").classList.add("hidden"); $("editorTitle").textContent=p?"Editar imóvel":"Novo imóvel"; $("propertyId").value=p?.id||"";
-  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("imageFile").value=""; $("currentImage").textContent=p?.image_url?"Foto atual cadastrada. Escolha outra para substituir.":""; $("propertyForm").dataset.imageUrl=p?.image_url||""; window.scrollTo({top:0,behavior:"smooth"});
+  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); window.scrollTo({top:0,behavior:"smooth"});
 }
 window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
 window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
 
-async function uploadImage(file,userId){
-  if(!file) return $("propertyForm").dataset.imageUrl || null;
-  const ext=(file.name.split('.').pop()||'jpg').toLowerCase(); const path=`${userId}/${crypto.randomUUID()}.${ext}`;
-  const {error}=await client.storage.from("property-images").upload(path,file,{upsert:false,contentType:file.type}); if(error) throw error;
-  const {data}=client.storage.from("property-images").getPublicUrl(path); return data.publicUrl;
+async function uploadImages(files,userId){
+  const selected=Array.from(files||[]);
+  if(!selected.length){
+    const existing=JSON.parse($("propertyForm").dataset.galleryUrls||"[]");
+    return existing.length?existing:($("propertyForm").dataset.imageUrl?[ $("propertyForm").dataset.imageUrl ]:[]);
+  }
+  if(selected.length>10) throw new Error("Escolha no máximo 10 fotos por imóvel.");
+  const urls=[];
+  for(const file of selected){
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=`${userId}/${crypto.randomUUID()}.${ext}`;
+    const {error}=await client.storage.from("property-images").upload(path,file,{upsert:false,contentType:file.type});
+    if(error) throw error;
+    const {data}=client.storage.from("property-images").getPublicUrl(path);
+    urls.push(data.publicUrl);
+  }
+  return urls;
 }
 
 $("propertyForm").addEventListener("submit",async e=>{
  e.preventDefault(); showMsg("saveMsg","Salvando...");
  const {data:{user}}=await client.auth.getUser(); if(!user){showMsg("saveMsg","Sessão expirada.");return;}
  try{
-  const imageUrl=await uploadImage($("imageFile").files[0],user.id);
-  const payload={owner_id:user.id,title:$("title").value.trim(),type:$("type").value,badge:$("type").value.toUpperCase(),location:$("location").value.trim(),price:Number($("price").value||0),price_label:$("priceLabel").value.trim()||null,bedrooms:Number($("bedrooms").value||0),suites:Number($("suites").value||0),parking:Number($("parking").value||0),area_m2:Number($("area").value||0)||null,image_url:imageUrl,description:$("description").value.trim(),is_published:$("published").checked};
+  const galleryUrls=await uploadImages($("imageFile").files,user.id);
+  const imageUrl=galleryUrls[0] || null;
+  const payload={owner_id:user.id,title:$("title").value.trim(),type:$("type").value,badge:$("type").value.toUpperCase(),location:$("location").value.trim(),price:Number($("price").value||0),price_label:$("priceLabel").value.trim()||null,bedrooms:Number($("bedrooms").value||0),suites:Number($("suites").value||0),parking:Number($("parking").value||0),area_m2:Number($("area").value||0)||null,image_url:imageUrl,description:$("description").value.trim(),gallery_urls:galleryUrls,is_published:$("published").checked};
   const id=$("propertyId").value; const result=id?await client.from("properties").update(payload).eq("id",id):await client.from("properties").insert(payload); if(result.error) throw result.error;
   $("editor").classList.add("hidden"); $("dashboard").classList.remove("hidden"); showMsg("saveMsg",""); refresh();
  }catch(err){showMsg("saveMsg",err.message)}

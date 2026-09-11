@@ -130,7 +130,12 @@
   <div class="modal" id="property-modal" aria-hidden="true">
     <div class="modal-card">
       <button class="modal-close" aria-label="Fechar">×</button>
-      <img id="modal-image" src="" alt="">
+      <div class="modal-gallery">
+        <img id="modal-image" src="" alt="">
+        <button class="gallery-prev" type="button" aria-label="Foto anterior">‹</button>
+        <button class="gallery-next" type="button" aria-label="Próxima foto">›</button>
+        <div class="gallery-counter" id="gallery-counter"></div>
+      </div>
       <div class="modal-body">
         <p class="eyebrow" id="modal-type"></p>
         <h2 id="modal-title"></h2>
@@ -144,6 +149,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>

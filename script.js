@@ -24,7 +24,8 @@ function normalizeProperty(p) {
   if (Number(p.suites) > 0) meta.push(`${p.suites} suítes`);
   if (Number(p.parking) > 0) meta.push(`${p.parking} vagas`);
   if (p.area_m2) meta.push(`${Number(p.area_m2).toLocaleString("pt-BR")} m²`);
-  return { ...p, badge: p.badge || String(p.type || "").toUpperCase(), price_label: p.price_label || formatPrice(p.price, p.type), meta };
+  const gallery_urls = Array.isArray(p.gallery_urls) && p.gallery_urls.length ? p.gallery_urls : (p.image_url ? [p.image_url] : []);
+  return { ...p, gallery_urls, image_url: gallery_urls[0] || p.image_url || "logo.png", badge: p.badge || String(p.type || "").toUpperCase(), price_label: p.price_label || formatPrice(p.price, p.type), meta };
 }
 
 function formatPrice(value, type) {
@@ -68,16 +69,31 @@ function renderProperties(filter = "todos") {
   document.querySelectorAll(".property-card").forEach(card => card.addEventListener("click", () => openModal(card.dataset.id)));
 }
 
+let currentGallery = [];
+let currentGalleryIndex = 0;
+
+function showGalleryImage() {
+  const img = document.getElementById("modal-image");
+  const counter = document.getElementById("gallery-counter");
+  if (!currentGallery.length) return;
+  img.src = currentGallery[currentGalleryIndex];
+  img.alt = document.getElementById("modal-title").textContent;
+  counter.textContent = currentGallery.length > 1 ? `${currentGalleryIndex + 1} / ${currentGallery.length}` : "";
+  document.querySelector(".gallery-prev").classList.toggle("hidden", currentGallery.length <= 1);
+  document.querySelector(".gallery-next").classList.toggle("hidden", currentGallery.length <= 1);
+}
+
 function openModal(id) {
   const p = properties.find(item => String(item.id) === String(id));
   if (!p) return;
-  document.getElementById("modal-image").src = p.image_url;
-  document.getElementById("modal-image").alt = p.title;
+  currentGallery = p.gallery_urls?.length ? p.gallery_urls : [p.image_url];
+  currentGalleryIndex = 0;
   document.getElementById("modal-type").textContent = p.badge + (dataSource === "demo" ? " • DEMONSTRATIVO" : "");
   document.getElementById("modal-title").textContent = p.title;
   document.getElementById("modal-location").textContent = p.location;
   document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");
   document.getElementById("modal-description").textContent = p.description || "Entre em contato com a Aelo para mais informações.";
+  showGalleryImage();
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
 }
 
@@ -88,6 +104,9 @@ document.querySelectorAll(".filter").forEach(button => button.addEventListener("
   button.classList.add("active"); renderProperties(button.dataset.filter);
 }));
 document.querySelector(".modal-close").addEventListener("click", closeModal);
+document.querySelector(".gallery-prev").addEventListener("click", () => { if (!currentGallery.length) return; currentGalleryIndex = (currentGalleryIndex - 1 + currentGallery.length) % currentGallery.length; showGalleryImage(); });
+document.querySelector(".gallery-next").addEventListener("click", () => { if (!currentGallery.length) return; currentGalleryIndex = (currentGalleryIndex + 1) % currentGallery.length; showGalleryImage(); });
+
 const modalInterest = document.querySelector(".modal-interest");
 if (modalInterest) modalInterest.addEventListener("click", () => { closeModal(); });
 modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
@@ -113,6 +132,6 @@ if (menuToggle && mobileMenu) {
   });
 }
 
-properties = DEMO_PROPERTIES;
+properties = DEMO_PROPERTIES.map(normalizeProperty);
 renderProperties();
 loadProperties();
