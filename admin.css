@@ -40,3 +40,18 @@
 .lead-main{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.lead-main .lead-interest{margin-top:0;white-space:nowrap}.lead-admin{padding:20px}.lead-admin time{font-size:11px}.lead-admin h3{font-size:23px}.lead-actions .danger{background:#fff}.lead-actions .danger:hover{background:#fff5f5}
 @media(max-width:850px){.filter-grid{grid-template-columns:1fr 1fr}.filter-grid label:first-child{grid-column:1/-1}.funnel-title{align-items:flex-start;flex-direction:column}.lead-main{flex-direction:column}.lead-main .lead-interest{order:-1}.conversion-badge{align-self:flex-start}}
 @media(max-width:500px){.lead-stats{grid-template-columns:repeat(2,1fr)}.filter-grid{grid-template-columns:1fr}.filter-grid label:first-child{grid-column:auto}.lead-funnel-wrap{padding:18px 15px}.lead-admin{padding:16px}.lead-main p{line-height:1.5}}
+
+
+/* V29 — acompanhamento comercial */
+.followup-box{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:2px}
+.followup-box label{display:grid;gap:6px}
+.followup-box input{border-radius:8px;padding:11px 12px}
+.followup-status{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#f4f5f6;color:#53606e}
+.followup-status.overdue{background:#fff1f1;color:#9b2c2c}
+.followup-status.today{background:#fff7df;color:#80580d}
+.interaction-history{margin-top:4px;padding:12px 14px;border:1px solid #eceef1;background:#fafafa;border-radius:8px}
+.interaction-history strong{font-size:12px}
+.interaction-item{padding:8px 0;border-top:1px solid #e5e7eb;font-size:12px;color:#596575;line-height:1.45}
+.interaction-item:first-of-type{margin-top:7px}
+.interaction-item time{float:none;color:#8a929d;font-size:10px;margin-right:7px}
+@media(max-width:600px){.followup-box{grid-template-columns:1fr}}

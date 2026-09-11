@@ -22,6 +22,8 @@ async function refresh() {
 
 
 let allLeads = [];
+let allInteractions = [];
+
 const STATUS_META = {
   novo:{label:'Novo',icon:'🟡'}, atendimento:{label:'Em atendimento',icon:'🔵'}, visita:{label:'Visita agendada',icon:'🟢'}, proposta:{label:'Proposta',icon:'🟣'}, fechado:{label:'Negócio fechado',icon:'✅'}, sem_interesse:{label:'Sem interesse',icon:'⚫'}
 };
@@ -54,13 +56,25 @@ function renderLeadCard(l){
   const status=l.status||'novo'; const meta=STATUS_META[status]||STATUS_META.novo;
   const wa=String(l.whatsapp||'').replace(/\D/g,''); const waUrl=wa?`https://wa.me/55${wa}`:'#';
   const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`,Number(l.bedrooms)>0&&`🛏️ ${l.bedrooms}+ quartos`].filter(Boolean).join(' • ');
-  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p></div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label><div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar lead</button>${wa?`<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
+  const follow=l.next_follow_up_at?new Date(l.next_follow_up_at):null;
+  const now=new Date(); const dayNow=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  let followClass='', followLabel='';
+  if(follow){ const day=new Date(follow.getFullYear(),follow.getMonth(),follow.getDate()); const diff=Math.round((day-dayNow)/86400000); if(diff<0){followClass='overdue';followLabel='⚠️ Retorno atrasado'} else if(diff===0){followClass='today';followLabel='🔔 Retorno hoje'} else {followLabel=`🔔 Retorno ${follow.toLocaleDateString('pt-BR')}`;} }
+  const interactions=allInteractions.filter(i=>i.lead_id===l.id).slice(0,5);
+  const history=interactions.length?`<div class="interaction-history"><strong>Histórico recente</strong>${interactions.map(i=>`<div class="interaction-item"><time>${new Date(i.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time>${escapeHtml(i.note)}</div>`).join('')}</div>`:'';
+  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${wa?`<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
 }
+function formatDateTimeLocal(d){ const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
 async function refreshLeads(){
   const box=document.getElementById('leadList'); if(!box) return;
-  const {data,error}=await client.from('leads').select('*').order('created_at',{ascending:false}).limit(100);
-  if(error){box.innerHTML=`<div class="lead-empty">Não foi possível carregar os leads: ${escapeHtml(error.message)}</div>`; return;}
-  allLeads=data||[]; renderLeadDashboard();
+  const [leadRes, interactionRes] = await Promise.all([
+    client.from('leads').select('*').order('created_at',{ascending:false}).limit(100),
+    client.from('lead_interactions').select('*').order('created_at',{ascending:false}).limit(500)
+  ]);
+  if(leadRes.error){box.innerHTML=`<div class="lead-empty">Não foi possível carregar os leads: ${escapeHtml(leadRes.error.message)}</div>`; return;}
+  allLeads=leadRes.data||[];
+  allInteractions=interactionRes.error ? [] : (interactionRes.data||[]);
+  renderLeadDashboard();
 }
 ['leadSearch','leadStatusFilter','leadInterestFilter'].forEach(id=>{document.getElementById(id)?.addEventListener('input',applyLeadFilters);document.getElementById(id)?.addEventListener('change',applyLeadFilters)});
 
@@ -73,8 +87,15 @@ window.deleteLead = async id => {
 window.saveLead = async id => {
   const status = $("status-"+id)?.value || "novo";
   const notes = $("notes-"+id)?.value.trim() || null;
-  const { error } = await client.from("leads").update({status, notes, last_contact_at: new Date().toISOString()}).eq("id", id);
+  const followRaw = $("follow-"+id)?.value || "";
+  const next_follow_up_at = followRaw ? new Date(followRaw).toISOString() : null;
+  const interactionNote = $("interaction-"+id)?.value.trim() || "";
+  const { error } = await client.from("leads").update({status, notes, next_follow_up_at, last_contact_at: interactionNote ? new Date().toISOString() : (status!=='novo' ? new Date().toISOString() : null)}).eq("id", id);
   if (error) return alert(error.message);
+  if(interactionNote){
+    const {error: iError}=await client.from('lead_interactions').insert({lead_id:id,type:'contato',note:interactionNote});
+    if(iError) return alert('Lead salvo, mas não foi possível registrar o histórico: '+iError.message);
+  }
   await refreshLeads();
 };
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
