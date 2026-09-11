@@ -304,3 +304,34 @@ footer{background:#050607}
 .aelo-lead-submit{width:100%;margin-top:9px;border:0;border-radius:8px;padding:9px 10px;background:#d9a535;color:#0e2034;font:800 12px 'DM Sans',sans-serif;cursor:pointer}
 .aelo-lead-submit:disabled{opacity:.65;cursor:wait}
 .aelo-lead-status{margin:6px 0 0;color:#8a4c16;font:500 11px 'DM Sans',sans-serif}
+
+
+/* V25.1 — Assistente AELO: formulário completo com rolagem vertical acessível */
+.aelo-chat-quick{
+  flex:1 1 auto;
+  min-height:0;
+  max-height:none;
+  overflow-y:auto;
+  overflow-x:hidden;
+  align-content:flex-start;
+  scrollbar-width:auto;
+}
+.aelo-chat-quick::-webkit-scrollbar{width:8px}
+.aelo-chat-quick::-webkit-scrollbar-track{background:#eef1f4;border-radius:8px}
+.aelo-chat-quick::-webkit-scrollbar-thumb{background:#b8c0c9;border-radius:8px}
+.aelo-lead-card{margin-bottom:4px}
+@media(max-width:600px){
+  .aelo-chat{
+    height:min(650px,calc(100vh - 84px));
+    max-height:calc(100vh - 84px);
+  }
+  .aelo-chat-messages{max-height:150px;min-height:0}
+  .aelo-chat-quick{
+    flex:1 1 auto;
+    min-height:0;
+    max-height:none;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:8px 10px;
+  }
+}
