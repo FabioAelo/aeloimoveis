@@ -293,23 +293,14 @@ footer{background:#050607}
   }
 }
 
-/* V24.3 — Assistente AELO: nome visível no botão mobile */
-@media (max-width:600px){
-  .aelo-chat-launcher{
-    display:flex !important;
-    align-items:center;
-    gap:7px;
-    right:12px;
-    bottom:max(12px, env(safe-area-inset-bottom));
-    padding:10px 13px;
-    min-height:48px;
-    border-radius:999px;
-    font-size:12px;
-    line-height:1;
-  }
-  .aelo-chat-label{
-    display:inline !important;
-    white-space:nowrap;
-  }
-  .aelo-chat-icon{width:26px;height:26px;font-size:14px;flex:0 0 26px}
-}
+/* V25 — Captura de leads no Assistente AELO */
+.aelo-lead-card{background:#fff;border:1px solid #e0e5ea;border-radius:12px;padding:12px;margin:2px 0;color:#17304a}
+.aelo-lead-card>strong{display:block;font:700 14px/1.25 'DM Sans',sans-serif;margin-bottom:3px}
+.aelo-lead-card>small{display:block;color:#687588;font-size:11px;line-height:1.35;margin-bottom:9px}
+.aelo-lead-card label{display:grid;gap:4px;margin-top:7px;font:600 11px 'DM Sans',sans-serif;color:#34465a}
+.aelo-lead-card label span{font-weight:400;color:#7a8490}
+.aelo-lead-card input,.aelo-lead-card textarea{width:100%;padding:8px 9px;border:1px solid #d8dee5;border-radius:8px;font:400 12px 'DM Sans',sans-serif;color:#182b40;background:#fff}
+.aelo-lead-card textarea{resize:none}
+.aelo-lead-submit{width:100%;margin-top:9px;border:0;border-radius:8px;padding:9px 10px;background:#d9a535;color:#0e2034;font:800 12px 'DM Sans',sans-serif;cursor:pointer}
+.aelo-lead-submit:disabled{opacity:.65;cursor:wait}
+.aelo-lead-status{margin:6px 0 0;color:#8a4c16;font:500 11px 'DM Sans',sans-serif}

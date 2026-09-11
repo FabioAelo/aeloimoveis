@@ -25,3 +25,6 @@ PRÓXIMA ETAPA RECOMENDADA
 - Restringir o cadastro de administradores a um único e-mail autorizado.
 - Adicionar galeria com várias fotos por imóvel.
 - Adicionar status vendido/alugado/reservado e formulário de leads.
+
+
+V25 — Assistente AELO com captação de leads. Execute leads.sql no SQL Editor do Supabase antes de testar o envio de contatos. O painel administrativo passa a exibir os leads recebidos.

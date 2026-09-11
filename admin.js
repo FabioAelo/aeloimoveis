@@ -20,6 +20,19 @@ async function refresh() {
     </article>`).join("") : `<div class="card"><p>Nenhum imóvel cadastrado ainda. Clique em “+ Novo imóvel”.</p></div>`;
 }
 
+
+async function refreshLeads() {
+  const box = $("leadList");
+  if (!box) return;
+  const { data, error } = await client.from("leads").select("*").order("created_at", { ascending:false }).limit(50);
+  if (error) { box.innerHTML = `<div class="lead-empty">Não foi possível carregar os leads: ${error.message}</div>`; return; }
+  box.innerHTML = data && data.length ? data.map(l => {
+    const dt = l.created_at ? new Date(l.created_at).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"}) : "";
+    return `<article class="lead-admin"><time>${dt}</time><h3>${escapeHtml(l.name || "Sem nome")}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp || "—")}</p><p><strong>Região:</strong> ${escapeHtml(l.region || "Não informada")}</p><p><strong>Mensagem:</strong> ${escapeHtml(l.message || "—")}</p><span class="lead-interest">${escapeHtml(l.interest || "Atendimento")}</span></article>`;
+  }).join("") : `<div class="lead-empty">Nenhum lead recebido ainda.</div>`;
+}
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
+
 async function start() {
   if (!client) return;
   const { data:{session} } = await client.auth.getSession();
@@ -27,7 +40,7 @@ async function start() {
   client.auth.onAuthStateChange((_event, session) => showSession(session));
 }
 function showSession(session) {
-  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); }
+  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); refreshLeads(); }
   else { $("dashboard").classList.add("hidden"); $("editor").classList.add("hidden"); $("loginCard").classList.remove("hidden"); $("logoutBtn").classList.add("hidden"); }
 }
 function showMsg(id,text){$(id).textContent=text||""}
