@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=29">
+<link rel="stylesheet" href="admin.css?v=30">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -20,6 +20,7 @@
   <div id="propertyList" class="admin-list"></div>
   <div class="dashboard-head leads-head"><div><p class="eyebrow">ATENDIMENTO</p><h2>Central de oportunidades.</h2><p>Organize os contatos do Assistente AELO e acompanhe cada oportunidade até o fechamento.</p></div></div>
 <div id="leadStats" class="lead-stats"></div>
+<div id="leadAgenda" class="lead-agenda"></div>
 <div class="lead-funnel-wrap"><div class="funnel-title"><div><strong>Funil comercial</strong><span>Acompanhe a evolução dos leads por etapa.</span></div><span id="leadConversion" class="conversion-badge">0% de conversão</span></div><div id="leadFunnel" class="lead-funnel"></div></div>
 <div class="lead-filters"><div class="filter-title"><strong>Meus leads</strong><span id="leadResultCount">0 leads</span></div><div class="filter-grid"><label>Buscar<input id="leadSearch" type="search" placeholder="Nome, WhatsApp ou região"></label><label>Status<select id="leadStatusFilter"><option value="todos">Todos</option><option value="novo">🟡 Novo</option><option value="atendimento">🔵 Em atendimento</option><option value="visita">🟢 Visita agendada</option><option value="proposta">🟣 Proposta</option><option value="fechado">✅ Negócio fechado</option><option value="sem_interesse">⚫ Sem interesse</option></select></label><label>Interesse<select id="leadInterestFilter"><option value="todos">Todos</option><option value="Compra">Compra</option><option value="Aluguel">Aluguel</option><option value="Venda">Venda</option><option value="Avaliação / PTAM">Avaliação / PTAM</option><option value="Perícia / assistência">Perícia / assistência</option></select></label></div></div>
 <div id="leadList" class="admin-list"></div>
@@ -44,5 +45,5 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=29"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=30"></script>
 </body></html>

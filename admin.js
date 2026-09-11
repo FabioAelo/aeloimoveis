@@ -35,10 +35,24 @@ function renderLeadDashboard(){
   if(stats) stats.innerHTML=`<div class="stat-total"><b>${leads.length}</b><span>Total</span></div><div><b>${counts.novo}</b><span>Novos</span></div><div><b>${counts.atendimento}</b><span>Em atendimento</span></div><div><b>${counts.visita}</b><span>Visitas</span></div><div><b>${counts.proposta}</b><span>Propostas</span></div><div><b>${counts.fechado}</b><span>Fechados</span></div>`;
   const conversion=leads.length?Math.round((counts.fechado/leads.length)*100):0;
   const conv=document.getElementById('leadConversion'); if(conv) conv.textContent=`${conversion}% de conversão`;
+  renderLeadAgenda();
   const funnel=document.getElementById('leadFunnel');
   if(funnel){const max=Math.max(leads.length,1); funnel.innerHTML=['novo','atendimento','visita','proposta','fechado'].map(k=>{const m=STATUS_META[k]; const n=counts[k]; const pct=Math.max(n?Math.round((n/max)*100):0, n?8:0); return `<div class="funnel-row"><div class="funnel-label"><span>${m.icon} ${m.label}</span><b>${n}</b></div><div class="funnel-track"><i style="width:${pct}%"></i></div></div>`}).join('');}
   applyLeadFilters();
 }
+function renderLeadAgenda(){
+  const box=document.getElementById('leadAgenda'); if(!box) return;
+  const now=new Date();
+  const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const endToday=new Date(startToday.getTime()+86400000);
+  const overdue=allLeads.filter(l=>l.next_follow_up_at && new Date(l.next_follow_up_at)<startToday && (l.status||'novo')!=='fechado' && (l.status||'novo')!=='sem_interesse').sort((a,b)=>new Date(a.next_follow_up_at)-new Date(b.next_follow_up_at));
+  const today=allLeads.filter(l=>l.next_follow_up_at && new Date(l.next_follow_up_at)>=startToday && new Date(l.next_follow_up_at)<endToday && (l.status||'novo')!=='fechado' && (l.status||'novo')!=='sem_interesse').sort((a,b)=>new Date(a.next_follow_up_at)-new Date(b.next_follow_up_at));
+  const upcoming=allLeads.filter(l=>l.next_follow_up_at && new Date(l.next_follow_up_at)>=endToday && (l.status||'novo')!=='fechado' && (l.status||'novo')!=='sem_interesse').sort((a,b)=>new Date(a.next_follow_up_at)-new Date(b.next_follow_up_at)).slice(0,8);
+  const item=(l,kind)=>{const d=new Date(l.next_follow_up_at); const meta=STATUS_META[l.status||'novo']||STATUS_META.novo; return `<div class="agenda-item ${kind}"><div class="agenda-date"><b>${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</b><span>${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="agenda-info"><strong>${escapeHtml(l.name||'Sem nome')}</strong><span>${escapeHtml(l.interest||'Atendimento')} · ${escapeHtml(l.region||'Região não informada')}</span><small>${meta.icon} ${meta.label}</small></div><button class="ghost agenda-btn" onclick="focusLead('${l.id}')">Abrir lead</button></div>`};
+  box.innerHTML=`<div class="agenda-head"><div><strong>Agenda de retornos</strong><span>Organize os próximos contatos sem deixar oportunidades para trás.</span></div><div class="agenda-badges"><span class="agenda-badge overdue">⚠️ ${overdue.length} atrasado${overdue.length===1?'':'s'}</span><span class="agenda-badge today">🔔 ${today.length} hoje</span><span class="agenda-badge upcoming">📅 ${upcoming.length} próximos</span></div></div><div class="agenda-grid"><section><h3>⚠️ Atrasados</h3>${overdue.length?overdue.slice(0,5).map(l=>item(l,'overdue')).join(''):'<p class="agenda-empty">Nenhum retorno atrasado.</p>'}</section><section><h3>🔔 Hoje</h3>${today.length?today.map(l=>item(l,'today')).join(''):'<p class="agenda-empty">Nenhum retorno agendado para hoje.</p>'}</section><section><h3>📅 Próximos</h3>${upcoming.length?upcoming.map(l=>item(l,'upcoming')).join(''):'<p class="agenda-empty">Nenhum retorno futuro agendado.</p>'}</section></div>`;
+}
+window.focusLead=id=>{const el=document.getElementById('status-'+id); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus();}};
+
 function applyLeadFilters(){
   const search=(document.getElementById('leadSearch')?.value||'').trim().toLowerCase();
   const sf=document.getElementById('leadStatusFilter')?.value||'todos';
