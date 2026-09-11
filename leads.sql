@@ -46,3 +46,13 @@ with check (true);
 alter table public.leads add column if not exists bedrooms integer;
 
 grant update on table public.leads to authenticated;
+
+-- V27.2 — permitir exclusão de leads somente por usuários autenticados
+grant delete on table public.leads to authenticated;
+
+drop policy if exists "authenticated can delete leads" on public.leads;
+create policy "authenticated can delete leads"
+on public.leads
+for delete
+to authenticated
+using (true);

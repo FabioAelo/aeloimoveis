@@ -32,3 +32,6 @@ V25 — Assistente AELO com captação de leads. Execute leads.sql no SQL Editor
 
 V26 — GESTÃO DE LEADS
 Após publicar os arquivos, execute no SQL Editor o conteúdo atualizado de leads.sql. A V26 adiciona status, observações e última interação aos leads e permite atualizar essas informações pelo painel administrativo.
+
+
+V27.2 — O painel administrativo agora permite excluir leads com confirmação. Execute o trecho V27.2 do leads.sql no Supabase uma vez para habilitar a exclusão.

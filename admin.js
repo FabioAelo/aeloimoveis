@@ -62,11 +62,18 @@ async function refreshLeads() {
         <div class="lead-actions">
           <button class="primary" onclick="saveLead('${l.id}')">Salvar lead</button>
           ${wa ? `<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>` : ""}
+          <button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button>
         </div>
       </div>
     </article>`;
   }).join("") : `<div class="lead-empty">Nenhum lead recebido ainda.</div>`;
 }
+window.deleteLead = async id => {
+  if (!confirm("Excluir este lead definitivamente? Esta ação não pode ser desfeita.")) return;
+  const { error } = await client.from("leads").delete().eq("id", id);
+  if (error) return alert("Não foi possível excluir o lead: " + error.message);
+  await refreshLeads();
+};
 window.saveLead = async id => {
   const status = $("status-"+id)?.value || "novo";
   const notes = $("notes-"+id)?.value.trim() || null;

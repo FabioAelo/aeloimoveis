@@ -28,3 +28,6 @@
 .lead-qual-summary{display:inline-block;margin:9px 0 2px;padding:7px 10px;border-radius:8px;background:#fbf6ea;color:#73500f;font-size:12px;font-weight:700}
 @media(max-width:850px){.lead-stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:500px){.lead-stats{grid-template-columns:repeat(2,1fr)}}
+
+/* V27.2 — exclusão segura de leads */
+.lead-actions .danger{color:#8b1f1f;border-color:#e7caca;background:#fff}.lead-actions .danger:hover{background:#fff5f5;border-color:#c98c8c}
