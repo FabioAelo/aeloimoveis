@@ -245,3 +245,50 @@ footer{background:#050607}
 .aelo-chat-quick button:hover{transform:translateY(-1px);background:#fbf5e8}
 .aelo-chat-form{padding:8px 10px}.aelo-chat-form input{padding:10px 11px;font-size:13px}.aelo-chat-form button{width:40px}
 @media(max-width:600px){.aelo-chat-launcher{right:13px;bottom:13px}.aelo-chat{right:7px;bottom:67px;width:calc(100vw - 14px);height:min(570px,calc(100vh - 82px))}}
+
+/* V24.2 — Assistente AELO: compacto, sem rolagem nos atalhos e visível no celular */
+.aelo-chat{
+  height:auto;
+  max-height:calc(100vh - 105px);
+}
+.aelo-chat-messages{
+  flex:0 0 auto;
+  max-height:190px;
+  overflow-y:auto;
+}
+.aelo-chat-quick{
+  max-height:none;
+  overflow:visible;
+  flex:0 0 auto;
+}
+.aelo-chat-form{flex:0 0 auto}
+@media(max-width:600px){
+  .aelo-chat-launcher{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    right:12px;
+    bottom:max(12px, env(safe-area-inset-bottom));
+    z-index:2147483000;
+  }
+  .aelo-chat{
+    right:7px;
+    bottom:70px;
+    width:calc(100vw - 14px);
+    max-height:calc(100vh - 84px);
+    height:auto;
+  }
+  .aelo-chat-messages{
+    max-height:170px;
+  }
+  .aelo-chat-quick{
+    max-height:none;
+    overflow:visible;
+    gap:5px;
+    padding:7px 10px;
+  }
+  .aelo-chat-quick button{
+    padding:7px 8px;
+    font-size:11px;
+  }
+}
