@@ -16,3 +16,15 @@
 .lead-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .lead-actions a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid #d7dce3;border-radius:8px;color:#0d2740;background:#fff}
 .lead-actions a:hover{border-color:#d9a42b}
+
+
+/* V27 — refinamento visual do CRM */
+.lead-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:0 0 18px}
+.lead-stats>div{background:#fff;border:1px solid var(--line);padding:15px 12px;text-align:center}
+.lead-stats b{display:block;font:700 25px/1 "Playfair Display",Georgia,serif;color:#0e2034}
+.lead-stats span{display:block;margin-top:5px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.lead-admin{border-left:4px solid #d9a535;box-shadow:0 5px 18px rgba(0,0,0,.035)}
+.lead-admin.status-atendimento{border-left-color:#557da6}.lead-admin.status-visita{border-left-color:#4b9364}.lead-admin.status-proposta{border-left-color:#7655a8}.lead-admin.status-fechado{border-left-color:#2f7d4a}.lead-admin.status-sem_interesse{border-left-color:#7b828b}
+.lead-qual-summary{display:inline-block;margin:9px 0 2px;padding:7px 10px;border-radius:8px;background:#fbf6ea;color:#73500f;font-size:12px;font-weight:700}
+@media(max-width:850px){.lead-stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:500px){.lead-stats{grid-template-columns:repeat(2,1fr)}}

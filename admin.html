@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=26">
+<link rel="stylesheet" href="admin.css?v=27">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -18,7 +18,7 @@
 <section id="dashboard" class="hidden">
   <div class="dashboard-head"><div><p class="eyebrow">CATÁLOGO AELO</p><h1>Gerenciar imóveis.</h1></div><button id="newBtn" class="primary">+ Novo imóvel</button></div>
   <div id="propertyList" class="admin-list"></div>
-  <div class="dashboard-head leads-head"><div><p class="eyebrow">ATENDIMENTO</p><h2>Leads recebidos.</h2><p>Contatos enviados pelo Assistente AELO no site.</p></div></div><div id="leadList" class="admin-list"></div>
+  <div class="dashboard-head leads-head"><div><p class="eyebrow">ATENDIMENTO</p><h2>Leads recebidos.</h2><p>Contatos enviados pelo Assistente AELO no site.</p></div></div><div id="leadStats" class="lead-stats"></div><div id="leadList" class="admin-list"></div>
 </section>
 <section id="editor" class="card hidden">
   <div class="editor-head"><div><p class="eyebrow">CADASTRO</p><h2 id="editorTitle">Novo imóvel</h2></div><button id="cancelBtn" class="ghost">Cancelar</button></div>
@@ -40,5 +40,5 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=26"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=27"></script>
 </body></html>

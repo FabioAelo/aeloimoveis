@@ -378,3 +378,9 @@ footer{background:#050607}
     flex:0 0 27px !important;
   }
 }
+
+
+/* V27 — resumo das preferências no formulário de lead */
+.lead-qualification{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 10px;padding:8px 9px;background:#fbf6ea;border:1px solid #ead8a8;border-radius:9px;font-size:10.5px;color:#6e5015}
+.lead-qualification b{grid-column:1/-1;color:#17304a;font-size:11px}.lead-qualification span{padding:3px 0}
+@media(max-width:600px){.lead-qualification{grid-template-columns:1fr}.lead-qualification b{grid-column:auto}}

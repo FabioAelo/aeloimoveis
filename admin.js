@@ -26,18 +26,26 @@ async function refreshLeads() {
   if (!box) return;
   const { data, error } = await client.from("leads").select("*").order("created_at", { ascending:false }).limit(100);
   if (error) { box.innerHTML = `<div class="lead-empty">Não foi possível carregar os leads: ${escapeHtml(error.message)}</div>`; return; }
-  box.innerHTML = data && data.length ? data.map(l => {
+  const leads=data||[];
+  const counts={novo:0,atendimento:0,visita:0,proposta:0,fechado:0,sem_interesse:0};
+  leads.forEach(l=>{const k=l.status||'novo'; if(counts[k]!==undefined) counts[k]++});
+  const stats=document.getElementById('leadStats');
+  if(stats) stats.innerHTML=`<div><b>${leads.length}</b><span>Total</span></div><div><b>${counts.novo}</b><span>Novos</span></div><div><b>${counts.atendimento}</b><span>Em atendimento</span></div><div><b>${counts.visita}</b><span>Visitas</span></div><div><b>${counts.proposta}</b><span>Propostas</span></div><div><b>${counts.fechado}</b><span>Fechados</span></div>`;
+  box.innerHTML = leads.length ? leads.map(l => {
     const dt = l.created_at ? new Date(l.created_at).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"}) : "";
     const status = l.status || "novo";
     const wa = String(l.whatsapp||"").replace(/\D/g,"");
     const waUrl = wa ? `https://wa.me/55${wa}` : "#";
-    return `<article class="lead-admin">
+    const statusLabel={novo:'🟡 Novo',atendimento:'🔵 Em atendimento',visita:'🟢 Visita agendada',proposta:'🟣 Proposta',fechado:'✅ Negócio fechado',sem_interesse:'⚫ Sem interesse'}[status]||'🟡 Novo';
+    const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`].filter(Boolean).join(' • ');
+    return `<article class="lead-admin status-${status}">
       <time>${dt}</time>
       <h3>${escapeHtml(l.name || "Sem nome")}</h3>
       <p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp || "—")}</p>
-      <p><strong>Região:</strong> ${escapeHtml(l.region || "Não informada")}</p>
+      <p><strong>Interesse:</strong> ${escapeHtml(l.interest || "Atendimento")}</p>
+      ${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}
       <p><strong>Mensagem:</strong> ${escapeHtml(l.message || "—")}</p>
-      <span class="lead-interest">${escapeHtml(l.interest || "Atendimento")}</span>
+      <span class="lead-interest">${escapeHtml(statusLabel)}</span>
       <div class="lead-tools">
         <label>Status
           <select id="status-${l.id}">
