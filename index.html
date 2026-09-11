@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
   <header class="site-header">
@@ -147,8 +147,17 @@
     </div>
   </div>
 
+
+  <!-- Assistente AELO -->
+  <button class="aelo-chat-launcher" id="aelo-chat-launcher" type="button" aria-label="Abrir Assistente AELO"><span class="aelo-chat-icon">✦</span><span class="aelo-chat-label">Assistente AELO</span></button>
+  <section class="aelo-chat" id="aelo-chat" aria-hidden="true" aria-label="Assistente AELO">
+    <div class="aelo-chat-header"><div><strong>Assistente AELO</strong><small>Atendimento imobiliário</small></div><button id="aelo-chat-close" type="button" aria-label="Fechar assistente">×</button></div>
+    <div class="aelo-chat-messages" id="aelo-chat-messages" aria-live="polite"></div><div class="aelo-chat-quick" id="aelo-chat-quick"></div>
+    <form class="aelo-chat-form" id="aelo-chat-form"><input id="aelo-chat-input" type="text" placeholder="Digite sua mensagem..." autocomplete="off"><button type="submit" aria-label="Enviar">➤</button></form>
+  </section>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>
