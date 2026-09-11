@@ -21,53 +21,49 @@ async function refresh() {
 }
 
 
-async function refreshLeads() {
-  const box = $("leadList");
-  if (!box) return;
-  const { data, error } = await client.from("leads").select("*").order("created_at", { ascending:false }).limit(100);
-  if (error) { box.innerHTML = `<div class="lead-empty">Não foi possível carregar os leads: ${escapeHtml(error.message)}</div>`; return; }
-  const leads=data||[];
+let allLeads = [];
+const STATUS_META = {
+  novo:{label:'Novo',icon:'🟡'}, atendimento:{label:'Em atendimento',icon:'🔵'}, visita:{label:'Visita agendada',icon:'🟢'}, proposta:{label:'Proposta',icon:'🟣'}, fechado:{label:'Negócio fechado',icon:'✅'}, sem_interesse:{label:'Sem interesse',icon:'⚫'}
+};
+function renderLeadDashboard(){
+  const leads=allLeads;
   const counts={novo:0,atendimento:0,visita:0,proposta:0,fechado:0,sem_interesse:0};
   leads.forEach(l=>{const k=l.status||'novo'; if(counts[k]!==undefined) counts[k]++});
   const stats=document.getElementById('leadStats');
-  if(stats) stats.innerHTML=`<div><b>${leads.length}</b><span>Total</span></div><div><b>${counts.novo}</b><span>Novos</span></div><div><b>${counts.atendimento}</b><span>Em atendimento</span></div><div><b>${counts.visita}</b><span>Visitas</span></div><div><b>${counts.proposta}</b><span>Propostas</span></div><div><b>${counts.fechado}</b><span>Fechados</span></div>`;
-  box.innerHTML = leads.length ? leads.map(l => {
-    const dt = l.created_at ? new Date(l.created_at).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"}) : "";
-    const status = l.status || "novo";
-    const wa = String(l.whatsapp||"").replace(/\D/g,"");
-    const waUrl = wa ? `https://wa.me/55${wa}` : "#";
-    const statusLabel={novo:'🟡 Novo',atendimento:'🔵 Em atendimento',visita:'🟢 Visita agendada',proposta:'🟣 Proposta',fechado:'✅ Negócio fechado',sem_interesse:'⚫ Sem interesse'}[status]||'🟡 Novo';
-    const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`,Number(l.bedrooms)>0&&`🛏️ ${l.bedrooms}+ quartos`].filter(Boolean).join(' • ');
-    return `<article class="lead-admin status-${status}">
-      <time>${dt}</time>
-      <h3>${escapeHtml(l.name || "Sem nome")}</h3>
-      <p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp || "—")}</p>
-      <p><strong>Interesse:</strong> ${escapeHtml(l.interest || "Atendimento")}</p>
-      ${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}
-      <p><strong>Mensagem:</strong> ${escapeHtml(l.message || "—")}</p>
-      <p><strong>Origem:</strong> ${escapeHtml(l.source === 'site-chatbot' ? 'Assistente AELO' : (l.source || 'Site'))}</p>
-      <span class="lead-interest">${escapeHtml(statusLabel)}</span>
-      <div class="lead-tools">
-        <label>Status
-          <select id="status-${l.id}">
-            <option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option>
-            <option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option>
-            <option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option>
-            <option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option>
-            <option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option>
-            <option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option>
-          </select>
-        </label>
-        <label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes || "")}</textarea></label>
-        <div class="lead-actions">
-          <button class="primary" onclick="saveLead('${l.id}')">Salvar lead</button>
-          ${wa ? `<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>` : ""}
-          <button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button>
-        </div>
-      </div>
-    </article>`;
-  }).join("") : `<div class="lead-empty">Nenhum lead recebido ainda.</div>`;
+  if(stats) stats.innerHTML=`<div class="stat-total"><b>${leads.length}</b><span>Total</span></div><div><b>${counts.novo}</b><span>Novos</span></div><div><b>${counts.atendimento}</b><span>Em atendimento</span></div><div><b>${counts.visita}</b><span>Visitas</span></div><div><b>${counts.proposta}</b><span>Propostas</span></div><div><b>${counts.fechado}</b><span>Fechados</span></div>`;
+  const conversion=leads.length?Math.round((counts.fechado/leads.length)*100):0;
+  const conv=document.getElementById('leadConversion'); if(conv) conv.textContent=`${conversion}% de conversão`;
+  const funnel=document.getElementById('leadFunnel');
+  if(funnel){const max=Math.max(leads.length,1); funnel.innerHTML=['novo','atendimento','visita','proposta','fechado'].map(k=>{const m=STATUS_META[k]; const n=counts[k]; const pct=Math.max(n?Math.round((n/max)*100):0, n?8:0); return `<div class="funnel-row"><div class="funnel-label"><span>${m.icon} ${m.label}</span><b>${n}</b></div><div class="funnel-track"><i style="width:${pct}%"></i></div></div>`}).join('');}
+  applyLeadFilters();
 }
+function applyLeadFilters(){
+  const search=(document.getElementById('leadSearch')?.value||'').trim().toLowerCase();
+  const sf=document.getElementById('leadStatusFilter')?.value||'todos';
+  const inf=document.getElementById('leadInterestFilter')?.value||'todos';
+  const filtered=allLeads.filter(l=>{
+    const hay=[l.name,l.whatsapp,l.region,l.message,l.budget,l.interest].filter(Boolean).join(' ').toLowerCase();
+    return (!search||hay.includes(search)) && (sf==='todos'||(l.status||'novo')===sf) && (inf==='todos'||String(l.interest||'').toLowerCase()===inf.toLowerCase());
+  });
+  const count=document.getElementById('leadResultCount'); if(count) count.textContent=`${filtered.length} ${filtered.length===1?'lead':'leads'}`;
+  const box=document.getElementById('leadList'); if(!box) return;
+  box.innerHTML=filtered.length ? filtered.map(l=>renderLeadCard(l)).join('') : `<div class="lead-empty">Nenhum lead corresponde aos filtros selecionados.</div>`;
+}
+function renderLeadCard(l){
+  const dt=l.created_at?new Date(l.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
+  const status=l.status||'novo'; const meta=STATUS_META[status]||STATUS_META.novo;
+  const wa=String(l.whatsapp||'').replace(/\D/g,''); const waUrl=wa?`https://wa.me/55${wa}`:'#';
+  const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`,Number(l.bedrooms)>0&&`🛏️ ${l.bedrooms}+ quartos`].filter(Boolean).join(' • ');
+  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p></div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label><div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar lead</button>${wa?`<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
+}
+async function refreshLeads(){
+  const box=document.getElementById('leadList'); if(!box) return;
+  const {data,error}=await client.from('leads').select('*').order('created_at',{ascending:false}).limit(100);
+  if(error){box.innerHTML=`<div class="lead-empty">Não foi possível carregar os leads: ${escapeHtml(error.message)}</div>`; return;}
+  allLeads=data||[]; renderLeadDashboard();
+}
+['leadSearch','leadStatusFilter','leadInterestFilter'].forEach(id=>{document.getElementById(id)?.addEventListener('input',applyLeadFilters);document.getElementById(id)?.addEventListener('change',applyLeadFilters)});
+
 window.deleteLead = async id => {
   if (!confirm("Excluir este lead definitivamente? Esta ação não pode ser desfeita.")) return;
   const { error } = await client.from("leads").delete().eq("id", id);
