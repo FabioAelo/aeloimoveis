@@ -113,3 +113,6 @@
 
 /* V38 — agenda de retornos com ações rápidas */
 .agenda-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.agenda-section-head h3{margin:0}.agenda-link{padding:5px 8px;font-size:10px;border-radius:999px}.agenda-actions{display:flex;gap:5px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.agenda-complete{border-color:#b9dec8;background:#f4fbf6}.agenda-item.overdue{background:#fff9f9;border-radius:6px;padding-left:6px;padding-right:6px}.agenda-item.today{background:#fffdf5;border-radius:6px;padding-left:6px;padding-right:6px}.agenda-item.overdue .agenda-actions .agenda-complete{border-color:#e7b7b7;background:#fff5f5;color:#8f2f2f}@media(max-width:500px){.agenda-actions{justify-content:flex-start}.agenda-section-head{align-items:flex-start}}
+
+/* V39 */
+.agenda-complete{font-weight:800}.agenda-item.overdue .agenda-complete{box-shadow:0 0 0 1px rgba(143,47,47,.05)}

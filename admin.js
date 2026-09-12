@@ -1,4 +1,4 @@
-// V37 — Gestão inteligente de retornos e follow-up
+// V39 — Conclusão de retornos e follow-up
 const cfg = window.AELO_SUPABASE_CONFIG || {};
 const ready = window.supabase && cfg.url && cfg.anonKey && !String(cfg.url).startsWith("COLE_AQUI");
 const client = ready ? window.supabase.createClient(cfg.url, cfg.anonKey) : null;
@@ -50,7 +50,7 @@ function renderLeadAgenda(){
   const overdue=allLeads.filter(l=>l.next_follow_up_at && new Date(l.next_follow_up_at)<startToday && (l.status||'novo')!=='fechado' && (l.status||'novo')!=='sem_interesse').sort((a,b)=>new Date(a.next_follow_up_at)-new Date(b.next_follow_up_at));
   const today=allLeads.filter(l=>l.next_follow_up_at && new Date(l.next_follow_up_at)>=startToday && new Date(l.next_follow_up_at)<endToday && (l.status||'novo')!=='fechado' && (l.status||'novo')!=='sem_interesse').sort((a,b)=>new Date(a.next_follow_up_at)-new Date(b.next_follow_up_at));
   const upcoming=allLeads.filter(l=>l.next_follow_up_at && new Date(l.next_follow_up_at)>=endToday && (l.status||'novo')!=='fechado' && (l.status||'novo')!=='sem_interesse').sort((a,b)=>new Date(a.next_follow_up_at)-new Date(b.next_follow_up_at)).slice(0,8);
-  const item=(l,kind)=>{const d=new Date(l.next_follow_up_at); const meta=STATUS_META[l.status||'novo']||STATUS_META.novo; const action=kind==='overdue'||kind==='today'?`<button type="button" class="ghost agenda-btn agenda-complete" onclick="completeFollowUp('${l.id}')">✅ Concluir</button>`:''; return `<div class="agenda-item ${kind}"><div class="agenda-date"><b>${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</b><span>${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="agenda-info"><strong>${escapeHtml(l.name||'Sem nome')}</strong><span>${escapeHtml(l.interest||'Atendimento')} · ${escapeHtml(l.region||'Região não informada')}</span><small>${meta.icon} ${meta.label}</small></div><div class="agenda-actions"><button type="button" class="ghost agenda-btn" onclick="focusLead('${l.id}')">Abrir lead</button>${action}</div></div>`};
+  const item=(l,kind)=>{const d=new Date(l.next_follow_up_at); const meta=STATUS_META[l.status||'novo']||STATUS_META.novo; const action=kind==='overdue'||kind==='today'?`<button type="button" class="ghost agenda-btn agenda-complete" onclick="completeFollowUp('${l.id}')">✅ Concluir retorno</button>`:''; return `<div class="agenda-item ${kind}"><div class="agenda-date"><b>${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</b><span>${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="agenda-info"><strong>${escapeHtml(l.name||'Sem nome')}</strong><span>${escapeHtml(l.interest||'Atendimento')} · ${escapeHtml(l.region||'Região não informada')}</span><small>${meta.icon} ${meta.label}</small></div><div class="agenda-actions"><button type="button" class="ghost agenda-btn" onclick="focusLead('${l.id}')">Abrir lead</button>${action}</div></div>`};
   const overdueAction=overdue.length?`<button type="button" class="ghost agenda-link" onclick="setQuickFilter('agora')">Ver todos</button>`:'';
   const todayAction=today.length?`<button type="button" class="ghost agenda-link" onclick="setQuickFilter('hoje')">Ver todos</button>`:'';
   box.innerHTML=`<div class="agenda-head"><div><strong>Agenda de retornos</strong><span>Organize os próximos contatos sem deixar oportunidades para trás.</span></div><div class="agenda-badges"><span class="agenda-badge overdue">⚠️ ${overdue.length} atrasado${overdue.length===1?'':'s'}</span><span class="agenda-badge today">🔔 ${today.length} hoje</span><span class="agenda-badge upcoming">📅 ${upcoming.length} próximos</span></div></div><div class="agenda-grid"><section><div class="agenda-section-head"><h3>⚠️ Atrasados</h3>${overdueAction}</div>${overdue.length?overdue.slice(0,5).map(l=>item(l,'overdue')).join(''):'<p class="agenda-empty">Nenhum retorno atrasado.</p>'}</section><section><div class="agenda-section-head"><h3>🔔 Hoje</h3>${todayAction}</div>${today.length?today.map(l=>item(l,'today')).join(''):'<p class="agenda-empty">Nenhum retorno agendado para hoje.</p>'}</section><section><div class="agenda-section-head"><h3>📅 Próximos</h3></div>${upcoming.length?upcoming.map(l=>item(l,'upcoming')).join(''):'<p class="agenda-empty">Nenhum retorno futuro agendado.</p>'}</section></div>`;
@@ -193,10 +193,14 @@ window.markLeadContacted = async id => {
 window.completeFollowUp = async id => {
   const lead = allLeads.find(l => l.id === id);
   if (!lead) return;
+  if (!confirm(`Concluir o retorno de ${lead.name || 'este cliente'}?`)) return;
   const note = prompt('Como foi o retorno? (opcional)', '') || '';
+  const now = new Date().toISOString();
+  const nextStatus = (lead.status || 'novo') === 'novo' ? 'atendimento' : (lead.status || 'novo');
   const { error } = await client.from('leads').update({
     next_follow_up_at: null,
-    last_contact_at: new Date().toISOString()
+    last_contact_at: now,
+    status: nextStatus
   }).eq('id', id);
   if (error) return alert('Não foi possível concluir o retorno: ' + error.message);
   const historyNote = note.trim() ? `Retorno realizado — ${note.trim()}` : 'Retorno realizado';
