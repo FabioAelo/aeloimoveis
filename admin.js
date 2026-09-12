@@ -123,11 +123,19 @@ function renderLeadCard(l){
   const now=new Date(); const dayNow=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   let followClass='', followLabel='';
   if(follow){ const day=new Date(follow.getFullYear(),follow.getMonth(),follow.getDate()); const diff=Math.round((day-dayNow)/86400000); if(diff<0){followClass='overdue';followLabel='⚠️ Retorno atrasado'} else if(diff===0){followClass='today';followLabel='🔔 Retorno hoje'} else {followLabel=`🔔 Retorno ${follow.toLocaleDateString('pt-BR')}`;} }
-  const interactions=allInteractions.filter(i=>i.lead_id===l.id).slice(0,5);
+  const interactions=allInteractions.filter(i=>i.lead_id===l.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
   const hasContact=leadHasContact(l);
   const attentionLabel=followClass==='overdue'?'⚠️ Prioridade de atendimento':((status==='novo'&&!hasContact)?'📞 Ainda não contatado':'');
   const lastContact=l.last_contact_at?new Date(l.last_contact_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
-  const history=interactions.length?`<div class="interaction-history"><strong>Histórico recente</strong>${interactions.map(i=>`<div class="interaction-item"><time>${new Date(i.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time>${escapeHtml(i.note)}</div>`).join('')}</div>`:'';
+  const interactionMeta={
+    whatsapp:{icon:'📱',label:'WhatsApp iniciado',cls:'whatsapp'},
+    contato:{icon:'📌',label:'Contato',cls:'contato'},
+    retorno:{icon:'🔔',label:'Retorno realizado',cls:'retorno'},
+    status:{icon:'🔄',label:'Status alterado',cls:'status'},
+    agendamento:{icon:'📅',label:'Retorno agendado',cls:'agendamento'},
+    observacao:{icon:'📝',label:'Observação',cls:'observacao'}
+  };
+  const history=interactions.length?`<div class="interaction-history timeline"><div class="timeline-head"><strong>Linha do tempo do atendimento</strong><span>${interactions.length} ${interactions.length===1?'registro':'registros'}</span></div><div class="timeline-list">${interactions.map(i=>{const m=interactionMeta[i.type]||{icon:'•',label:'Registro',cls:'default'};const dt=new Date(i.created_at);return `<div class="timeline-item ${m.cls}"><div class="timeline-dot">${m.icon}</div><div class="timeline-content"><div class="timeline-meta"><strong>${m.label}</strong><time>${dt.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time></div><div class="timeline-note">${escapeHtml(i.note)}</div></div></div>`;}).join('')}</div></div>`:'<div class="interaction-history timeline-empty"><strong>Linha do tempo do atendimento</strong><span>Nenhum registro de atendimento ainda.</span></div>';
   const profile=extractProfile(l);
   const profileItems=[['Interesse',l.interest||'—'],['Região',l.region||'—'],['Tipo',profile.type||'—'],['Faixa',l.budget||profile.faixa||'—'],['Quartos',Number(l.bedrooms)>0?`${l.bedrooms}+`:profile.quartos||'—'],['Prazo',profile.prazo||'—']];
   const profileHtml=`<div class="client-sheet"><div class="client-sheet-head"><div><span class="sheet-eyebrow">FICHA DO CLIENTE</span><strong>${escapeHtml(l.name||'Sem nome')}</strong></div><button type="button" class="ghost copy-sheet" onclick="copyLeadSummary('${l.id}')">📋 Copiar ficha</button></div><div class="client-grid">${profileItems.map(([label,value])=>`<div><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`).join('')}</div><div class="client-phone"><span>WhatsApp</span><strong>${escapeHtml(l.whatsapp||'—')}</strong>${wa?`<button type="button" class="ghost copy-phone" onclick="copyLeadPhone('${l.id}')">Copiar número</button>`:''}</div></div>`;
@@ -238,15 +246,31 @@ window.openWhatsAppLead = async id => {
 };
 
 window.saveLead = async id => {
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
   const status = $("status-"+id)?.value || "novo";
   const notes = $("notes-"+id)?.value.trim() || null;
   const followRaw = $("follow-"+id)?.value || "";
   const next_follow_up_at = followRaw ? new Date(followRaw).toISOString() : null;
   const interactionNote = $("interaction-"+id)?.value.trim() || "";
-  const { error } = await client.from("leads").update({status, notes, next_follow_up_at, last_contact_at: interactionNote ? new Date().toISOString() : (status!=='novo' ? new Date().toISOString() : null)}).eq("id", id);
+  const oldStatus = lead.status || 'novo';
+  const oldFollow = lead.next_follow_up_at || null;
+  const now = new Date().toISOString();
+  const last_contact_at = interactionNote ? now : (status!=='novo' ? (lead.last_contact_at || now) : (lead.last_contact_at || null));
+  const { error } = await client.from("leads").update({status, notes, next_follow_up_at, last_contact_at}).eq("id", id);
   if (error) return alert(error.message);
-  if(interactionNote){
-    const {error: iError}=await client.from('lead_interactions').insert({lead_id:id,type:'contato',note:interactionNote});
+
+  const records=[];
+  if(interactionNote) records.push({lead_id:id,type:'contato',note:interactionNote});
+  if(oldStatus!==status){
+    const labels={novo:'Novo',atendimento:'Em atendimento',visita:'Visita agendada',proposta:'Proposta',fechado:'Negócio fechado',sem_interesse:'Sem interesse'};
+    records.push({lead_id:id,type:'status',note:`Status alterado: ${labels[oldStatus]||oldStatus} → ${labels[status]||status}`});
+  }
+  if((oldFollow||'')!==(next_follow_up_at||'')){
+    records.push({lead_id:id,type:'agendamento',note:next_follow_up_at?`Próximo retorno agendado para ${new Date(next_follow_up_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}`:'Próximo retorno removido'});
+  }
+  if(records.length){
+    const {error:iError}=await client.from('lead_interactions').insert(records);
     if(iError) return alert('Lead salvo, mas não foi possível registrar o histórico: '+iError.message);
   }
   await refreshLeads();
