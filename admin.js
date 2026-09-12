@@ -53,18 +53,37 @@ function renderLeadAgenda(){
 }
 window.focusLead=id=>{const el=document.getElementById('status-'+id); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus();}};
 
+let activeQuickFilter='todos';
+function leadIsOpen(l){const s=l.status||'novo'; return s!=='fechado' && s!=='sem_interesse';}
+function leadFollowState(l){
+  if(!l.next_follow_up_at) return 'none';
+  const d=new Date(l.next_follow_up_at); if(Number.isNaN(d.getTime())) return 'none';
+  const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  if(day<today) return 'overdue'; if(day.getTime()===today.getTime()) return 'today'; return 'upcoming';
+}
+function leadHasContact(l){return !!l.last_contact_at || allInteractions.some(i=>i.lead_id===l.id);}
+function leadNeedsAttention(l){return leadIsOpen(l) && (leadFollowState(l)==='overdue' || (l.status||'novo')==='novo');}
 function applyLeadFilters(){
   const search=(document.getElementById('leadSearch')?.value||'').trim().toLowerCase();
   const sf=document.getElementById('leadStatusFilter')?.value||'todos';
   const inf=document.getElementById('leadInterestFilter')?.value||'todos';
   const filtered=allLeads.filter(l=>{
-    const hay=[l.name,l.whatsapp,l.region,l.message,l.budget,l.interest].filter(Boolean).join(' ').toLowerCase();
-    return (!search||hay.includes(search)) && (sf==='todos'||(l.status||'novo')===sf) && (inf==='todos'||String(l.interest||'').toLowerCase()===inf.toLowerCase());
+    const hay=[l.name,l.whatsapp,l.region,l.message,l.budget,l.interest,l.bedrooms,l.notes].filter(Boolean).join(' ').toLowerCase();
+    let quick=true;
+    if(activeQuickFilter==='novos') quick=(l.status||'novo')==='novo';
+    if(activeQuickFilter==='urgentes') quick=leadNeedsAttention(l);
+    if(activeQuickFilter==='hoje') quick=leadFollowState(l)==='today' && leadIsOpen(l);
+    if(activeQuickFilter==='sem-contato') quick=!leadHasContact(l) && leadIsOpen(l);
+    return quick && (!search||hay.includes(search)) && (sf==='todos'||(l.status||'novo')===sf) && (inf==='todos'||String(l.interest||'').toLowerCase()===inf.toLowerCase());
   });
+  const priority={overdue:0,today:1,none:2,upcoming:3};
+  filtered.sort((a,b)=>{const pa=priority[leadFollowState(a)]??4,pb=priority[leadFollowState(b)]??4;if(pa!==pb)return pa-pb;const na=(a.status||'novo')==='novo'?0:1,nb=(b.status||'novo')==='novo'?0:1;if(na!==nb)return na-nb;return new Date(b.created_at||0)-new Date(a.created_at||0);});
   const count=document.getElementById('leadResultCount'); if(count) count.textContent=`${filtered.length} ${filtered.length===1?'lead':'leads'}`;
   const box=document.getElementById('leadList'); if(!box) return;
   box.innerHTML=filtered.length ? filtered.map(l=>renderLeadCard(l)).join('') : `<div class="lead-empty">Nenhum lead corresponde aos filtros selecionados.</div>`;
 }
+function setQuickFilter(value){activeQuickFilter=value;document.querySelectorAll('.quick-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.quickFilter===value));applyLeadFilters();}
+
 function renderLeadCard(l){
   const dt=l.created_at?new Date(l.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
   const status=l.status||'novo'; const meta=STATUS_META[status]||STATUS_META.novo;
@@ -75,8 +94,11 @@ function renderLeadCard(l){
   let followClass='', followLabel='';
   if(follow){ const day=new Date(follow.getFullYear(),follow.getMonth(),follow.getDate()); const diff=Math.round((day-dayNow)/86400000); if(diff<0){followClass='overdue';followLabel='⚠️ Retorno atrasado'} else if(diff===0){followClass='today';followLabel='🔔 Retorno hoje'} else {followLabel=`🔔 Retorno ${follow.toLocaleDateString('pt-BR')}`;} }
   const interactions=allInteractions.filter(i=>i.lead_id===l.id).slice(0,5);
+  const hasContact=leadHasContact(l);
+  const attentionLabel=followClass==='overdue'?'⚠️ Prioridade de atendimento':((status==='novo'&&!hasContact)?'📞 Ainda não contatado':'');
+  const lastContact=l.last_contact_at?new Date(l.last_contact_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
   const history=interactions.length?`<div class="interaction-history"><strong>Histórico recente</strong>${interactions.map(i=>`<div class="interaction-item"><time>${new Date(i.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time>${escapeHtml(i.note)}</div>`).join('')}</div>`:'';
-  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<button class="ghost whatsapp-btn" onclick="openWhatsAppLead('${l.id}')">📱 Abrir WhatsApp</button>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
+  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}${attentionLabel?`<span class="attention-status">${attentionLabel}</span>`:''}${lastContact?`<span class="last-contact">Último contato: ${escapeHtml(lastContact)}</span>`:'<span class="last-contact muted-contact">Nenhum contato registrado ainda</span>'}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<button class="ghost whatsapp-btn" onclick="openWhatsAppLead('${l.id}')">📱 Abrir WhatsApp</button>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
 }
 function formatDateTimeLocal(d){ const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
 async function refreshLeads(){
@@ -91,6 +113,8 @@ async function refreshLeads(){
   renderLeadDashboard();
 }
 ['leadSearch','leadStatusFilter','leadInterestFilter'].forEach(id=>{document.getElementById(id)?.addEventListener('input',applyLeadFilters);document.getElementById(id)?.addEventListener('change',applyLeadFilters)});
+document.querySelectorAll('.quick-filter').forEach(btn=>btn.addEventListener('click',()=>setQuickFilter(btn.dataset.quickFilter)));
+document.getElementById('clearLeadFilters')?.addEventListener('click',()=>{document.getElementById('leadSearch').value='';document.getElementById('leadStatusFilter').value='todos';document.getElementById('leadInterestFilter').value='todos';setQuickFilter('todos');});
 
 window.deleteLead = async id => {
   if (!confirm("Excluir este lead definitivamente? Esta ação não pode ser desfeita.")) return;
