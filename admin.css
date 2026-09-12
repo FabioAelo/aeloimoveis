@@ -106,3 +106,7 @@
 /* V36 — ação rápida de contato */
 .lead-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .lead-actions .success{border-color:#b9dec8;background:#f4fbf6}
+
+
+/* V37 — atalhos de follow-up */
+.followup-quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.followup-quick .mini{padding:5px 8px;font-size:10px;border-radius:999px;color:#29445c}.followup-quick .mini:hover{border-color:var(--gold);background:#fffaf0}.followup-box input{margin-bottom:0}@media(max-width:600px){.followup-quick{gap:5px}.followup-quick .mini{padding:5px 7px;font-size:9px}}

@@ -40,3 +40,6 @@ V27.2 — O painel administrativo agora permite excluir leads com confirmação.
 
 
 V31 — WhatsApp e mensagens prontas: botão WhatsApp por lead, mensagem inicial sugerida por interesse, edição antes do envio e registro do contato no histórico.
+
+
+V37 — Gestão inteligente de retornos: atalhos Hoje, Amanhã, +7 dias e Limpar no campo Próximo retorno.
