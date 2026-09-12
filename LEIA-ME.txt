@@ -1,3 +1,5 @@
+V36.2 — Correção definitiva da distinção entre WhatsApp iniciado e contato confirmado.
+
 AELO IMÓVEIS — V8 / BANCO DE DADOS
 
 O site agora pode buscar imóveis do Supabase. Sem configuração, ele continua exibindo os imóveis demonstrativos.
