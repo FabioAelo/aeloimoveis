@@ -33,6 +33,7 @@ function renderLeadDashboard(){
   leads.forEach(l=>{const k=l.status||'novo'; if(counts[k]!==undefined) counts[k]++});
   const stats=document.getElementById('leadStats');
   if(stats) stats.innerHTML=`<div class="stat-total"><b>${leads.length}</b><span>Total</span></div><div><b>${counts.novo}</b><span>Novos</span></div><div><b>${counts.atendimento}</b><span>Em atendimento</span></div><div><b>${counts.visita}</b><span>Visitas</span></div><div><b>${counts.proposta}</b><span>Propostas</span></div><div><b>${counts.fechado}</b><span>Fechados</span></div>`;
+  renderLeadPrioritySummary();
   const conversion=leads.length?Math.round((counts.fechado/leads.length)*100):0;
   const conv=document.getElementById('leadConversion'); if(conv) conv.textContent=`${conversion}% de conversão`;
   renderLeadAgenda();
@@ -63,6 +64,27 @@ function leadFollowState(l){
 }
 function leadHasContact(l){return !!l.last_contact_at || allInteractions.some(i=>i.lead_id===l.id);}
 function leadNeedsAttention(l){return leadIsOpen(l) && (leadFollowState(l)==='overdue' || (l.status||'novo')==='novo');}
+function getLeadPriority(l){
+  const status=l.status||'novo';
+  if(status==='fechado') return {key:'fechado',label:'✅ Negócio fechado',rank:5};
+  if(status==='sem_interesse') return {key:'sem_interesse',label:'⚫ Sem interesse',rank:6};
+  const follow=leadFollowState(l);
+  if(follow==='overdue') return {key:'agora',label:'🔴 Atender agora',rank:0};
+  if(follow==='today') return {key:'hoje',label:'🟠 Retornar hoje',rank:1};
+  if(status==='novo' && !leadHasContact(l)) return {key:'novo',label:'🟡 Novo lead',rank:2};
+  if(status==='novo') return {key:'novo',label:'🟡 Novo lead',rank:2};
+  if(status==='atendimento') return {key:'atendimento',label:'🔵 Em atendimento',rank:3};
+  if(status==='visita' || status==='proposta') return {key:'acompanhamento',label:'🟣 Em acompanhamento',rank:4};
+  return {key:'acompanhamento',label:'🔵 Em acompanhamento',rank:4};
+}
+function renderLeadPrioritySummary(){
+  const box=document.getElementById('leadPrioritySummary'); if(!box) return;
+  const open=allLeads.filter(leadIsOpen);
+  const counts={agora:0,hoje:0,novo:0,atendimento:0,acompanhamento:0,fechado:0};
+  open.forEach(l=>{counts[getLeadPriority(l).key]=(counts[getLeadPriority(l).key]||0)+1});
+  const labels=[['agora','🔴 Atender agora'],['hoje','🟠 Retornar hoje'],['novo','🟡 Novos leads'],['atendimento','🔵 Em atendimento'],['acompanhamento','🟣 Acompanhamento']];
+  box.innerHTML=labels.map(([k,label])=>`<button type="button" class="priority-tile priority-${k}" onclick="setQuickFilter('${k}')"><b>${counts[k]||0}</b><span>${label}</span></button>`).join('');
+}
 function applyLeadFilters(){
   const search=(document.getElementById('leadSearch')?.value||'').trim().toLowerCase();
   const sf=document.getElementById('leadStatusFilter')?.value||'todos';
@@ -74,10 +96,10 @@ function applyLeadFilters(){
     if(activeQuickFilter==='urgentes') quick=leadNeedsAttention(l);
     if(activeQuickFilter==='hoje') quick=leadFollowState(l)==='today' && leadIsOpen(l);
     if(activeQuickFilter==='sem-contato') quick=!leadHasContact(l) && leadIsOpen(l);
+    if(['agora','hoje','novo','atendimento','acompanhamento'].includes(activeQuickFilter)) quick=leadIsOpen(l) && getLeadPriority(l).key===activeQuickFilter;
     return quick && (!search||hay.includes(search)) && (sf==='todos'||(l.status||'novo')===sf) && (inf==='todos'||String(l.interest||'').toLowerCase()===inf.toLowerCase());
   });
-  const priority={overdue:0,today:1,none:2,upcoming:3};
-  filtered.sort((a,b)=>{const pa=priority[leadFollowState(a)]??4,pb=priority[leadFollowState(b)]??4;if(pa!==pb)return pa-pb;const na=(a.status||'novo')==='novo'?0:1,nb=(b.status||'novo')==='novo'?0:1;if(na!==nb)return na-nb;return new Date(b.created_at||0)-new Date(a.created_at||0);});
+  filtered.sort((a,b)=>{const pa=getLeadPriority(a).rank,pb=getLeadPriority(b).rank;if(pa!==pb)return pa-pb;return new Date(b.created_at||0)-new Date(a.created_at||0);});
   const count=document.getElementById('leadResultCount'); if(count) count.textContent=`${filtered.length} ${filtered.length===1?'lead':'leads'}`;
   const box=document.getElementById('leadList'); if(!box) return;
   box.innerHTML=filtered.length ? filtered.map(l=>renderLeadCard(l)).join('') : `<div class="lead-empty">Nenhum lead corresponde aos filtros selecionados.</div>`;
@@ -86,7 +108,7 @@ function setQuickFilter(value){activeQuickFilter=value;document.querySelectorAll
 
 function renderLeadCard(l){
   const dt=l.created_at?new Date(l.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
-  const status=l.status||'novo'; const meta=STATUS_META[status]||STATUS_META.novo;
+  const status=l.status||'novo'; const meta=STATUS_META[status]||STATUS_META.novo; const priorityMeta=getLeadPriority(l);
   const wa=String(l.whatsapp||'').replace(/\D/g,''); const waUrl=wa?`https://wa.me/55${wa}`:'#';
   const qual=[l.region&&`📍 ${l.region}`,l.budget&&`💰 ${l.budget}`,Number(l.bedrooms)>0&&`🛏️ ${l.bedrooms}+ quartos`].filter(Boolean).join(' • ');
   const follow=l.next_follow_up_at?new Date(l.next_follow_up_at):null;
@@ -98,7 +120,7 @@ function renderLeadCard(l){
   const attentionLabel=followClass==='overdue'?'⚠️ Prioridade de atendimento':((status==='novo'&&!hasContact)?'📞 Ainda não contatado':'');
   const lastContact=l.last_contact_at?new Date(l.last_contact_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
   const history=interactions.length?`<div class="interaction-history"><strong>Histórico recente</strong>${interactions.map(i=>`<div class="interaction-item"><time>${new Date(i.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time>${escapeHtml(i.note)}</div>`).join('')}</div>`:'';
-  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}${attentionLabel?`<span class="attention-status">${attentionLabel}</span>`:''}${lastContact?`<span class="last-contact">Último contato: ${escapeHtml(lastContact)}</span>`:'<span class="last-contact muted-contact">Nenhum contato registrado ainda</span>'}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<button class="ghost whatsapp-btn" onclick="openWhatsAppLead('${l.id}')">📱 Abrir WhatsApp</button>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
+  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-priority-line"><span class="priority-pill priority-${priorityMeta.key}">${priorityMeta.label}</span></div><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}${attentionLabel?`<span class="attention-status">${attentionLabel}</span>`:''}${lastContact?`<span class="last-contact">Último contato: ${escapeHtml(lastContact)}</span>`:'<span class="last-contact muted-contact">Nenhum contato registrado ainda</span>'}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<button class="ghost whatsapp-btn" onclick="openWhatsAppLead('${l.id}')">📱 Abrir WhatsApp</button>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
 }
 function formatDateTimeLocal(d){ const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
 async function refreshLeads(){
