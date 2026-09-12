@@ -76,7 +76,7 @@ function renderLeadCard(l){
   if(follow){ const day=new Date(follow.getFullYear(),follow.getMonth(),follow.getDate()); const diff=Math.round((day-dayNow)/86400000); if(diff<0){followClass='overdue';followLabel='⚠️ Retorno atrasado'} else if(diff===0){followClass='today';followLabel='🔔 Retorno hoje'} else {followLabel=`🔔 Retorno ${follow.toLocaleDateString('pt-BR')}`;} }
   const interactions=allInteractions.filter(i=>i.lead_id===l.id).slice(0,5);
   const history=interactions.length?`<div class="interaction-history"><strong>Histórico recente</strong>${interactions.map(i=>`<div class="interaction-item"><time>${new Date(i.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time>${escapeHtml(i.note)}</div>`).join('')}</div>`:'';
-  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${wa?`<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
+  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-main"><div><h3>${escapeHtml(l.name||'Sem nome')}</h3><p><strong>WhatsApp:</strong> ${escapeHtml(l.whatsapp||'—')} &nbsp; <strong>Interesse:</strong> ${escapeHtml(l.interest||'Atendimento')}</p>${qual?`<div class="lead-qual-summary">${escapeHtml(qual)}</div>`:''}<p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<a class="ghost" target="_blank" rel="noopener" href="${waUrl}">📱 WhatsApp</a>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
 }
 function formatDateTimeLocal(d){ const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
 async function refreshLeads(){
@@ -98,6 +98,25 @@ window.deleteLead = async id => {
   if (error) return alert("Não foi possível excluir o lead: " + error.message);
   await refreshLeads();
 };
+window.completeFollowUp = async id => {
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
+  const note = prompt('Como foi o retorno? (opcional)', '') || '';
+  const { error } = await client.from('leads').update({
+    next_follow_up_at: null,
+    last_contact_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) return alert('Não foi possível concluir o retorno: ' + error.message);
+  const historyNote = note.trim() ? `Retorno realizado — ${note.trim()}` : 'Retorno realizado';
+  const { error: iError } = await client.from('lead_interactions').insert({
+    lead_id: id,
+    type: 'retorno',
+    note: historyNote
+  });
+  if (iError) return alert('Retorno concluído, mas não foi possível registrar o histórico: ' + iError.message);
+  await refreshLeads();
+};
+
 window.saveLead = async id => {
   const status = $("status-"+id)?.value || "novo";
   const notes = $("notes-"+id)?.value.trim() || null;
