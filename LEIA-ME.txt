@@ -35,3 +35,6 @@ Após publicar os arquivos, execute no SQL Editor o conteúdo atualizado de lead
 
 
 V27.2 — O painel administrativo agora permite excluir leads com confirmação. Execute o trecho V27.2 do leads.sql no Supabase uma vez para habilitar a exclusão.
+
+
+V31 — WhatsApp e mensagens prontas: botão WhatsApp por lead, mensagem inicial sugerida por interesse, edição antes do envio e registro do contato no histórico.

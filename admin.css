@@ -65,3 +65,6 @@
 /* V30.1 — controle de retornos */
 .lead-actions .success{border-color:#b9d9c4;color:#17663a;background:#f7fcf8}
 .lead-actions .success:hover{background:#edf8f0}
+
+/* V31 — WhatsApp e mensagens prontas */
+.whatsapp-btn{border-color:#c9d9d0;color:#165b3b;background:#fff}.whatsapp-btn:hover{border-color:#83b99d;background:#f5fbf7}
