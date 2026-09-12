@@ -102,3 +102,7 @@
 .lead-main{margin-top:4px}
 @media(max-width:700px){.client-grid{grid-template-columns:1fr 1fr!important}}
 @media(max-width:480px){.client-grid{grid-template-columns:1fr!important}.client-sheet-head{flex-direction:column!important}.copy-sheet{align-self:flex-start}}
+
+/* V36 — ação rápida de contato */
+.lead-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lead-actions .success{border-color:#b9dec8;background:#f4fbf6}

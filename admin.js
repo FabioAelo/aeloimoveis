@@ -1,4 +1,4 @@
-// V35.1 — Ficha completa do cliente
+// V36 — Ações de atendimento e controle de contato
 const cfg = window.AELO_SUPABASE_CONFIG || {};
 const ready = window.supabase && cfg.url && cfg.anonKey && !String(cfg.url).startsWith("COLE_AQUI");
 const client = ready ? window.supabase.createClient(cfg.url, cfg.anonKey) : null;
@@ -129,7 +129,7 @@ function renderLeadCard(l){
   const profile=extractProfile(l);
   const profileItems=[['Interesse',l.interest||'—'],['Região',l.region||'—'],['Tipo',profile.type||'—'],['Faixa',l.budget||profile.faixa||'—'],['Quartos',Number(l.bedrooms)>0?`${l.bedrooms}+`:profile.quartos||'—'],['Prazo',profile.prazo||'—']];
   const profileHtml=`<div class="client-sheet"><div class="client-sheet-head"><div><span class="sheet-eyebrow">FICHA DO CLIENTE</span><strong>${escapeHtml(l.name||'Sem nome')}</strong></div><button type="button" class="ghost copy-sheet" onclick="copyLeadSummary('${l.id}')">📋 Copiar ficha</button></div><div class="client-grid">${profileItems.map(([label,value])=>`<div><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`).join('')}</div><div class="client-phone"><span>WhatsApp</span><strong>${escapeHtml(l.whatsapp||'—')}</strong>${wa?`<button type="button" class="ghost copy-phone" onclick="copyLeadPhone('${l.id}')">Copiar número</button>`:''}</div></div>`;
-  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-priority-line"><span class="priority-pill priority-${priorityMeta.key}">${priorityMeta.label}</span></div>${profileHtml}<div class="lead-main"><div><p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}${attentionLabel?`<span class="attention-status">${attentionLabel}</span>`:''}${lastContact?`<span class="last-contact">Último contato: ${escapeHtml(lastContact)}</span>`:'<span class="last-contact muted-contact">Nenhum contato registrado ainda</span>'}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<button class="ghost whatsapp-btn" onclick="openWhatsAppLead('${l.id}')">📱 Abrir WhatsApp</button>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
+  return `<article class="lead-admin status-${status}"><time>${dt}</time><div class="lead-priority-line"><span class="priority-pill priority-${priorityMeta.key}">${priorityMeta.label}</span></div>${profileHtml}<div class="lead-main"><div><p><strong>Mensagem:</strong> ${escapeHtml(l.message||'—')}</p><p><strong>Origem:</strong> ${escapeHtml(l.source==='site-chatbot'?'Assistente AELO':(l.source||'Site'))}</p>${followLabel?`<span class="followup-status ${followClass}">${followLabel}</span>`:''}${attentionLabel?`<span class="attention-status">${attentionLabel}</span>`:''}${lastContact?`<span class="last-contact">Último contato: ${escapeHtml(lastContact)}</span>`:'<span class="last-contact muted-contact">Nenhum contato registrado ainda</span>'}</div><span class="lead-interest">${meta.icon} ${meta.label}</span></div><div class="lead-tools"><label>Status<select id="status-${l.id}"><option value="novo" ${status==='novo'?'selected':''}>🟡 Novo</option><option value="atendimento" ${status==='atendimento'?'selected':''}>🔵 Em atendimento</option><option value="visita" ${status==='visita'?'selected':''}>🟢 Visita agendada</option><option value="proposta" ${status==='proposta'?'selected':''}>🟣 Proposta</option><option value="fechado" ${status==='fechado'?'selected':''}>✅ Negócio fechado</option><option value="sem_interesse" ${status==='sem_interesse'?'selected':''}>⚫ Sem interesse</option></select></label><div class="followup-box"><label>Próximo retorno<input id="follow-${l.id}" type="datetime-local" value="${follow?formatDateTimeLocal(follow):''}"></label><label>Registro deste contato<input id="interaction-${l.id}" type="text" placeholder="Ex.: Cliente pediu visita no sábado."></label></div><label>Observações<textarea id="notes-${l.id}" rows="3" placeholder="Registre aqui o andamento do atendimento...">${escapeHtml(l.notes||'')}</textarea></label>${history}<div class="lead-actions"><button class="primary" onclick="saveLead('${l.id}')">Salvar atualização</button>${follow?`<button class="ghost success" onclick="completeFollowUp('${l.id}')">✅ Retorno realizado</button>`:''}${wa?`<button class="ghost whatsapp-btn" onclick="openWhatsAppLead('${l.id}')">📱 Abrir WhatsApp</button>`:''}${status!=='fechado'&&status!=='sem_interesse'&&!hasContact?`<button class="ghost success" onclick="markLeadContacted('${l.id}')">📌 Marcar como contatado</button>`:''}<button class="ghost danger" onclick="deleteLead('${l.id}')">🗑️ Excluir lead</button></div></div></article>`;
 }
 window.copyLeadPhone=async id=>{const lead=allLeads.find(l=>l.id===id);if(!lead)return;const phone=String(lead.whatsapp||'').replace(/\D/g,'');if(!phone)return;await copyText(phone);};
 window.copyLeadSummary=async id=>{const lead=allLeads.find(l=>l.id===id);if(!lead)return;const p=extractProfile(lead);const lines=[`Cliente: ${lead.name||'Sem nome'}`,`WhatsApp: ${lead.whatsapp||'—'}`,`Interesse: ${lead.interest||'—'}`,`Região: ${lead.region||'—'}`,`Tipo: ${p.type||'—'}`,`Faixa: ${lead.budget||p.faixa||'—'}`,`Quartos: ${Number(lead.bedrooms)>0?lead.bedrooms+'+':p.quartos||'—'}`,`Prazo: ${p.prazo||'—'}`,`Mensagem: ${lead.message||'—'}`];await copyText(lines.join('\n'));};
@@ -155,6 +155,26 @@ window.deleteLead = async id => {
   if (!confirm("Excluir este lead definitivamente? Esta ação não pode ser desfeita.")) return;
   const { error } = await client.from("leads").delete().eq("id", id);
   if (error) return alert("Não foi possível excluir o lead: " + error.message);
+  await refreshLeads();
+};
+
+window.markLeadContacted = async id => {
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
+  const now = new Date().toISOString();
+  const currentStatus = lead.status || 'novo';
+  const nextStatus = currentStatus === 'novo' ? 'atendimento' : currentStatus;
+  const { error } = await client.from('leads').update({
+    last_contact_at: now,
+    status: nextStatus
+  }).eq('id', id);
+  if (error) return alert('Não foi possível registrar o contato: ' + error.message);
+  const { error: iError } = await client.from('lead_interactions').insert({
+    lead_id: id,
+    type: 'contato',
+    note: 'Contato registrado manualmente no painel'
+  });
+  if (iError) return alert('Contato registrado, mas não foi possível registrar o histórico: ' + iError.message);
   await refreshLeads();
 };
 window.completeFollowUp = async id => {
