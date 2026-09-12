@@ -88,3 +88,17 @@
 
 /* V35 — ficha completa do cliente */
 .client-sheet{margin:10px 0 18px;padding:16px 18px;border:1px solid #e5e7eb;border-radius:10px;background:#fbfcfd}.client-sheet-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:13px}.sheet-eyebrow{display:block;color:#9a6a0a;font-size:9px;font-weight:800;letter-spacing:1.4px;margin-bottom:3px}.client-sheet-head strong{display:block;font:700 20px/1.1 "Playfair Display",Georgia,serif;color:#0e2034}.copy-sheet,.copy-phone{padding:7px 10px;font-size:11px;white-space:nowrap}.client-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.client-grid>div{padding:9px 10px;background:#fff;border:1px solid #e8ebee;border-radius:7px}.client-grid span,.client-phone span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#7b8793;font-weight:700;margin-bottom:3px}.client-grid b{display:block;font-size:12px;color:#19344d;overflow-wrap:anywhere}.client-phone{display:flex;align-items:center;gap:10px;margin-top:9px;padding:9px 10px;background:#fff;border:1px solid #e8ebee;border-radius:7px}.client-phone strong{font-size:12px;color:#19344d;margin-right:auto}.client-phone span{margin:0}.client-phone .copy-phone{margin-left:auto}@media(max-width:700px){.client-grid{grid-template-columns:1fr 1fr}.client-sheet-head{align-items:flex-start}.client-sheet-head .copy-sheet{flex-shrink:0}}@media(max-width:480px){.client-grid{grid-template-columns:1fr}.client-sheet{padding:13px}.client-sheet-head strong{font-size:18px}.client-phone{flex-wrap:wrap}.client-phone strong{margin-right:0}.client-phone .copy-phone{margin-left:0}}
+
+
+/* V35.1 — Ficha do cliente: refinamento final */
+.client-sheet{margin:14px 0 20px!important;padding:18px!important;border:1px solid #dfe4e9!important;border-radius:12px!important;background:linear-gradient(180deg,#f8fafb 0%,#ffffff 100%)!important;box-shadow:0 3px 12px rgba(14,32,52,.04)}
+.client-sheet-head{padding-bottom:12px;border-bottom:1px solid #e7eaee;margin-bottom:12px!important}
+.client-sheet-head strong{font-size:22px!important;color:#0e2034!important}
+.client-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.client-grid>div{min-height:48px;display:flex;flex-direction:column;justify-content:center;background:#fff!important}
+.client-grid span,.client-phone span{font-size:9px!important;color:#7b8793!important}
+.client-grid b{font-size:13px!important;color:#19344d!important}
+.client-phone{margin-top:10px!important;background:#fff!important}
+.lead-main{margin-top:4px}
+@media(max-width:700px){.client-grid{grid-template-columns:1fr 1fr!important}}
+@media(max-width:480px){.client-grid{grid-template-columns:1fr!important}.client-sheet-head{flex-direction:column!important}.copy-sheet{align-self:flex-start}}

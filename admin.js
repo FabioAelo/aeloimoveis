@@ -1,3 +1,4 @@
+// V35.1 — Ficha completa do cliente
 const cfg = window.AELO_SUPABASE_CONFIG || {};
 const ready = window.supabase && cfg.url && cfg.anonKey && !String(cfg.url).startsWith("COLE_AQUI");
 const client = ready ? window.supabase.createClient(cfg.url, cfg.anonKey) : null;
