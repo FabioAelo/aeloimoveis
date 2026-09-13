@@ -169,3 +169,22 @@
 #opportunitiesContent>.lead-stats{margin-bottom:14px}
 #opportunitiesContent>.lead-priority-summary{margin-bottom:14px}
 @media(max-width:600px){.section-toggle{padding:15px}.collapsible-content{padding:0 14px 16px}.section-toggle b{font-size:16px}.section-toggle small{font-size:10px}}
+
+/* V45 — Inteligência comercial */
+.commercial-intelligence{display:flex;flex-direction:column;gap:16px;padding:18px 0 4px}
+.commercial-intel-head{display:flex;justify-content:space-between;gap:16px}
+.commercial-intel-head strong{display:block;font-family:'Playfair Display',serif;font-size:20px}
+.commercial-intel-head span{display:block;color:#667085;font-size:13px;margin-top:4px}
+.commercial-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.commercial-kpis>div,.commercial-rates>div{border:1px solid #dfe3e8;background:#fff;padding:14px 16px}
+.commercial-kpis b,.commercial-rates b{display:block;font-family:'Playfair Display',serif;font-size:25px;line-height:1.1}
+.commercial-kpis span,.commercial-rates span{display:block;font-size:12px;color:#53657a;margin-top:5px}
+.commercial-rates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.commercial-rates small{display:block;color:#8a95a3;font-size:11px;margin-top:5px}
+.commercial-path{border:1px solid #dfe3e8;background:#fff;padding:15px}
+.commercial-path>strong{display:block;margin-bottom:10px}
+.commercial-stage-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.commercial-stage{border:1px solid #e7e9ed;padding:10px 8px;display:flex;justify-content:space-between;gap:8px;font-size:12px;align-items:center}
+.commercial-stage b{font-size:16px}
+.commercial-intel-note{font-size:11px;color:#667085;line-height:1.45;padding:0 2px}
+@media(max-width:800px){.commercial-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.commercial-stage-list{grid-template-columns:1fr 1fr}.commercial-rates{grid-template-columns:1fr}}

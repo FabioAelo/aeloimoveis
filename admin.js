@@ -42,6 +42,34 @@ let allInteractions = [];
 const STATUS_META = {
   novo:{label:'Novo',icon:'🟡'}, atendimento:{label:'Em atendimento',icon:'🔵'}, visita:{label:'Visita agendada',icon:'🟢'}, proposta:{label:'Proposta',icon:'🟣'}, fechado:{label:'Negócio fechado',icon:'✅'}, sem_interesse:{label:'Sem interesse',icon:'⚫'}
 };
+function renderCommercialIntelligence(){
+  const box=document.getElementById('commercialIntelligence'); if(!box) return;
+  const leads=(typeof allLeads!=='undefined' ? allLeads : []);
+  const total=leads.length;
+  const count=s=>leads.filter(l=>(l.status||'novo')===s).length;
+  const novos=count('novo'), atendimento=count('atendimento'), visita=count('visita'), proposta=count('proposta'), fechado=count('fechado'), semInteresse=count('sem_interesse');
+  const abertos=Math.max(0,total-fechado-semInteresse);
+  const negociacao=visita+proposta;
+  const fechamento=total ? (fechado/total*100) : 0;
+  const aproveitamento=total ? ((fechado+proposta+visita)/total*100) : 0;
+  const stages=[
+    ['🟡','Novo',novos],['🔵','Em atendimento',atendimento],['🟢','Visita agendada',visita],['🟣','Proposta',proposta],['✅','Fechado',fechado]
+  ];
+  box.innerHTML=`<div class="commercial-intel-head"><div><strong>Visão da carteira</strong><span>Indicadores calculados sobre os leads cadastrados no painel.</span></div></div>
+  <div class="commercial-kpis">
+    <div><b>${total}</b><span>Total de leads</span></div>
+    <div><b>${abertos}</b><span>Oportunidades abertas</span></div>
+    <div><b>${negociacao}</b><span>Em visita / proposta</span></div>
+    <div><b>${fechado}</b><span>Negócios fechados</span></div>
+  </div>
+  <div class="commercial-rates">
+    <div><b>${fechamento.toFixed(1)}%</b><span>Taxa de fechamento</span><small>fechados ÷ todos os leads</small></div>
+    <div><b>${aproveitamento.toFixed(1)}%</b><span>Em etapa comercial</span><small>visita + proposta + fechado</small></div>
+  </div>
+  <div class="commercial-path"><strong>Caminho comercial</strong><div class="commercial-stage-list">${stages.map(([icon,label,n])=>`<div class="commercial-stage"><span>${icon} ${label}</span><b>${n}</b></div>`).join('')}</div></div>
+  <div class="commercial-intel-note">ℹ️ Esta leitura considera o status atual de cada lead. Ela não afirma que uma visita do site virou um lead específico, porque os eventos de acesso são anônimos.</div>`;
+}
+
 function renderLeadDashboard(){
   const leads=allLeads;
   const counts={novo:0,atendimento:0,visita:0,proposta:0,fechado:0,sem_interesse:0};
@@ -229,6 +257,7 @@ async function refreshLeads(){
   allLeads=leadRes.data||[];
   allInteractions=interactionRes.error ? [] : (interactionRes.data||[]);
   renderLeadDashboard();
+  renderCommercialIntelligence();
   loadAnalytics(Number(document.getElementById('analyticsPeriod')?.value || 30));
 }
 ['leadSearch','leadStatusFilter','leadInterestFilter'].forEach(id=>{document.getElementById(id)?.addEventListener('input',applyLeadFilters);document.getElementById(id)?.addEventListener('change',applyLeadFilters)});

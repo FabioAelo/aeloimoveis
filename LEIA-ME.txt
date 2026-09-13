@@ -43,3 +43,5 @@ V31 — WhatsApp e mensagens prontas: botão WhatsApp por lead, mensagem inicial
 
 
 V37 — Gestão inteligente de retornos: atalhos Hoje, Amanhã, +7 dias e Limpar no campo Próximo retorno.
+
+V45 — Inteligência comercial: indicadores da carteira e caminho por etapa; sem SQL novo.

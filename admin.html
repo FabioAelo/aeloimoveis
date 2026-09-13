@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=44">
+<link rel="stylesheet" href="admin.css?v=45">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -41,6 +41,10 @@
   <section class="sub-collapsible">
     <button class="section-toggle sub-toggle" type="button" data-target="agendaContent" aria-expanded="false"><span><b>📅 Agendas e retornos</b><small>Compromissos, atrasados e próximos retornos</small></span><strong class="toggle-chevron">⌄</strong></button>
     <div id="agendaContent" class="collapsible-content hidden-section"><div id="leadAgenda" class="lead-agenda"></div></div>
+  </section>
+  <section class="sub-collapsible">
+    <button class="section-toggle sub-toggle" type="button" data-target="commercialIntelligenceContent" aria-expanded="false"><span><b>🧠 Inteligência comercial</b><small>Indicadores e conversão da carteira de leads</small></span><strong class="toggle-chevron">⌄</strong></button>
+    <div id="commercialIntelligenceContent" class="collapsible-content hidden-section"><div id="commercialIntelligence" class="commercial-intelligence"></div></div>
   </section>
   <section class="sub-collapsible">
     <button class="section-toggle sub-toggle" type="button" data-target="funnelContent" aria-expanded="false"><span><b>📈 Funil comercial</b><small>Acompanhe a evolução dos leads por etapa</small></span><strong class="toggle-chevron">⌄</strong></button>
@@ -83,7 +87,7 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=44"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=45"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
