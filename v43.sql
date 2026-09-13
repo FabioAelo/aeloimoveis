@@ -24,3 +24,7 @@ create policy "authenticated can read site events"
 on public.site_events for select
 to authenticated
 using (true);
+
+-- Permissões necessárias para o navegador registrar eventos e o painel ler os indicadores.
+grant insert on table public.site_events to anon, authenticated;
+grant select on table public.site_events to authenticated;

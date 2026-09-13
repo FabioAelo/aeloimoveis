@@ -180,7 +180,12 @@ async function loadAnalytics(days=30){
   const since=new Date(Date.now()-Number(days)*86400000).toISOString();
   stats.innerHTML='<div class="analytics-loading">Atualizando indicadores...</div>';
   const {data,error}=await client.from('site_events').select('visitor_id,event_type,details,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(10000);
-  if(error){stats.innerHTML='<div class="analytics-error">Não foi possível carregar os indicadores agora.</div>'; if(searches) searches.innerHTML=''; return;}
+  if(error){
+    const msg=String(error.message||'Erro desconhecido');
+    stats.innerHTML=`<div class="analytics-error"><strong>Não foi possível carregar os indicadores agora.</strong><small>${escapeHtml(msg)}</small><button type="button" class="ghost" onclick="loadAnalytics(${Number(days)||30})">Tentar novamente</button></div>`;
+    if(searches) searches.innerHTML='';
+    return;
+  }
   const rows=data||[];
   const visitors=new Set(rows.filter(r=>r.event_type==='page_view').map(r=>r.visitor_id)).size;
   const views=rows.filter(r=>r.event_type==='page_view').length;
