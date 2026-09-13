@@ -232,7 +232,6 @@ const filmMeta = document.getElementById('film-meta');
 const filmStatus = document.getElementById('film-status');
 const filmProgress = document.getElementById('film-progress-bar');
 const filmPlay = document.getElementById('film-play');
-const filmGenerate = document.getElementById('film-generate');
 let filmProperty = null, filmIndex = 0, filmTimer = null, filmPlaying = false;
 
 function filmRender(){
@@ -304,30 +303,3 @@ async function drawFilmFrame(ctx,canvas,img,p,index,total,pauseMs){
   }catch(e){}
 }
 
-async function generateFilmVideo(){
-  if(!filmProperty || !filmProperty.gallery_urls?.length){return;}
-  if(!window.MediaRecorder){filmStatus.textContent='Seu navegador não oferece geração de vídeo.';return;}
-  filmGenerate.disabled=true; filmPlay.disabled=true; filmStatus.textContent='Preparando vídeo...';
-  try{
-    const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;
-    const ctx=canvas.getContext('2d');
-    const stream=canvas.captureStream(30);
-    const chunks=[]; const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':(MediaRecorder.isTypeSupported('video/webm')?'video/webm':'');
-    const rec=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
-    rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-    const done=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=reject});
-    rec.start();
-    for(let i=0;i<filmProperty.gallery_urls.length;i++){
-      filmStatus.textContent=`Gerando vídeo: foto ${i+1} de ${filmProperty.gallery_urls.length}...`;
-      const im=await loadFilmImage(filmProperty.gallery_urls[i]);
-      await drawFilmFrame(ctx,canvas,im,filmProperty,i,filmProperty.gallery_urls.length,3500);
-      await new Promise(r=>setTimeout(r,3200));
-    }
-    rec.stop(); await done; stream.getTracks().forEach(t=>t.stop());
-    const blob=new Blob(chunks,{type:'video/webm'}); const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=`${(filmProperty.title||'imovel').replace(/[^a-z0-9]+/gi,'-').toLowerCase()}-aelo.webm`;a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),30000);filmStatus.textContent='Vídeo gerado em WebM. Verifique a pasta de downloads.';
-  }catch(err){console.error(err);filmStatus.textContent='Não foi possível gerar o vídeo. A apresentação continua disponível.';}
-  finally{filmGenerate.disabled=false;filmPlay.disabled=false;}
-}
-filmGenerate?.addEventListener('click',generateFilmVideo);
