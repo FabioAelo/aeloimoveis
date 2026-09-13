@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=48.2">
+  <link rel="stylesheet" href="style.css?v=48.5">
 
-<style id="aelo-gallery-v48-3">
+<style id="aelo-gallery-v48-5">
 /* Galeria: foto preservada, painel de detalhes com rolagem própria */
 .modal-card{
   width:min(1220px,94vw)!important;
@@ -39,18 +39,7 @@
   object-position:center!important;
   background:#0c1118!important;
 }
-.modal-watermark{
-  position:absolute!important;
-  right:22px!important;
-  bottom:22px!important;
-  width:132px!important;
-  max-width:24%!important;
-  height:auto!important;
-  opacity:.52!important;
-  z-index:4!important;
-  pointer-events:none!important;
-  user-select:none!important;
-}
+.modal-watermark{display:none!important;}
 .modal-body{
   min-width:0!important;
   min-height:0!important;
@@ -64,7 +53,7 @@
   .modal-card{width:96vw!important;height:92vh!important;max-height:92vh!important;grid-template-columns:1fr!important;grid-template-rows:minmax(46%,52%) minmax(48%,1fr)!important;}
   .modal-gallery{height:auto!important;}
   .modal-body{height:auto!important;}
-  .modal-watermark{width:104px!important;right:14px!important;bottom:14px!important;}
+  .modal-watermark{display:none!important;}
 }
 </style>
 </head>
@@ -190,7 +179,6 @@
       <button class="modal-close" aria-label="Fechar">×</button>
       <div class="modal-gallery">
         <img id="modal-image" src="" alt="">
-        <img class="modal-watermark" src="aelo-watermark-exact.png" alt="AELO Imóveis" aria-hidden="true">
         <button class="gallery-prev" type="button" aria-label="Foto anterior">‹</button>
         <button class="gallery-next" type="button" aria-label="Próxima foto">›</button>
         <div class="gallery-counter" id="gallery-counter"></div>
