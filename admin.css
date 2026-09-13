@@ -292,3 +292,57 @@
   .lead-expanded-content{width:100%;min-width:0;overflow:hidden}
   .lead-admin{overflow:hidden}
 }
+
+/* V48.16 — correção definitiva do cabeçalho dos leads no celular */
+@media(max-width:600px){
+  .lead-compact-header{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    align-items:flex-start!important;
+    gap:9px!important;
+    padding:13px 11px!important;
+  }
+  .lead-compact-main{
+    width:100%!important;
+    min-width:0!important;
+  }
+  .lead-compact-main strong{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    font-size:20px!important;
+    line-height:1.15!important;
+    white-space:normal!important;
+    word-break:normal!important;
+    overflow-wrap:break-word!important;
+  }
+  .lead-compact-main small{
+    display:block!important;
+    width:100%!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+  .lead-compact-right{
+    width:100%!important;
+    min-width:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+    gap:6px!important;
+  }
+  .lead-open-label{
+    display:inline!important;
+    width:auto!important;
+    text-align:left!important;
+    font-size:10px!important;
+    white-space:nowrap!important;
+  }
+}
+@media(max-width:420px){
+  .lead-compact-main strong{font-size:19px!important}
+  .lead-compact-right{justify-content:flex-start!important}
+  .lead-open-label{width:auto!important;text-align:left!important}
+}
