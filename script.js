@@ -55,7 +55,7 @@ function renderProperties(filter = "todos") {
     <article class="property-card" data-id="${p.id}">
       <div class="property-image">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
-        <span class="badge">${p.badge}</span>
+        <span class="badge">${p.badge}</span>${p.commercial_status==='vendido'?`<span class="sold-badge">✓ IMÓVEL VENDIDO</span>`:''}
       </div>
       <div class="property-info">
         <h3>${p.title}</h3>
@@ -88,7 +88,7 @@ function openModal(id) {
   if (!p) return;
   currentGallery = p.gallery_urls?.length ? p.gallery_urls : [p.image_url];
   currentGalleryIndex = 0;
-  document.getElementById("modal-type").textContent = p.badge + (dataSource === "demo" ? " • DEMONSTRATIVO" : "");
+  document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : "") + (dataSource === "demo" ? " • DEMONSTRATIVO" : "");
   document.getElementById("modal-title").textContent = p.title;
   document.getElementById("modal-location").textContent = p.location;
   document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");

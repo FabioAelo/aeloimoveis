@@ -130,3 +130,8 @@
 .timeline-item.whatsapp .timeline-dot{background:#f4fbf6}.timeline-item.contato .timeline-dot{background:#fff8e9}.timeline-item.retorno .timeline-dot{background:#fff7df}.timeline-item.status .timeline-dot{background:#f2f5fb}.timeline-item.agendamento .timeline-dot{background:#f4f1fb}
 .timeline-empty{display:flex;align-items:center;justify-content:space-between;gap:12px}.timeline-empty span{font-size:11px;color:#8a929d}
 @media(max-width:600px){.timeline{padding:12px}.timeline-item{grid-template-columns:26px 1fr;gap:8px}.timeline-dot{width:26px;height:26px;font-size:11px}.timeline-empty{display:block}.timeline-empty span{display:block;margin-top:5px}}
+
+
+/* V42 — situação comercial */
+#soldByWrap.hidden{display:none!important}
+.commercial-pill{display:inline-flex;padding:5px 9px;border:1px solid #e3d4af;background:#fbf6ea;border-radius:999px;font-size:11px;font-weight:800;color:#76500c}

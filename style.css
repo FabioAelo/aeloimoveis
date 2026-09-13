@@ -384,3 +384,9 @@ footer{background:#050607}
 .lead-qualification{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 10px;padding:8px 9px;background:#fbf6ea;border:1px solid #ead8a8;border-radius:9px;font-size:10.5px;color:#6e5015}
 .lead-qualification b{grid-column:1/-1;color:#17304a;font-size:11px}.lead-qualification span{padding:3px 0}
 @media(max-width:600px){.lead-qualification{grid-template-columns:1fr}.lead-qualification b{grid-column:auto}}
+
+
+/* V42 — Status comercial do imóvel */
+.property-image{position:relative}
+.sold-badge{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;background:rgba(18,35,48,.94);color:#fff;text-align:center;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.property-card:has(.sold-badge) .price{color:#6f7680}
