@@ -148,8 +148,16 @@ function applyLeadFilters(){
   const count=document.getElementById('leadResultCount'); if(count) count.textContent=`${filtered.length} ${filtered.length===1?'lead':'leads'}`;
   const box=document.getElementById('leadList'); if(!box) return;
   box.innerHTML=filtered.length ? filtered.map(l=>renderLeadCard(l)).join('') : `<div class="lead-empty">Nenhum lead corresponde aos filtros selecionados.</div>`;
+  sanitizeCompactLeadHeaders();
 }
 function setQuickFilter(value){activeQuickFilter=value;document.querySelectorAll('.quick-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.quickFilter===value));applyLeadFilters();}
+
+// V46.2: compact list must show only the lead's current status. Any legacy priority badge
+// accidentally injected by an older cached script is removed from the compact header.
+function sanitizeCompactLeadHeaders(){
+  document.querySelectorAll('.lead-compact-header .priority-pill, .lead-compact-header .lead-priority, .lead-compact-header [data-priority]').forEach(el=>el.remove());
+}
+
 
 function extractProfile(lead){
   const text=String(lead.message||'');
