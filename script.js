@@ -103,6 +103,24 @@ function renderProperties(filter = "todos") {
 let currentGallery = [];
 let currentGalleryIndex = 0;
 
+function renderGalleryThumbs(){
+  const wrap=document.getElementById("gallery-thumbs");
+  if(!wrap) return;
+  wrap.innerHTML="";
+  if(currentGallery.length<=1) return;
+  currentGallery.forEach((src,i)=>{
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.className="gallery-thumb"+(i===currentGalleryIndex?" active":"");
+    btn.setAttribute("aria-label",`Ver foto ${i+1}`);
+    const im=document.createElement("img");
+    im.src=src; im.alt=`Miniatura da foto ${i+1}`; im.loading="lazy";
+    btn.appendChild(im);
+    btn.addEventListener("click",()=>{ currentGalleryIndex=i; showGalleryImage(); });
+    wrap.appendChild(btn);
+  });
+}
+
 function showGalleryImage() {
   const img = document.getElementById("modal-image");
   const counter = document.getElementById("gallery-counter");
@@ -112,6 +130,11 @@ function showGalleryImage() {
   counter.textContent = currentGallery.length > 1 ? `${currentGalleryIndex + 1} / ${currentGallery.length}` : "";
   document.querySelector(".gallery-prev").classList.toggle("hidden", currentGallery.length <= 1);
   document.querySelector(".gallery-next").classList.toggle("hidden", currentGallery.length <= 1);
+  document.querySelectorAll(".gallery-thumb").forEach((b,i)=>b.classList.toggle("active",i===currentGalleryIndex));
+  const active=document.querySelector(".gallery-thumb.active");
+  if(active) active.scrollIntoView({behavior:"smooth",block:"nearest",inline:"nearest"});
+  const wm=document.getElementById("modal-watermark");
+  if(wm) wm.style.display=currentGallery.length?"block":"none";
 }
 
 function openModal(id) {
@@ -124,6 +147,7 @@ function openModal(id) {
   document.getElementById("modal-location").textContent = p.location;
   document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");
   document.getElementById("modal-description").textContent = p.description || "Entre em contato com a Aelo para mais informações.";
+  renderGalleryThumbs();
   showGalleryImage();
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
 }
