@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=43.3">
+<link rel="stylesheet" href="admin.css?v=43.5">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -18,19 +18,34 @@
 <section id="dashboard" class="hidden">
   <div class="dashboard-head"><div><p class="eyebrow">CATÁLOGO AELO</p><h1>Gerenciar imóveis.</h1></div><button id="newBtn" class="primary">+ Novo imóvel</button></div>
   <div id="propertyList" class="admin-list"></div>
-  <section id="analyticsPanel" class="analytics-panel">
-  <div class="analytics-head"><div><p class="eyebrow">INTELIGÊNCIA DO SITE</p><h2>Visitas e pesquisas.</h2><p>Estimativa anônima de visitantes, acessos e pesquisas realizadas no site.</p></div><select id="analyticsPeriod" class="analytics-period"><option value="1">Hoje</option><option value="7">7 dias</option><option value="30" selected>30 dias</option></select></div>
-  <div id="analyticsStats" class="analytics-stats"><div class="analytics-loading">Carregando indicadores...</div></div>
-  <div class="analytics-bottom"><div><strong>Pesquisas mais realizadas</strong><span>Com base nas buscas concluídas pelo Assistente AELO.</span></div><div id="analyticsSearches" class="analytics-searches"></div></div>
-  <div id="analyticsEvolution" class="analytics-evolution"></div>
+  <section id="analyticsPanel" class="analytics-panel collapsible-panel">
+  <button class="section-toggle" type="button" data-target="analyticsContent" aria-expanded="false"><span><b>📊 Visitas e pesquisas</b><small>Inteligência do site • acessos, pesquisas e conversão</small></span><strong class="toggle-chevron">⌄</strong></button>
+  <div id="analyticsContent" class="collapsible-content hidden-section">
+    <div class="analytics-head"><div><p class="eyebrow">INTELIGÊNCIA DO SITE</p><h2>Visitas e pesquisas.</h2><p>Estimativa anônima de visitantes, acessos e pesquisas realizadas no site.</p></div><select id="analyticsPeriod" class="analytics-period"><option value="1">Hoje</option><option value="7">7 dias</option><option value="30" selected>30 dias</option></select></div>
+    <div id="analyticsStats" class="analytics-stats"><div class="analytics-loading">Carregando indicadores...</div></div>
+    <div class="analytics-bottom"><div><strong>Pesquisas mais realizadas</strong><span>Com base nas buscas concluídas pelo Assistente AELO.</span></div><div id="analyticsSearches" class="analytics-searches"></div></div>
+    <div id="analyticsEvolution" class="analytics-evolution"></div>
+  </div>
 </section>
-<div class="dashboard-head leads-head"><div><p class="eyebrow">ATENDIMENTO</p><h2>Central de oportunidades.</h2><p>Organize os contatos do Assistente AELO e acompanhe cada oportunidade até o fechamento.</p></div></div>
-<div id="leadStats" class="lead-stats"></div>
-<div id="leadPrioritySummary" class="lead-priority-summary" aria-label="Prioridade de atendimento"></div>
-<div id="leadAgenda" class="lead-agenda"></div>
-<div class="lead-funnel-wrap"><div class="funnel-title"><div><strong>Funil comercial</strong><span>Acompanhe a evolução dos leads por etapa.</span></div><span id="leadConversion" class="conversion-badge">0% de conversão</span></div><div id="leadFunnel" class="lead-funnel"></div></div>
-<div class="lead-filters"><div class="filter-title"><div><strong>Meus leads</strong><span id="leadResultCount">0 leads</span></div><button id="clearLeadFilters" class="ghost filter-clear" type="button">Limpar filtros</button></div><div class="lead-quick-filters" role="group" aria-label="Filtros rápidos"><button type="button" class="quick-filter active" data-quick-filter="todos">Todos</button><button type="button" class="quick-filter" data-quick-filter="agora">🔴 Atender agora</button><button type="button" class="quick-filter" data-quick-filter="hoje">🟠 Retornar hoje</button><button type="button" class="quick-filter" data-quick-filter="novo">🟡 Novos leads</button><button type="button" class="quick-filter" data-quick-filter="atendimento">🔵 Em atendimento</button><button type="button" class="quick-filter" data-quick-filter="acompanhamento">🟣 Acompanhamento</button><button type="button" class="quick-filter" data-quick-filter="sem-contato">📞 Sem contato</button></div><div class="filter-grid"><label>Buscar<input id="leadSearch" type="search" placeholder="Nome, WhatsApp ou região"></label><label>Status<select id="leadStatusFilter"><option value="todos">Todos</option><option value="novo">🟡 Novo</option><option value="atendimento">🔵 Em atendimento</option><option value="visita">🟢 Visita agendada</option><option value="proposta">🟣 Proposta</option><option value="fechado">✅ Negócio fechado</option><option value="sem_interesse">⚫ Sem interesse</option></select></label><label>Interesse<select id="leadInterestFilter"><option value="todos">Todos</option><option value="Compra">Compra</option><option value="Aluguel">Aluguel</option><option value="Venda">Venda</option><option value="Avaliação / PTAM">Avaliação / PTAM</option><option value="Perícia / assistência">Perícia / assistência</option></select></label></div></div>
-<div id="leadList" class="admin-list"></div>
+<div class="dashboard-head leads-head collapsible-heading">
+  <button class="section-toggle standalone-toggle" type="button" data-target="opportunitiesContent" aria-expanded="false"><span><b>🎯 Central de oportunidades</b><small>Leads, prioridades, agenda e funil comercial</small></span><strong class="toggle-chevron">⌄</strong></button>
+</div>
+<div id="opportunitiesContent" class="collapsible-content hidden-section">
+  <div id="leadStats" class="lead-stats"></div>
+  <div id="leadPrioritySummary" class="lead-priority-summary" aria-label="Prioridade de atendimento"></div>
+  <section class="sub-collapsible">
+    <button class="section-toggle sub-toggle" type="button" data-target="agendaContent" aria-expanded="false"><span><b>📅 Agendas e retornos</b><small>Compromissos, atrasados e próximos retornos</small></span><strong class="toggle-chevron">⌄</strong></button>
+    <div id="agendaContent" class="collapsible-content hidden-section"><div id="leadAgenda" class="lead-agenda"></div></div>
+  </section>
+  <div class="lead-funnel-wrap"><div class="funnel-title"><div><strong>Funil comercial</strong><span>Acompanhe a evolução dos leads por etapa.</span></div><span id="leadConversion" class="conversion-badge">0% de conversão</span></div><div id="leadFunnel" class="lead-funnel"></div></div>
+  <section class="sub-collapsible">
+    <button class="section-toggle sub-toggle" type="button" data-target="myLeadsContent" aria-expanded="false"><span><b>👥 Meus leads</b><small>Filtros, contatos e histórico de oportunidades</small></span><strong class="toggle-chevron">⌄</strong></button>
+    <div id="myLeadsContent" class="collapsible-content hidden-section">
+      <div class="lead-filters"><div class="filter-title"><div><strong>Meus leads</strong><span id="leadResultCount">0 leads</span></div><button id="clearLeadFilters" class="ghost filter-clear" type="button">Limpar filtros</button></div><div class="lead-quick-filters" role="group" aria-label="Filtros rápidos"><button type="button" class="quick-filter active" data-quick-filter="todos">Todos</button><button type="button" class="quick-filter" data-quick-filter="agora">🔴 Atender agora</button><button type="button" class="quick-filter" data-quick-filter="hoje">🟠 Retornar hoje</button><button type="button" class="quick-filter" data-quick-filter="novo">🟡 Novos leads</button><button type="button" class="quick-filter" data-quick-filter="atendimento">🔵 Em atendimento</button><button type="button" class="quick-filter" data-quick-filter="acompanhamento">🟣 Acompanhamento</button><button type="button" class="quick-filter" data-quick-filter="sem-contato">📞 Sem contato</button></div><div class="filter-grid"><label>Buscar<input id="leadSearch" type="search" placeholder="Nome, WhatsApp ou região"></label><label>Status<select id="leadStatusFilter"><option value="todos">Todos</option><option value="novo">🟡 Novo</option><option value="atendimento">🔵 Em atendimento</option><option value="visita">🟢 Visita agendada</option><option value="proposta">🟣 Proposta</option><option value="fechado">✅ Negócio fechado</option><option value="sem_interesse">⚫ Sem interesse</option></select></label><label>Interesse<select id="leadInterestFilter"><option value="todos">Todos</option><option value="Compra">Compra</option><option value="Aluguel">Aluguel</option><option value="Venda">Venda</option><option value="Avaliação / PTAM">Avaliação / PTAM</option><option value="Perícia / assistência">Perícia / assistência</option></select></label></div></div>
+      <div id="leadList" class="admin-list"></div>
+    </div>
+  </section>
+</div>
 </section>
 <section id="editor" class="card hidden">
   <div class="editor-head"><div><p class="eyebrow">CADASTRO</p><h2 id="editorTitle">Novo imóvel</h2></div><button id="cancelBtn" class="ghost">Cancelar</button></div>
@@ -58,5 +73,19 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=43.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=43.5"></script>
+<script>
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.section-toggle');
+  if(!btn) return;
+  const id=btn.getAttribute('data-target');
+  const panel=document.getElementById(id);
+  if(!panel) return;
+  const open=btn.getAttribute('aria-expanded')==='true';
+  btn.setAttribute('aria-expanded',String(!open));
+  panel.classList.toggle('hidden-section',open);
+  btn.classList.toggle('is-open',!open);
+  if(!open){ setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),30); }
+});
+</script>
 </body></html>

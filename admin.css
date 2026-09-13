@@ -147,3 +147,25 @@
 .analytics-error small{display:block;margin-top:8px;opacity:.82;word-break:break-word}.analytics-error button{margin-top:12px}
 
 .analytics-evolution{margin-top:14px;border:1px solid #e2e6ea;padding:15px;background:#fbfbfb}.analytics-evolution-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.analytics-evolution-head>div:first-child{display:flex;flex-direction:column;gap:3px}.analytics-evolution-head strong{font-size:12px;color:#0d2740}.analytics-evolution-head span{font-size:10px;color:#7b8793}.analytics-legend{display:flex!important;gap:12px;flex-direction:row!important;white-space:nowrap}.analytics-legend span{display:flex;align-items:center;gap:5px}.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#17334d}.legend-dot.searches{background:#b8862d}.analytics-conversion{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.analytics-conversion>div{background:#fff;border:1px solid #e8ebee;padding:10px}.analytics-conversion b{display:block;font:700 21px/1 "Playfair Display",Georgia,serif;color:#0d2740}.analytics-conversion span{display:block;margin-top:4px;color:#687687;font-size:9px;font-weight:700}.analytics-chart{height:155px;display:flex;align-items:stretch;gap:3px;padding:10px 4px 0;border-top:1px solid #e8ebee;overflow:hidden}.analytics-day{min-width:0;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative}.analytics-day-label{font-size:8px;color:#7b8793;margin-top:5px;white-space:nowrap}.analytics-day-bars{height:122px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px}.analytics-bar-wrap{height:100%;width:38%;display:flex;align-items:flex-end;justify-content:center}.analytics-bar{display:block;width:100%;min-height:0;border-radius:3px 3px 0 0;background:#17334d}.analytics-bar.searches{background:#b8862d}.analytics-day-leads{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:7px;color:#7b8793;white-space:nowrap;font-weight:700}.analytics-chart-note{margin-top:8px;color:#8a949e;font-size:9px}@media(max-width:600px){.analytics-evolution-head{display:block}.analytics-legend{margin-top:8px}.analytics-conversion{grid-template-columns:1fr 1fr}.analytics-conversion>div:last-child{grid-column:1/-1}.analytics-chart{overflow-x:auto;justify-content:flex-start}.analytics-day{min-width:18px}.analytics-day-label{font-size:7px}}
+
+/* V43.5 — painel administrativo em seções recolhíveis */
+.collapsible-panel{padding:0;margin:0 0 18px;background:#fff;border:1px solid #e1e5ea}
+.section-toggle{width:100%;border:0;background:#fff;color:#0d2740;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;padding:17px 20px;cursor:pointer}
+.section-toggle:hover{background:#fcfaf5}
+.section-toggle span{display:flex;flex-direction:column;gap:4px}
+.section-toggle b{font:700 18px/1.2 "Playfair Display",Georgia,serif}
+.section-toggle small{font:500 11px "DM Sans",Arial,sans-serif;color:#7a8591}
+.toggle-chevron{font:700 24px/1 "DM Sans",Arial,sans-serif;color:#b17b18;transition:transform .18s ease}
+.section-toggle.is-open .toggle-chevron{transform:rotate(180deg)}
+.hidden-section{display:none!important}
+.collapsible-content{padding:0 22px 22px}
+.collapsible-panel>.collapsible-content{padding-top:0}
+.leads-head.collapsible-heading{display:block;margin:0 0 18px}
+.standalone-toggle{border:1px solid #e1e5ea;background:#fff}
+.sub-collapsible{border:1px solid #e1e5ea;background:#fff;margin:0 0 18px}
+.sub-toggle{padding:14px 16px}
+.sub-toggle b{font-size:16px}
+.sub-collapsible>.collapsible-content{padding:0 14px 14px}
+#opportunitiesContent>.lead-stats{margin-bottom:14px}
+#opportunitiesContent>.lead-priority-summary{margin-bottom:14px}
+@media(max-width:600px){.section-toggle{padding:15px}.collapsible-content{padding:0 14px 16px}.section-toggle b{font-size:16px}.section-toggle small{font-size:10px}}
