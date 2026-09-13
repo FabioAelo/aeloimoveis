@@ -44,14 +44,26 @@ function getAeloVisitorId(){
     return id;
   }catch(e){ return 'session_'+Date.now()+'_'+Math.random().toString(36).slice(2); }
 }
-async function trackAeloEvent(eventType, details={}){
+async function trackAeloEvent(eventType, details={}, attempt=0){
   try{
     const c=getSupabaseClient();
-    if(!c) return;
-    await c.from('site_events').insert({visitor_id:getAeloVisitorId(), event_type:eventType, details});
-  }catch(e){ console.debug('Analytics AELO:',e); }
+    if(!c){
+      if(attempt<3) setTimeout(()=>trackAeloEvent(eventType,details,attempt+1),800);
+      return;
+    }
+    const {error}=await c.from('site_events').insert({visitor_id:getAeloVisitorId(), event_type:eventType, details});
+    if(error && attempt<2) setTimeout(()=>trackAeloEvent(eventType,details,attempt+1),1000);
+    if(error) console.debug('Analytics AELO:',error);
+  }catch(e){
+    if(attempt<2) setTimeout(()=>trackAeloEvent(eventType,details,attempt+1),1000);
+    else console.debug('Analytics AELO:',e);
+  }
 }
-trackAeloEvent('page_view',{page:location.pathname});
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>trackAeloEvent('page_view',{page:location.pathname}),{once:true});
+}else{
+  trackAeloEvent('page_view',{page:location.pathname});
+}
 
 async function loadProperties() {
   const client = getSupabaseClient();
