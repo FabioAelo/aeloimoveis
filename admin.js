@@ -197,6 +197,25 @@ async function loadAnalytics(days=30){
   searchRows.forEach(r=>{const d=r.details||{}; const key=[d.type||'imóvel',d.region||'região não informada',d.bedrooms?`${d.bedrooms}+ quartos`:null].filter(Boolean).join(' · '); groups[key]=(groups[key]||0)+1;});
   const top=Object.entries(groups).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(searches) searches.innerHTML=top.length?top.map(([k,n])=>`<div class="analytics-search-row"><span>${escapeHtml(k)}</span><b>${n}</b></div>`).join(''):'<p class="analytics-empty">Ainda não há pesquisas registradas neste período.</p>';
+
+  const evolution=document.getElementById('analyticsEvolution');
+  if(evolution){
+    const dayMap={};
+    const dayKey=d=>{const x=new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;};
+    const labelDay=k=>{const [y,m,d]=k.split('-'); return `${d}/${m}`;};
+    rows.forEach(r=>{const k=dayKey(r.created_at); if(!dayMap[k]) dayMap[k]={views:0,searches:0,visitors:new Set()}; if(r.event_type==='page_view'){dayMap[k].views++; dayMap[k].visitors.add(r.visitor_id);} if(r.event_type==='search') dayMap[k].searches++;});
+    const leadMap={};
+    (typeof allLeads!=='undefined' ? allLeads : []).forEach(l=>{if(l.created_at){const k=dayKey(l.created_at); leadMap[k]=(leadMap[k]||0)+1;}});
+    const now=new Date();
+    const daysToShow=Math.min(Number(days)||30,30);
+    const keys=[];
+    for(let i=daysToShow-1;i>=0;i--){const d=new Date(now); d.setHours(12,0,0,0); d.setDate(d.getDate()-i); keys.push(dayKey(d));}
+    const maxVal=Math.max(1,...keys.map(k=>Math.max(dayMap[k]?.views||0,dayMap[k]?.searches||0)));
+    const rowsHtml=keys.map(k=>{const v=dayMap[k]?.views||0; const q=dayMap[k]?.searches||0; const l=leadMap[k]||0; return `<div class="analytics-day"><span class="analytics-day-label">${labelDay(k)}</span><div class="analytics-day-bars"><div class="analytics-bar-wrap" title="${v} visita(s)"><i class="analytics-bar views" style="height:${Math.max(v?4:0,Math.round(v/maxVal*100))}%"></i></div><div class="analytics-bar-wrap" title="${q} pesquisa(s)"><i class="analytics-bar searches" style="height:${Math.max(q?4:0,Math.round(q/maxVal*100))}%"></i></div></div><span class="analytics-day-leads">${l} lead${l===1?'':'s'}</span></div>`;}).join('');
+    const searchRate=views?((searchRows.length/views)*100):0;
+    const leadRate=views?((leadsInPeriod/views)*100):0;
+    evolution.innerHTML=`<div class="analytics-evolution-head"><div><strong>Evolução e conversão.</strong><span>Visitas e pesquisas por dia. Os percentuais são aproximados e usam os leads recebidos no período.</span></div><div class="analytics-legend"><span><i class="legend-dot views"></i>Visitas</span><span><i class="legend-dot searches"></i>Pesquisas</span></div></div><div class="analytics-conversion"><div><b>${searchRate.toFixed(1)}%</b><span>Pesquisa / visita</span></div><div><b>${leadRate.toFixed(1)}%</b><span>Lead / visita</span></div><div><b>${visitors}</b><span>Visitantes únicos estimados</span></div></div><div class="analytics-chart">${rowsHtml}</div><div class="analytics-chart-note">Cada coluna representa um dia do período selecionado. Passe o mouse sobre as barras para ver os números.</div>`;
+  }
 }
 document.getElementById('analyticsPeriod')?.addEventListener('change',e=>loadAnalytics(e.target.value));
 
