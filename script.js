@@ -164,6 +164,11 @@ document.querySelector(".gallery-next").addEventListener("click", () => { if (!c
 
 const modalInterest = document.querySelector(".modal-interest");
 if (modalInterest) modalInterest.addEventListener("click", () => { closeModal(); });
+const modalAssistant = document.getElementById("modal-assistant");
+if (modalAssistant) modalAssistant.addEventListener("click", () => {
+  const launcher = document.getElementById("aelo-chat-launcher");
+  if (launcher) launcher.click();
+});
 modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 

@@ -185,6 +185,108 @@
 }
 </style>
 
+
+<style id="aelo-v48-18-modal-mobile">
+/* V48.18 — Assistente ao lado de VENDA + descrição ampliada no mobile */
+.modal-type-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  margin:0 0 10px!important;
+}
+.modal-type-row .eyebrow{margin:0!important;}
+.modal-assistant{
+  flex:0 0 auto!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  min-height:40px!important;
+  padding:8px 15px!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:#10253d!important;
+  color:#fff!important;
+  font:600 13px/1 "DM Sans",sans-serif!important;
+  cursor:pointer!important;
+  box-shadow:0 5px 16px rgba(10,24,40,.18)!important;
+  white-space:nowrap!important;
+}
+.modal-assistant-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:24px!important;
+  height:24px!important;
+  border-radius:50%!important;
+  background:#e9ad19!important;
+  color:#10253d!important;
+  font-size:14px!important;
+}
+/* Ao abrir o imóvel, o launcher flutuante não fica mais sobre o conteúdo. */
+.modal.open ~ #aelo-chat-launcher{display:none!important;}
+@media(max-width:900px){
+  .modal-card{
+    grid-template-rows:minmax(0,54%) minmax(0,46%)!important;
+  }
+  .modal-body{
+    padding:16px 18px 18px!important;
+  }
+  .modal-type-row{
+    gap:10px!important;
+    margin-bottom:6px!important;
+  }
+  .modal-assistant{
+    min-height:36px!important;
+    padding:7px 12px!important;
+    font-size:12px!important;
+    gap:6px!important;
+  }
+  .modal-assistant-icon{width:22px!important;height:22px!important;font-size:13px!important;}
+  .modal-body h2{
+    font-size:38px!important;
+    line-height:1.08!important;
+    margin-bottom:8px!important;
+  }
+  .modal-body #modal-location{
+    margin-bottom:10px!important;
+    font-size:15px!important;
+  }
+  .modal-body .modal-meta{
+    margin-bottom:10px!important;
+    padding:10px 4px 8px!important;
+  }
+  .modal-body #modal-description{
+    flex:1 1 auto!important;
+    height:0!important;
+    min-height:130px!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:12px 12px 12px 0!important;
+    margin:0 0 6px!important;
+    border-top:1px solid #e4e6e9!important;
+    border-bottom:1px solid #e4e6e9!important;
+    scrollbar-width:auto!important;
+    scrollbar-gutter:stable!important;
+    line-height:1.58!important;
+    font-size:15px!important;
+  }
+  .modal-body #modal-description::-webkit-scrollbar{width:7px!important;}
+  .modal-body #modal-description::-webkit-scrollbar-thumb{background:#9ea5ad!important;border-radius:999px!important;}
+  .modal-body #modal-description::-webkit-scrollbar-track{background:#eceef1!important;border-radius:999px!important;}
+  .modal-body .modal-actions{padding-top:3px!important;}
+  .modal-interest{min-height:38px!important;font-size:13px!important;padding:0 16px!important;}
+}
+@media(max-width:430px){
+  .modal-type-row{align-items:center!important;}
+  .modal-assistant{min-height:34px!important;padding:6px 10px!important;font-size:11px!important;}
+  .modal-assistant-icon{width:21px!important;height:21px!important;}
+  .modal-body h2{font-size:35px!important;}
+}
+</style>
+
 </head>
 <body>
   <header class="site-header">
@@ -317,7 +419,7 @@
         <div class="gallery-thumbs" id="gallery-thumbs" aria-label="Miniaturas das fotos"></div>
       </div>
       <div class="modal-body">
-        <p class="eyebrow" id="modal-type"></p>
+        <div class="modal-type-row"><p class="eyebrow" id="modal-type"></p><button class="modal-assistant" id="modal-assistant" type="button"><span class="modal-assistant-icon">✦</span><span>Assistente AELO</span></button></div>
         <h2 id="modal-title"></h2>
         <p id="modal-location"></p>
         <div class="modal-meta" id="modal-meta"></div>
@@ -339,7 +441,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=48.14"></script>
+  <script src="script.js?v=48.18"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */
