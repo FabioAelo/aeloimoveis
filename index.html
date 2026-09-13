@@ -51,18 +51,6 @@
   object-position:center!important;
   background:#0c1118!important;
 }
-.modal-watermark{
-  position:absolute!important;
-  right:24px!important;
-  bottom:22px!important;
-  width:128px!important;
-  height:auto!important;
-  max-width:18%!important;
-  z-index:4!important;
-  opacity:.78!important;
-  pointer-events:none!important;
-  object-fit:contain!important;
-}
 .gallery-thumbs{
   flex:0 0 92px!important;
   height:92px!important;
@@ -103,13 +91,12 @@
   overflow-x:hidden!important;
   box-sizing:border-box!important;
 }
-.gallery-prev,.gallery-next,.gallery-counter,.modal-watermark{z-index:5!important;}
+.gallery-prev,.gallery-next,.gallery-counter{z-index:5!important;}
 @media (max-width:900px){
   .modal-card{width:96vw!important;height:92vh!important;max-height:92vh!important;grid-template-columns:1fr!important;grid-template-rows:minmax(0,58%) minmax(0,42%)!important;}
   .modal-gallery{height:auto!important;}
   .gallery-thumbs{flex-basis:76px!important;height:76px!important;padding:8px 12px!important;}
   .gallery-thumb{flex-basis:68px!important;width:68px!important;height:58px!important;}
-  .modal-watermark{width:94px!important;right:14px!important;bottom:14px!important;max-width:22%!important;}
   .modal-body{height:auto!important;}
 }
 </style>
@@ -237,7 +224,6 @@
       <div class="modal-gallery">
         <div class="modal-gallery-stage">
           <img id="modal-image" src="" alt="">
-          <img class="modal-watermark" id="modal-watermark" src="aelo-watermark-exact-transparent.png" alt="" aria-hidden="true">
           <button class="gallery-prev" type="button" aria-label="Foto anterior">‹</button>
           <button class="gallery-next" type="button" aria-label="Próxima foto">›</button>
           <div class="gallery-counter" id="gallery-counter"></div>

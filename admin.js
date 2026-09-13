@@ -439,11 +439,11 @@ async function createAeloWatermarkedPhoto(file, index=0){
   if($('photoWatermark')?.checked!==false){
     try{
       const wm=await loadImageFromUrl('aelo-watermark-exact-transparent.png');
-      const target=Math.max(72,Math.min(w*0.09,170));
+      const target=Math.max(48,Math.min(w*0.055,96));
       const ratio=wm.naturalHeight/wm.naturalWidth;
       const ww=target, wh=target*ratio;
       const margin=Math.max(16,Math.round(Math.min(w,h)*0.022));
-      ctx.save(); ctx.globalAlpha=0.62;
+      ctx.save(); ctx.globalAlpha=0.72;
       ctx.drawImage(wm,w-ww-margin,h-wh-margin,ww,wh); ctx.restore();
     }catch(e){ console.warn('Marca d’água não aplicada',e); }
   }
