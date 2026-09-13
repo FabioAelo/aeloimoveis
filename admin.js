@@ -12,14 +12,17 @@ if (!ready) {
 
 function commercialLabel(p){
   const s=p.commercial_status||'disponivel';
-  if(s==='vendido') return p.sold_by==='terceiro' ? '🔵 Vendido por terceiro' : '🏆 Vendido pela AELO';
+  if(s==='vendido') return p.sold_by==='parceiro' ? `🔵 Vendido por corretor parceiro${p.partner_name ? ' — '+p.partner_name : ''}` : '🏆 Vendido pela AELO';
   if(s==='negociacao') return '🟡 Em negociação';
   if(s==='indisponivel') return '⚫ Indisponível';
   return '🟢 Disponível';
 }
 function syncSoldFields(){
   const sold=$('commercialStatus')?.value==='vendido';
+  const partner=sold && $('soldBy')?.value==='parceiro';
   $('soldByWrap')?.classList.toggle('hidden',!sold);
+  $('partnerNameWrap')?.classList.toggle('hidden',!partner);
+  $('partnerCreciWrap')?.classList.toggle('hidden',!partner);
 }
 async function refresh() {
   const { data, error } = await client.from("properties").select("*").order("created_at", { ascending:false });
@@ -307,7 +310,7 @@ $("cancelBtn").addEventListener("click",()=>$("editor").classList.add("hidden"))
 
 function openEditor(p=null){
   $("editor").classList.remove("hidden"); $("dashboard").classList.add("hidden"); $("editorTitle").textContent=p?"Editar imóvel":"Novo imóvel"; $("propertyId").value=p?.id||"";
-  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; syncSoldFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); window.scrollTo({top:0,behavior:"smooth"});
+  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; syncSoldFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); window.scrollTo({top:0,behavior:"smooth"});
 }
 window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
 window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
@@ -337,10 +340,10 @@ $("propertyForm").addEventListener("submit",async e=>{
  try{
   const galleryUrls=await uploadImages($("imageFile").files,user.id);
   const imageUrl=galleryUrls[0] || null;
-  const payload={owner_id:user.id,title:$("title").value.trim(),type:$("type").value,badge:$("type").value.toUpperCase(),location:$("location").value.trim(),price:Number($("price").value||0),price_label:$("priceLabel").value.trim()||null,bedrooms:Number($("bedrooms").value||0),suites:Number($("suites").value||0),parking:Number($("parking").value||0),area_m2:Number($("area").value||0)||null,image_url:imageUrl,description:$("description").value.trim(),gallery_urls:galleryUrls,is_published:$("published").checked};
+  const sold=$("commercialStatus").value==="vendido"; const partner=sold && $("soldBy").value==="parceiro"; const payload={owner_id:user.id,title:$("title").value.trim(),type:$("type").value,badge:$("type").value.toUpperCase(),location:$("location").value.trim(),price:Number($("price").value||0),price_label:$("priceLabel").value.trim()||null,bedrooms:Number($("bedrooms").value||0),suites:Number($("suites").value||0),parking:Number($("parking").value||0),area_m2:Number($("area").value||0)||null,image_url:imageUrl,description:$("description").value.trim(),gallery_urls:galleryUrls,is_published:$("published").checked,commercial_status:$("commercialStatus").value,sold_by:sold ? $("soldBy").value : null,partner_name:partner ? $("partnerName").value.trim()||null : null,partner_creci:partner ? $("partnerCreci").value.trim()||null : null};
   const id=$("propertyId").value; if(id && payload.commercial_status==="vendido" && !payload.sold_at){ const {data:oldProp}=await client.from("properties").select("sold_at,commercial_status").eq("id",id).single(); payload.sold_at=oldProp?.sold_at||new Date().toISOString(); } if(id && payload.commercial_status!=="vendido") payload.sold_at=null; const result=id?await client.from("properties").update(payload).eq("id",id):await client.from("properties").insert(payload); if(result.error) throw result.error;
   $("editor").classList.add("hidden"); $("dashboard").classList.remove("hidden"); showMsg("saveMsg",""); refresh();
  }catch(err){showMsg("saveMsg",err.message)}
 });
-$("commercialStatus")?.addEventListener("change",syncSoldFields);
+$("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.addEventListener("change",syncSoldFields);
 start();

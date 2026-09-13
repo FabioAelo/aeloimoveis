@@ -40,7 +40,11 @@
     <label>Vagas<input id="parking" type="number" min="0" value="0"></label>
     <label>Área (m²)<input id="area" type="number" min="0" step="0.01"></label>
     <label>Situação comercial<select id="commercialStatus"><option value="disponivel">🟢 Disponível</option><option value="negociacao">🟡 Em negociação</option><option value="vendido">🏆 Vendido</option><option value="indisponivel">⚫ Indisponível</option></select></label>
-    <label id="soldByWrap" class="hidden">Venda realizada por<select id="soldBy"><option value="aelo">AELO</option><option value="terceiro">Terceiro</option></select></label>
+    <div id="soldByWrap" class="sold-by-grid hidden full">
+  <label>Venda realizada por<select id="soldBy"><option value="aelo">AELO</option><option value="parceiro">Corretor parceiro</option></select></label>
+  <label id="partnerNameWrap" class="hidden">Nome do corretor parceiro<input id="partnerName" type="text" placeholder="Nome completo"></label>
+  <label id="partnerCreciWrap" class="hidden">CRECI do corretor parceiro<input id="partnerCreci" type="text" placeholder="Ex.: CRECI 31.100"></label>
+</div>
     <label class="full">Fotos do imóvel <small>Selecione até 10 fotos. A primeira será a foto principal.</small><input id="imageFile" type="file" accept="image/*" multiple><small id="currentImage"></small></label>
     <label class="full">Descrição<textarea id="description" rows="5" placeholder="Descrição do imóvel"></textarea></label>
     <label class="check full"><input id="published" type="checkbox" checked> Publicar no site</label>
@@ -48,5 +52,5 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=42"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=42.1"></script>
 </body></html>
