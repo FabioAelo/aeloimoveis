@@ -279,3 +279,16 @@
   .client-grid{grid-template-columns:1fr!important}
   .analytics-stats{grid-template-columns:1fr!important}
 }
+
+/* V48.15 — correção definitiva do layout móvel da ficha de lead */
+@media(max-width:600px){
+  .client-sheet{width:100%;max-width:100%;min-width:0;overflow:hidden}
+  .client-sheet-head{width:100%;min-width:0}
+  .client-sheet-head > div:first-child{min-width:0;flex:1}
+  .client-sheet-head strong{white-space:normal;overflow-wrap:anywhere;word-break:normal}
+  .client-grid{width:100%;min-width:0}
+  .client-grid>div{min-width:0}
+  .client-grid b{overflow-wrap:anywhere;word-break:normal}
+  .lead-expanded-content{width:100%;min-width:0;overflow:hidden}
+  .lead-admin{overflow:hidden}
+}
