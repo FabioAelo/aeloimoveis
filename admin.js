@@ -98,15 +98,38 @@ function renderLeadAgenda(){
   box.innerHTML=`<div class="agenda-head"><div><strong>Agenda de retornos</strong><span>Organize os próximos contatos sem deixar oportunidades para trás.</span></div><div class="agenda-badges"><span class="agenda-badge overdue">⚠️ ${overdue.length} atrasado${overdue.length===1?'':'s'}</span><span class="agenda-badge today">🔔 ${today.length} hoje</span><span class="agenda-badge upcoming">📅 ${upcoming.length} próximos</span></div></div><div class="agenda-grid"><section><div class="agenda-section-head"><h3>⚠️ Atrasados</h3>${overdueAction}</div>${overdue.length?overdue.slice(0,5).map(l=>item(l,'overdue')).join(''):'<p class="agenda-empty">Nenhum retorno atrasado.</p>'}</section><section><div class="agenda-section-head"><h3>🔔 Hoje</h3>${todayAction}</div>${today.length?today.map(l=>item(l,'today')).join(''):'<p class="agenda-empty">Nenhum retorno agendado para hoje.</p>'}</section><section><div class="agenda-section-head"><h3>📅 Próximos</h3></div>${upcoming.length?upcoming.map(l=>item(l,'upcoming')).join(''):'<p class="agenda-empty">Nenhum retorno futuro agendado.</p>'}</section></div>`;
 }
 window.focusLead=id=>{
-  const details=document.getElementById('lead-details-'+id);
-  const btn=document.querySelector(`.lead-compact-header[onclick="toggleLeadCard('${id}')"]`);
-  const card=btn?.closest('.lead-admin');
-  if(!details || !btn || !card) return;
-  if(details.classList.contains('hidden-section')) toggleLeadCard(id);
-  requestAnimationFrame(()=>{
-    card.scrollIntoView({behavior:'smooth',block:'center'});
-    setTimeout(()=>document.getElementById('status-'+id)?.focus({preventScroll:true}),350);
+  // Garante que o lead esteja visível mesmo se a lista estiver filtrada ou recolhida.
+  const openSection=target=>{
+    const panel=document.getElementById(target);
+    if(panel && panel.classList.contains('hidden-section')){
+      document.querySelector(`.section-toggle[data-target="${target}"]`)?.click();
+    }
+  };
+  openSection('opportunitiesContent');
+  openSection('myLeadsContent');
+  ['leadSearch','leadStatusFilter','leadInterestFilter','leadRegionFilter','leadBedroomsFilter'].forEach(k=>{
+    const el=document.getElementById(k); if(el) el.value='todos'===k?'todos':'';
   });
+  if(document.getElementById('leadStatusFilter')) document.getElementById('leadStatusFilter').value='todos';
+  if(document.getElementById('leadInterestFilter')) document.getElementById('leadInterestFilter').value='todos';
+  if(document.getElementById('leadRegionFilter')) document.getElementById('leadRegionFilter').value='todos';
+  if(document.getElementById('leadBedroomsFilter')) document.getElementById('leadBedroomsFilter').value='todos';
+  if(document.getElementById('leadSearch')) document.getElementById('leadSearch').value='';
+  setQuickFilter('todos');
+  const findAndOpen=()=>{
+    const details=document.getElementById('lead-details-'+id);
+    const btn=document.querySelector(`.lead-compact-header[onclick="toggleLeadCard('${id}')"]`);
+    const card=btn?.closest('.lead-admin');
+    if(!details || !btn || !card) return false;
+    if(details.classList.contains('hidden-section')) toggleLeadCard(id);
+    requestAnimationFrame(()=>{
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(()=>document.getElementById('status-'+id)?.focus({preventScroll:true}),350);
+    });
+    return true;
+  };
+  if(findAndOpen()) return;
+  requestAnimationFrame(()=>{ applyLeadFilters(); requestAnimationFrame(()=>{ if(!findAndOpen()) setTimeout(findAndOpen,120); }); });
 };
 
 let activeQuickFilter='todos';

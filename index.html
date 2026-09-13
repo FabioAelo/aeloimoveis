@@ -297,6 +297,30 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="script.js?v=48.11"></script>
+
+<style id="aelo-v48-13-chat">
+/* V48.13 — Assistente AELO conversacional e responsivo */
+.aelo-chat-msg{word-break:break-word}
+.aelo-chat-quick button{min-height:34px;touch-action:manipulation}
+.aelo-chat-form{padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.aelo-chat-form input{min-height:42px;box-sizing:border-box}
+.aelo-chat-form button{min-height:42px;flex:0 0 42px}
+@media(max-width:600px){
+  .aelo-chat{left:8px!important;right:8px!important;bottom:max(68px,calc(env(safe-area-inset-bottom) + 60px))!important;width:auto!important;height:min(690px,calc(100dvh - 78px))!important;max-height:calc(100dvh - 78px)!important;border-radius:18px!important}
+  .aelo-chat-header{padding:13px 14px!important}
+  .aelo-chat-messages{flex:0 0 150px!important;height:150px!important;max-height:150px!important;padding:12px 10px 6px!important}
+  .aelo-chat-quick{padding:8px 9px 10px!important;gap:5px!important}
+  .aelo-chat-quick button{font-size:11px!important;padding:8px 10px!important;max-width:100%;white-space:normal}
+  .aelo-chat-form{padding:8px 9px!important;gap:6px!important}
+  .aelo-chat-form input{font-size:14px!important;padding:10px 11px!important}
+  .aelo-chat-launcher{max-width:calc(100vw - 24px)!important}
+}
+@media(max-width:380px){
+  .aelo-chat{left:5px!important;right:5px!important}
+  .aelo-chat-messages{flex-basis:135px!important;height:135px!important;max-height:135px!important}
+  .aelo-chat-quick button{font-size:10.5px!important;padding:7px 8px!important}
+}
+</style>
 </body>
 </html>
 
