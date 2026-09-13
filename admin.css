@@ -203,9 +203,9 @@
 .lead-admin:not(.is-expanded) > time,.lead-admin:not(.is-expanded) > .lead-priority-line,.lead-admin:not(.is-expanded) > .client-sheet,.lead-admin:not(.is-expanded) > .lead-main,.lead-admin:not(.is-expanded) > .lead-tools{display:none}
 @media(max-width:700px){.lead-compact-header{align-items:flex-start}.lead-compact-right{gap:6px}.lead-compact-main strong{font-size:19px}.lead-compact-main small{white-space:normal}.lead-open-label{display:none}}
 
-/* V48 — Estúdio de fotos AELO */
-.photo-studio-option{display:flex;flex-direction:column;gap:5px;margin-top:8px;padding:12px 14px;border:1px solid #e2e6ea;background:#fbfbfb;border-radius:7px}
-.photo-studio-option .check{display:flex;align-items:center;gap:8px;font-weight:700;color:#17334d}
-.photo-studio-option .check input{width:auto}
-.photo-studio-option small{font-size:10px;color:#718096}
-#photoStudioMsg{color:#9a6a0a;font-weight:700}
+.photo-preview-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:10px}
+.photo-preview-card{position:relative;border:1px solid #dfe4e8;border-radius:7px;overflow:hidden;background:#fff;min-height:90px}
+.photo-preview-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.photo-preview-card span{display:block;padding:5px 7px;font-size:9px;color:#607286;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.photo-preview-empty{font-size:10px;color:#718096;padding:8px 0}
+@media(max-width:760px){.photo-preview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

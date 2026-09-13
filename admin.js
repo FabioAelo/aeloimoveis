@@ -402,43 +402,33 @@ $("cancelBtn").addEventListener("click",()=>$("editor").classList.add("hidden"))
 
 function openEditor(p=null){
   $("editor").classList.remove("hidden"); $("dashboard").classList.add("hidden"); $("editorTitle").textContent=p?"Editar imóvel":"Novo imóvel"; $("propertyId").value=p?.id||"";
-  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; syncSoldFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); window.scrollTo({top:0,behavior:"smooth"});
+  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; syncSoldFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); renderPhotoPreviews([]); window.scrollTo({top:0,behavior:"smooth"});
 }
 window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
 window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
 
-async function loadImageForStudio(file){
-  return await new Promise((resolve,reject)=>{
-    const url=URL.createObjectURL(file);
-    const img=new Image();
-    img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
-    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error(`Não foi possível ler a foto ${file.name}.`))};
-    img.src=url;
-  });
-}
-
-async function createAeloWatermarkedPhoto(file,index){
-  const img=await loadImageForStudio(file);
-  const maxSide=2400;
-  const sourceW=img.naturalWidth||img.width, sourceH=img.naturalHeight||img.height;
-  const scale=Math.min(1,maxSide/Math.max(sourceW,sourceH));
-  const width=Math.max(1,Math.round(sourceW*scale)), height=Math.max(1,Math.round(sourceH*scale));
-  const canvas=document.createElement('canvas'); canvas.width=width; canvas.height=height;
-  const ctx=canvas.getContext('2d',{alpha:false});
-  ctx.filter='brightness(1.035) contrast(1.055) saturate(1.045)';
-  ctx.drawImage(img,0,0,width,height);
-  ctx.filter='none';
-  const watermark=new Image();
-  await new Promise((resolve,reject)=>{ watermark.onload=resolve; watermark.onerror=reject; watermark.src='watermark-logo.png'; });
-  const wmW=Math.min(Math.round(width*0.22),Math.max(150,Math.round(width*0.22)));
-  const wmH=Math.round(watermark.naturalHeight*(wmW/watermark.naturalWidth));
-  const margin=Math.max(24,Math.round(width*0.018));
-  ctx.save(); ctx.globalAlpha=0.20;
-  ctx.drawImage(watermark,width-wmW-margin,height-wmH-margin,wmW,wmH);
-  ctx.restore();
-  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.90));
-  if(!blob) throw new Error(`Não foi possível preparar a foto ${index+1}.`);
-  return new File([blob],`aelo-${Date.now()}-${index+1}.jpg`,{type:'image/jpeg'});
+async function renderPhotoPreviews(files){
+  const wrap=$("photoPreview");
+  if(!wrap) return;
+  wrap.innerHTML="";
+  const selected=Array.from(files||[]);
+  if(!selected.length){ wrap.innerHTML='<div class="photo-preview-empty">As fotos selecionadas aparecerão aqui antes de salvar.</div>'; return; }
+  if(selected.length>10){ wrap.innerHTML='<div class="photo-preview-empty">Selecione no máximo 10 fotos.</div>'; return; }
+  const studioEnabled=$("photoStudio")?.checked!==false;
+  for(let i=0;i<selected.length;i++){
+    const card=document.createElement('div'); card.className='photo-preview-card';
+    const img=document.createElement('img'); img.alt=`Prévia da foto ${i+1}`;
+    const caption=document.createElement('span'); caption.textContent=i===0?`Foto ${i+1} • Principal`:`Foto ${i+1}`;
+    card.appendChild(img); card.appendChild(caption); wrap.appendChild(card);
+    try{
+      if(studioEnabled){
+        const processed=await createAeloWatermarkedPhoto(selected[i],i);
+        img.src=URL.createObjectURL(processed);
+      }else{
+        img.src=URL.createObjectURL(selected[i]);
+      }
+    }catch(err){ img.remove(); caption.textContent=`Foto ${i+1} • não foi possível pré-visualizar`; }
+  }
 }
 
 async function uploadImages(files,userId){
@@ -449,23 +439,19 @@ async function uploadImages(files,userId){
   }
   if(selected.length>10) throw new Error("Escolha no máximo 10 fotos por imóvel.");
   const urls=[];
-  const studioEnabled=$("photoStudio")?.checked!==false;
-  const msg=$("photoStudioMsg");
-  if(msg) msg.textContent=studioEnabled?`Preparando ${selected.length} foto(s) com tratamento AELO...`:'';
-  for(let i=0;i<selected.length;i++){
-    const original=selected[i];
-    const file=studioEnabled?await createAeloWatermarkedPhoto(original,i):original;
-    const ext=studioEnabled?'jpg':((original.name.split('.').pop()||'jpg').toLowerCase());
+  for(const file of selected){
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
     const path=`${userId}/${crypto.randomUUID()}.${ext}`;
-    const {error}=await client.storage.from("property-images").upload(path,file,{upsert:false,contentType:file.type||'image/jpeg'});
+    const {error}=await client.storage.from("property-images").upload(path,file,{upsert:false,contentType:file.type});
     if(error) throw error;
     const {data}=client.storage.from("property-images").getPublicUrl(path);
     urls.push(data.publicUrl);
-    if(msg) msg.textContent=`Foto ${i+1} de ${selected.length} preparada e enviada.`;
   }
-  if(msg) msg.textContent=studioEnabled?`${selected.length} foto(s) tratada(s) e com marca d'água AELO.`:'';
   return urls;
 }
+
+$("imageFile")?.addEventListener("change",e=>renderPhotoPreviews(e.target.files));
+$("photoStudio")?.addEventListener("change",()=>renderPhotoPreviews($("imageFile")?.files||[]));
 
 $("propertyForm").addEventListener("submit",async e=>{
  e.preventDefault(); showMsg("saveMsg","Salvando...");
