@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=48.5">
+  <link rel="stylesheet" href="style.css?v=48.7">
 
 <style id="aelo-gallery-v48-6">
 /* Galeria V48.6 — modelo aprovado: foto inteira + miniaturas + detalhes com rolagem própria */
@@ -250,7 +250,7 @@
         <p id="modal-location"></p>
         <div class="modal-meta" id="modal-meta"></div>
         <p id="modal-description"></p>
-        <a class="btn btn-gold modal-interest" href="https://wa.me/5571992961212" target="_blank" rel="noopener">Tenho interesse</a>
+        <div class="modal-actions"><a class="btn btn-gold modal-interest" href="https://wa.me/5571992961212" target="_blank" rel="noopener">Tenho interesse</a><button class="btn modal-film-btn" id="modal-film-btn" type="button">🎬 Criar apresentação do imóvel</button></div>
       </div>
     </div>
   </div>
@@ -269,3 +269,47 @@
   <script src="script.js?v=48.6"></script>
 </body>
 </html>
+
+<style id="aelo-film-v48-7">
+/* V48.7 — Apresentação cinematográfica do imóvel */
+.modal-film-btn{margin-top:10px!important;width:100%!important;background:#111827!important;color:#fff!important;border:1px solid #111827!important}
+.modal-actions{display:flex!important;flex-direction:column!important;gap:10px!important}
+.film-overlay{position:fixed;inset:0;background:rgba(4,8,13,.94);z-index:99999;display:none;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+.film-overlay.open{display:flex}
+.film-card{width:min(1180px,96vw);height:min(760px,92vh);background:#0b1017;border:1px solid rgba(255,255,255,.12);box-shadow:0 25px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden;border-radius:10px}
+.film-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#0b1017;overflow:hidden}
+.film-stage img{width:100%;height:100%;object-fit:contain;display:block}
+.film-watermark{position:absolute;right:28px;bottom:28px;width:88px;opacity:.62;pointer-events:none}
+.film-caption{position:absolute;left:28px;bottom:28px;max-width:60%;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65)}
+.film-caption .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 5px;color:#e3ab39;font-weight:700}
+.film-caption h2{margin:0;font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,44px)}
+.film-caption p{margin:5px 0 0;font-size:14px}
+.film-close{position:absolute;right:16px;top:12px;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:30px;width:44px;height:44px;border-radius:50%;z-index:4;cursor:pointer}
+.film-nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;pointer-events:none}
+.film-nav button{pointer-events:auto;border:0;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);font-size:28px;cursor:pointer}
+.film-footer{background:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.film-progress{height:4px;flex:1;min-width:160px;background:#e8ebef;border-radius:99px;overflow:hidden}
+.film-progress span{display:block;height:100%;width:0;background:#d99a17;transition:width .2s linear}
+.film-footer button{border:1px solid #d99a17;background:#fff;color:#111827;padding:9px 13px;border-radius:6px;cursor:pointer;font-weight:600}
+.film-footer button.primary{background:#d99a17;border-color:#d99a17;color:#111}
+.film-status{font-size:12px;color:#697384;min-width:170px}
+@media(max-width:700px){.film-overlay{padding:8px}.film-card{width:100%;height:96vh}.film-caption{left:16px;bottom:16px;max-width:72%}.film-watermark{right:16px;bottom:16px;width:68px}.film-footer{padding:10px}.film-footer button{font-size:12px}}
+</style>
+
+<div class="film-overlay" id="film-overlay" aria-hidden="true">
+  <div class="film-card" role="dialog" aria-modal="true" aria-label="Apresentação do imóvel">
+    <div class="film-stage">
+      <img id="film-image" src="" alt="">
+      <img class="film-watermark" src="aelo-watermark-exact-transparent.png" alt="" aria-hidden="true">
+      <button class="film-close" id="film-close" type="button" aria-label="Fechar">×</button>
+      <div class="film-nav"><button id="film-prev" type="button" aria-label="Anterior">‹</button><button id="film-next" type="button" aria-label="Próxima">›</button></div>
+      <div class="film-caption"><p class="eyebrow" id="film-type"></p><h2 id="film-title"></h2><p id="film-location"></p><p id="film-meta"></p></div>
+    </div>
+    <div class="film-footer">
+      <button id="film-play" class="primary" type="button">▶ Reproduzir</button>
+      <button id="film-generate" type="button">🎬 Gerar vídeo</button>
+      <div class="film-progress"><span id="film-progress-bar"></span></div>
+      <span class="film-status" id="film-status">Apresentação pronta.</span>
+    </div>
+  </div>
+</div>
