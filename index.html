@@ -91,6 +91,7 @@
   overflow-x:hidden!important;
   box-sizing:border-box!important;
 }
+.modal-watermark{position:absolute!important;right:22px!important;bottom:18px!important;width:72px!important;height:auto!important;z-index:4!important;opacity:1!important;pointer-events:none!important;filter:none!important;}
 .gallery-prev,.gallery-next,.gallery-counter{z-index:5!important;}
 @media (max-width:900px){
   .modal-card{width:96vw!important;height:92vh!important;max-height:92vh!important;grid-template-columns:1fr!important;grid-template-rows:minmax(0,58%) minmax(0,42%)!important;}
@@ -121,7 +122,8 @@
   flex:0 0 auto!important;
 }
 .modal-body #modal-description{
-  flex:1 1 auto!important;
+  flex:1 1 0!important;
+  height:0!important;
   min-height:0!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -135,7 +137,8 @@
 }
 @media(max-width:900px){
   .modal-body{height:auto!important;min-height:0!important;overflow:hidden!important;}
-  .modal-body #modal-description{min-height:80px!important;}
+  .modal-body #modal-description{height:auto!important;min-height:80px!important;flex:1 1 auto!important;}
+  .modal-watermark{right:14px!important;bottom:14px!important;width:62px!important;}
 }
 </style>
 
@@ -263,6 +266,7 @@
       <div class="modal-gallery">
         <div class="modal-gallery-stage">
           <img id="modal-image" src="" alt="">
+          <img id="modal-watermark" class="modal-watermark" src="aelo-watermark-exact-transparent.png" alt="AELO Imóveis" aria-hidden="true">
           <button class="gallery-prev" type="button" aria-label="Foto anterior">‹</button>
           <button class="gallery-next" type="button" aria-label="Próxima foto">›</button>
           <div class="gallery-counter" id="gallery-counter"></div>
@@ -289,12 +293,6 @@
     <form class="aelo-chat-form" id="aelo-chat-form"><input id="aelo-chat-input" type="text" placeholder="Digite sua mensagem..." autocomplete="off"><button type="submit" aria-label="Enviar">➤</button></form>
   </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="script.js?v=48.9"></script>
-</body>
-</html>
-
 <style id="aelo-film-v48-7">
 /* V48.7 — Apresentação cinematográfica do imóvel */
 .modal-film-btn{margin-top:10px!important;width:100%!important;background:#111827!important;color:#fff!important;border:1px solid #111827!important}
@@ -304,7 +302,7 @@
 .film-card{width:min(1180px,96vw);height:min(760px,92vh);background:#0b1017;border:1px solid rgba(255,255,255,.12);box-shadow:0 25px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden;border-radius:10px}
 .film-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#0b1017;overflow:hidden}
 .film-stage img{width:100%;height:100%;object-fit:contain;display:block}
-.film-watermark{position:absolute;right:28px;bottom:28px;width:88px;opacity:.62;pointer-events:none}
+.film-watermark{position:absolute;right:28px;bottom:28px;width:88px;opacity:1;pointer-events:none;filter:none}
 .film-caption{position:absolute;left:28px;bottom:28px;max-width:60%;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65)}
 .film-caption .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 5px;color:#e3ab39;font-weight:700}
 .film-caption h2{margin:0;font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,44px)}
@@ -338,3 +336,9 @@
     </div>
   </div>
 </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js?v=48.10"></script>
+</body>
+</html>

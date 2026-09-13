@@ -419,6 +419,8 @@ function loadImageFromUrl(url){
   return new Promise((resolve,reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=reject; img.src=url+'?v=48.2'; });
 }
 async function createAeloWatermarkedPhoto(file, index=0){
+  // V48.10: a logo is NOT burned into the uploaded image.
+  // The original AELO logo is displayed as a separate overlay in the gallery.
   const img=await loadImageFromFile(file);
   const maxSide=1800;
   const scale=Math.min(1,maxSide/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
@@ -428,24 +430,15 @@ async function createAeloWatermarkedPhoto(file, index=0){
   const ctx=canvas.getContext('2d',{alpha:false});
   ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
   ctx.drawImage(img,0,0,w,h);
-  // Tratamento leve: preserva composição, cores e características do imóvel.
-  const imageData=ctx.getImageData(0,0,w,h); const d=imageData.data;
-  for(let i=0;i<d.length;i+=4){
-    d[i]=Math.min(255,Math.max(0,(d[i]-128)*1.035+130));
-    d[i+1]=Math.min(255,Math.max(0,(d[i+1]-128)*1.035+130));
-    d[i+2]=Math.min(255,Math.max(0,(d[i+2]-128)*1.035+130));
-  }
-  ctx.putImageData(imageData,0,0);
-  if($('photoWatermark')?.checked!==false){
-    try{
-      const wm=await loadImageFromUrl('aelo-watermark-exact-transparent.png');
-      const target=Math.max(48,Math.min(w*0.055,96));
-      const ratio=wm.naturalHeight/wm.naturalWidth;
-      const ww=target, wh=target*ratio;
-      const margin=Math.max(16,Math.round(Math.min(w,h)*0.022));
-      ctx.save(); ctx.globalAlpha=0.72;
-      ctx.drawImage(wm,w-ww-margin,h-wh-margin,ww,wh); ctx.restore();
-    }catch(e){ console.warn('Marca d’água não aplicada',e); }
+  // Tratamento leve de imagem: preserva composição e características reais.
+  if($('photoStudio')?.checked!==false){
+    const imageData=ctx.getImageData(0,0,w,h); const d=imageData.data;
+    for(let i=0;i<d.length;i+=4){
+      d[i]=Math.min(255,Math.max(0,(d[i]-128)*1.035+130));
+      d[i+1]=Math.min(255,Math.max(0,(d[i+1]-128)*1.035+130));
+      d[i+2]=Math.min(255,Math.max(0,(d[i+2]-128)*1.035+130));
+    }
+    ctx.putImageData(imageData,0,0);
   }
   return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Não foi possível processar a foto.')),'image/jpeg',0.90));
 }
