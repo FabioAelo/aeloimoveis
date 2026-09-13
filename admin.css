@@ -188,3 +188,17 @@
 .commercial-stage b{font-size:16px}
 .commercial-intel-note{font-size:11px;color:#667085;line-height:1.45;padding:0 2px}
 @media(max-width:800px){.commercial-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.commercial-stage-list{grid-template-columns:1fr 1fr}.commercial-rates{grid-template-columns:1fr}}
+
+/* V46 — Meus leads compactos: ficha abre somente ao clicar no nome */
+.lead-compact-header{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;border:0;background:#fff;padding:5px 2px;cursor:pointer;text-align:left;color:inherit}
+.lead-compact-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lead-compact-main strong{font:700 21px/1.15 "Playfair Display",Georgia,serif;color:#0e2034}
+.lead-compact-main small{font:500 12px/1.4 "DM Sans",Arial,sans-serif;color:#6d7885;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-compact-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.lead-compact-status{font-size:11px;font-weight:700;color:#40566a;white-space:nowrap}
+.lead-open-label{font-size:11px;font-weight:800;color:#a06f0a;white-space:nowrap}
+.lead-compact-header:hover .lead-compact-main strong{color:#9a6a0a}
+.lead-compact-header.is-open{padding-bottom:13px;border-bottom:1px solid #e7eaee;margin-bottom:4px}
+.lead-expanded-content{padding-top:2px}
+.lead-admin:not(.is-expanded) > time,.lead-admin:not(.is-expanded) > .lead-priority-line,.lead-admin:not(.is-expanded) > .client-sheet,.lead-admin:not(.is-expanded) > .lead-main,.lead-admin:not(.is-expanded) > .lead-tools{display:none}
+@media(max-width:700px){.lead-compact-header{align-items:flex-start}.lead-compact-right{gap:6px}.lead-compact-main strong{font-size:19px}.lead-compact-main small{white-space:normal}.lead-open-label{display:none}}
