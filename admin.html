@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=46">
+<link rel="stylesheet" href="admin.css?v=48.2">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -80,14 +80,24 @@
   <label id="partnerNameWrap" class="hidden">Nome do corretor parceiro<input id="partnerName" type="text" placeholder="Nome completo"></label>
   <label id="partnerCreciWrap" class="hidden">CRECI do corretor parceiro<input id="partnerCreci" type="text" placeholder="Ex.: CRECI 31.100"></label>
 </div>
-    <label class="full">Fotos do imóvel <small>Selecione até 10 fotos. A primeira será a foto principal.</small><input id="imageFile" type="file" accept="image/*" multiple><small id="currentImage"></small></label>
+    <div class="photo-studio full">
+      <div class="photo-studio-head"><div><strong>📸 Fotos do imóvel</strong><small>Selecione até 10 fotos. A primeira será a foto principal.</small></div></div>
+      <div class="photo-studio-options">
+        <label class="check"><input id="photoStudio" type="checkbox" checked> Tratamento profissional</label>
+        <label class="check"><input id="photoWatermark" type="checkbox" checked> Marca d’água AELO</label>
+      </div>
+      <small class="photo-studio-note">O tratamento preserva a proporção e as características reais da foto, com ajustes leves de luz, contraste e nitidez.</small>
+      <input id="imageFile" type="file" accept="image/*" multiple>
+      <small id="currentImage"></small>
+      <div id="photoPreview" class="photo-preview-grid"><div class="photo-preview-empty">As fotos selecionadas aparecerão aqui antes de salvar.</div></div>
+    </div>
     <label class="full">Descrição<textarea id="description" rows="5" placeholder="Descrição do imóvel"></textarea></label>
     <label class="check full"><input id="published" type="checkbox" checked> Publicar no site</label>
     <div class="actions full"><button type="submit" class="primary">Salvar imóvel</button><span id="saveMsg" class="msg"></span></div>
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=47"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=48.2"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

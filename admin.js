@@ -407,51 +407,87 @@ function openEditor(p=null){
 window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
 window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
 
+function loadImageFromFile(file){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{ URL.revokeObjectURL(img.src); resolve(img); };
+    img.onerror=()=>{ URL.revokeObjectURL(img.src); reject(new Error('Não foi possível ler a imagem.')); };
+    img.src=URL.createObjectURL(file);
+  });
+}
+function loadImageFromUrl(url){
+  return new Promise((resolve,reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=reject; img.src=url+'?v=48.2'; });
+}
+async function createAeloWatermarkedPhoto(file, index=0){
+  const img=await loadImageFromFile(file);
+  const maxSide=1800;
+  const scale=Math.min(1,maxSide/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
+  const w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
+  const h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+  const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d',{alpha:false});
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,0,0,w,h);
+  // Tratamento leve: preserva composição, cores e características do imóvel.
+  const imageData=ctx.getImageData(0,0,w,h); const d=imageData.data;
+  for(let i=0;i<d.length;i+=4){
+    d[i]=Math.min(255,Math.max(0,(d[i]-128)*1.035+130));
+    d[i+1]=Math.min(255,Math.max(0,(d[i+1]-128)*1.035+130));
+    d[i+2]=Math.min(255,Math.max(0,(d[i+2]-128)*1.035+130));
+  }
+  ctx.putImageData(imageData,0,0);
+  if($('photoWatermark')?.checked!==false){
+    try{
+      const wm=await loadImageFromUrl('aelo-watermark.png');
+      const target=Math.max(110,Math.min(w*0.18,300));
+      const ratio=wm.naturalHeight/wm.naturalWidth;
+      const ww=target, wh=target*ratio;
+      const margin=Math.max(16,Math.round(Math.min(w,h)*0.022));
+      ctx.save(); ctx.globalAlpha=0.20;
+      ctx.drawImage(wm,w-ww-margin,h-wh-margin,ww,wh); ctx.restore();
+    }catch(e){ console.warn('Marca d’água não aplicada',e); }
+  }
+  return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Não foi possível processar a foto.')),'image/jpeg',0.90));
+}
 async function renderPhotoPreviews(files){
-  const wrap=$("photoPreview");
-  if(!wrap) return;
-  wrap.innerHTML="";
-  const selected=Array.from(files||[]);
+  const wrap=$('photoPreview'); if(!wrap) return;
+  wrap.innerHTML=''; const selected=Array.from(files||[]);
   if(!selected.length){ wrap.innerHTML='<div class="photo-preview-empty">As fotos selecionadas aparecerão aqui antes de salvar.</div>'; return; }
   if(selected.length>10){ wrap.innerHTML='<div class="photo-preview-empty">Selecione no máximo 10 fotos.</div>'; return; }
-  const studioEnabled=$("photoStudio")?.checked!==false;
+  const studioEnabled=$('photoStudio')?.checked!==false;
   for(let i=0;i<selected.length;i++){
     const card=document.createElement('div'); card.className='photo-preview-card';
     const img=document.createElement('img'); img.alt=`Prévia da foto ${i+1}`;
-    const caption=document.createElement('span'); caption.textContent=i===0?`Foto ${i+1} • Principal`:`Foto ${i+1}`;
+    const caption=document.createElement('span'); caption.textContent=i===0?'Foto 1 • Principal':`Foto ${i+1}`;
     card.appendChild(img); card.appendChild(caption); wrap.appendChild(card);
     try{
-      if(studioEnabled){
-        const processed=await createAeloWatermarkedPhoto(selected[i],i);
-        img.src=URL.createObjectURL(processed);
-      }else{
-        img.src=URL.createObjectURL(selected[i]);
-      }
-    }catch(err){ img.remove(); caption.textContent=`Foto ${i+1} • não foi possível pré-visualizar`; }
+      const processed=studioEnabled?await createAeloWatermarkedPhoto(selected[i],i):selected[i];
+      img.src=URL.createObjectURL(processed);
+    }catch(err){ caption.textContent=`Foto ${i+1} • não foi possível pré-visualizar`; }
   }
 }
 
 async function uploadImages(files,userId){
   const selected=Array.from(files||[]);
   if(!selected.length){
-    const existing=JSON.parse($("propertyForm").dataset.galleryUrls||"[]");
-    return existing.length?existing:($("propertyForm").dataset.imageUrl?[ $("propertyForm").dataset.imageUrl ]:[]);
+    const existing=JSON.parse($('propertyForm').dataset.galleryUrls||'[]');
+    return existing.length?existing:($('propertyForm').dataset.imageUrl?[$('propertyForm').dataset.imageUrl]:[]);
   }
-  if(selected.length>10) throw new Error("Escolha no máximo 10 fotos por imóvel.");
-  const urls=[];
+  if(selected.length>10) throw new Error('Escolha no máximo 10 fotos por imóvel.');
+  const urls=[]; const studioEnabled=$('photoStudio')?.checked!==false;
   for(const file of selected){
-    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
-    const path=`${userId}/${crypto.randomUUID()}.${ext}`;
-    const {error}=await client.storage.from("property-images").upload(path,file,{upsert:false,contentType:file.type});
+    const uploadBlob=studioEnabled?await createAeloWatermarkedPhoto(file,0):file;
+    const path=`${userId}/${crypto.randomUUID()}.jpg`;
+    const {error}=await client.storage.from('property-images').upload(path,uploadBlob,{upsert:false,contentType:'image/jpeg'});
     if(error) throw error;
-    const {data}=client.storage.from("property-images").getPublicUrl(path);
-    urls.push(data.publicUrl);
+    const {data}=client.storage.from('property-images').getPublicUrl(path); urls.push(data.publicUrl);
   }
   return urls;
 }
 
 $("imageFile")?.addEventListener("change",e=>renderPhotoPreviews(e.target.files));
 $("photoStudio")?.addEventListener("change",()=>renderPhotoPreviews($("imageFile")?.files||[]));
+$("photoWatermark")?.addEventListener("change",()=>renderPhotoPreviews($("imageFile")?.files||[]));
 
 $("propertyForm").addEventListener("submit",async e=>{
  e.preventDefault(); showMsg("saveMsg","Salvando...");
