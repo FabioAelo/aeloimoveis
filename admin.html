@@ -18,7 +18,12 @@
 <section id="dashboard" class="hidden">
   <div class="dashboard-head"><div><p class="eyebrow">CATÁLOGO AELO</p><h1>Gerenciar imóveis.</h1></div><button id="newBtn" class="primary">+ Novo imóvel</button></div>
   <div id="propertyList" class="admin-list"></div>
-  <div class="dashboard-head leads-head"><div><p class="eyebrow">ATENDIMENTO</p><h2>Central de oportunidades.</h2><p>Organize os contatos do Assistente AELO e acompanhe cada oportunidade até o fechamento.</p></div></div>
+  <section id="analyticsPanel" class="analytics-panel">
+  <div class="analytics-head"><div><p class="eyebrow">INTELIGÊNCIA DO SITE</p><h2>Visitas e pesquisas.</h2><p>Estimativa anônima de visitantes, acessos e pesquisas realizadas no site.</p></div><select id="analyticsPeriod" class="analytics-period"><option value="1">Hoje</option><option value="7">7 dias</option><option value="30" selected>30 dias</option></select></div>
+  <div id="analyticsStats" class="analytics-stats"><div class="analytics-loading">Carregando indicadores...</div></div>
+  <div class="analytics-bottom"><div><strong>Pesquisas mais realizadas</strong><span>Com base nas buscas concluídas pelo Assistente AELO.</span></div><div id="analyticsSearches" class="analytics-searches"></div></div>
+</section>
+<div class="dashboard-head leads-head"><div><p class="eyebrow">ATENDIMENTO</p><h2>Central de oportunidades.</h2><p>Organize os contatos do Assistente AELO e acompanhe cada oportunidade até o fechamento.</p></div></div>
 <div id="leadStats" class="lead-stats"></div>
 <div id="leadPrioritySummary" class="lead-priority-summary" aria-label="Prioridade de atendimento"></div>
 <div id="leadAgenda" class="lead-agenda"></div>
@@ -52,5 +57,5 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=42.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=43"></script>
 </body></html>

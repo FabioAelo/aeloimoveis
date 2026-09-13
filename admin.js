@@ -171,6 +171,30 @@ window.setFollowUpQuick = (id, preset) => {
 };
 window.clearFollowUp = id => { const input=document.getElementById('follow-'+id); if(input) input.value=''; };
 
+
+// V43 — Analytics do site
+async function loadAnalytics(days=30){
+  const stats=document.getElementById('analyticsStats');
+  const searches=document.getElementById('analyticsSearches');
+  if(!stats || !client) return;
+  const since=new Date(Date.now()-Number(days)*86400000).toISOString();
+  stats.innerHTML='<div class="analytics-loading">Atualizando indicadores...</div>';
+  const {data,error}=await client.from('site_events').select('visitor_id,event_type,details,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(10000);
+  if(error){stats.innerHTML='<div class="analytics-error">Não foi possível carregar os indicadores agora.</div>'; if(searches) searches.innerHTML=''; return;}
+  const rows=data||[];
+  const visitors=new Set(rows.filter(r=>r.event_type==='page_view').map(r=>r.visitor_id)).size;
+  const views=rows.filter(r=>r.event_type==='page_view').length;
+  const searchRows=rows.filter(r=>r.event_type==='search');
+  const leadsInPeriod=(typeof allLeads!=='undefined' ? allLeads.filter(l=>l.created_at && new Date(l.created_at)>=new Date(since)).length : 0);
+  const cards=[['👥','Visitantes estimados',visitors],['👁️','Visitas ao site',views],['🔎','Pesquisas realizadas',searchRows.length],['📋','Leads recebidos',leadsInPeriod]];
+  stats.innerHTML=cards.map(c=>`<div class="analytics-card"><span>${c[0]}</span><b>${c[2]}</b><small>${c[1]}</small></div>`).join('');
+  const groups={};
+  searchRows.forEach(r=>{const d=r.details||{}; const key=[d.type||'imóvel',d.region||'região não informada',d.bedrooms?`${d.bedrooms}+ quartos`:null].filter(Boolean).join(' · '); groups[key]=(groups[key]||0)+1;});
+  const top=Object.entries(groups).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(searches) searches.innerHTML=top.length?top.map(([k,n])=>`<div class="analytics-search-row"><span>${escapeHtml(k)}</span><b>${n}</b></div>`).join(''):'<p class="analytics-empty">Ainda não há pesquisas registradas neste período.</p>';
+}
+document.getElementById('analyticsPeriod')?.addEventListener('change',e=>loadAnalytics(e.target.value));
+
 async function refreshLeads(){
   const box=document.getElementById('leadList'); if(!box) return;
   const [leadRes, interactionRes] = await Promise.all([
@@ -181,6 +205,7 @@ async function refreshLeads(){
   allLeads=leadRes.data||[];
   allInteractions=interactionRes.error ? [] : (interactionRes.data||[]);
   renderLeadDashboard();
+  loadAnalytics(Number(document.getElementById('analyticsPeriod')?.value || 30));
 }
 ['leadSearch','leadStatusFilter','leadInterestFilter'].forEach(id=>{document.getElementById(id)?.addEventListener('input',applyLeadFilters);document.getElementById(id)?.addEventListener('change',applyLeadFilters)});
 document.querySelectorAll('.quick-filter').forEach(btn=>btn.addEventListener('click',()=>setQuickFilter(btn.dataset.quickFilter)));
@@ -347,3 +372,5 @@ $("propertyForm").addEventListener("submit",async e=>{
 });
 $("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.addEventListener("change",syncSoldFields);
 start();
+
+loadAnalytics(30);
