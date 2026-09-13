@@ -202,3 +202,10 @@
 .lead-expanded-content{padding-top:2px}
 .lead-admin:not(.is-expanded) > time,.lead-admin:not(.is-expanded) > .lead-priority-line,.lead-admin:not(.is-expanded) > .client-sheet,.lead-admin:not(.is-expanded) > .lead-main,.lead-admin:not(.is-expanded) > .lead-tools{display:none}
 @media(max-width:700px){.lead-compact-header{align-items:flex-start}.lead-compact-right{gap:6px}.lead-compact-main strong{font-size:19px}.lead-compact-main small{white-space:normal}.lead-open-label{display:none}}
+
+/* V48 — Estúdio de fotos AELO */
+.photo-studio-option{display:flex;flex-direction:column;gap:5px;margin-top:8px;padding:12px 14px;border:1px solid #e2e6ea;background:#fbfbfb;border-radius:7px}
+.photo-studio-option .check{display:flex;align-items:center;gap:8px;font-weight:700;color:#17334d}
+.photo-studio-option .check input{width:auto}
+.photo-studio-option small{font-size:10px;color:#718096}
+#photoStudioMsg{color:#9a6a0a;font-weight:700}

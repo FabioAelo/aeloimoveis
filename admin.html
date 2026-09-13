@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=46">
+<link rel="stylesheet" href="admin.css?v=48">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -80,14 +80,14 @@
   <label id="partnerNameWrap" class="hidden">Nome do corretor parceiro<input id="partnerName" type="text" placeholder="Nome completo"></label>
   <label id="partnerCreciWrap" class="hidden">CRECI do corretor parceiro<input id="partnerCreci" type="text" placeholder="Ex.: CRECI 31.100"></label>
 </div>
-    <label class="full">Fotos do imóvel <small>Selecione até 10 fotos. A primeira será a foto principal.</small><input id="imageFile" type="file" accept="image/*" multiple><small id="currentImage"></small></label>
+    <label class="full">Fotos do imóvel <small>Selecione até 10 fotos. A primeira será a foto principal.</small><input id="imageFile" type="file" accept="image/*" multiple><span class="photo-studio-option"><label class="check"><input id="photoStudio" type="checkbox" checked> Aplicar tratamento profissional + marca d’água AELO</label><small>Iluminação, contraste e cor são ajustados de forma discreta, sem alterar características do imóvel.</small><small id="photoStudioMsg"></small></span><small id="currentImage"></small></label>
     <label class="full">Descrição<textarea id="description" rows="5" placeholder="Descrição do imóvel"></textarea></label>
     <label class="check full"><input id="published" type="checkbox" checked> Publicar no site</label>
     <div class="actions full"><button type="submit" class="primary">Salvar imóvel</button><span id="saveMsg" class="msg"></span></div>
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=47"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=48"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
