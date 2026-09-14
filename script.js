@@ -1,16 +1,7 @@
-const DEMO_PROPERTIES = [
-  { id: "demo-1", type: "venda", badge: "VENDA", title: "Casa Áurea", location: "Alphaville • Salvador, BA", price_label: "R$ 2.480.000", meta: ["4 quartos", "4 suítes", "420 m²"], image_url: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85", description: "Imóvel demonstrativo. Arquitetura contemporânea, integração entre ambientes e área externa generosa." },
-  { id: "demo-2", type: "venda", badge: "VENDA", title: "Apartamento Vista Mar", location: "Ondina • Salvador, BA", price_label: "R$ 1.180.000", meta: ["3 quartos", "2 suítes", "138 m²"], image_url: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1200&q=85", description: "Exemplo demonstrativo de apartamento premium com varanda ampla, vista aberta e localização estratégica." },
-  { id: "demo-3", type: "aluguel", badge: "ALUGUEL", title: "Casa Jardim Atlântico", location: "Vilão do Atlântico • Lauro de Freitas, BA", price_label: "R$ 9.800/mês", meta: ["4 quartos", "3 suítes", "310 m²"], image_url: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85", description: "Exemplo demonstrativo de locação residencial de alto padrão, com jardim, piscina e ambientes integrados." },
-  { id: "demo-4", type: "investimento", badge: "INVESTIMENTO", title: "Pátio Empresarial", location: "Paralela • Salvador, BA", price_label: "R$ 3.950.000", meta: ["12 salas", "8 vagas", "680 m²"], image_url: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=85", description: "Ativo comercial demonstrativo para a categoria de investimentos e oportunidades patrimoniais." },
-  { id: "demo-5", type: "venda", badge: "VENDA", title: "Villa Serena", location: "Praia do Forte • Mata de São João, BA", price_label: "R$ 4.750.000", meta: ["5 quartos", "5 suítes", "510 m²"], image_url: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=85", description: "Casa demonstrativa de inspiração tropical contemporânea, pensada para representar o segmento de alto padrão." },
-  { id: "demo-6", type: "aluguel", badge: "ALUGUEL", title: "Loft Alameda", location: "Caminho das Árvores • Salvador, BA", price_label: "R$ 5.900/mês", meta: ["2 quartos", "1 suíte", "96 m²"], image_url: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85", description: "Exemplo demonstrativo de imóvel compacto e sofisticado para locação." }
-];
-
 const grid = document.getElementById("property-grid");
 const modal = document.getElementById("property-modal");
 let properties = [];
-let dataSource = "demo";
+let dataSource = "supabase";
 
 function getSupabaseClient() {
   const cfg = window.AELO_SUPABASE_CONFIG || {};
@@ -71,13 +62,15 @@ async function loadProperties() {
   const { data, error } = await client.from("properties").select("*").eq("is_published", true).order("created_at", { ascending: false });
   if (!error && data) {
     properties = data.map(normalizeProperty);
-    dataSource = "supabase";
     const note = document.getElementById("catalog-note");
     if (note) note.innerHTML = "Catálogo atualizado pela equipe Aelo através do painel administrativo.";
-    renderProperties(document.querySelector(".filter.active")?.dataset.filter || "todos");
   } else {
-    console.warn("Supabase não conectado; exibindo catálogo demonstrativo.", error);
+    properties = [];
+    const note = document.getElementById("catalog-note");
+    if (note) note.innerHTML = "Não foi possível carregar o catálogo agora. Nenhum imóvel demonstrativo é exibido.";
+    console.warn("Não foi possível carregar o catálogo de imóveis.", error);
   }
+  renderProperties(document.querySelector(".filter.active")?.dataset.filter || "todos");
 }
 
 function renderProperties(filter = "todos") {
@@ -142,7 +135,7 @@ function openModal(id) {
   if (!p) return;
   currentGallery = p.gallery_urls?.length ? p.gallery_urls : [p.image_url];
   currentGalleryIndex = 0;
-  document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : "") + (dataSource === "demo" ? " • DEMONSTRATIVO" : "");
+  document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : "");
   document.getElementById("modal-title").textContent = p.title;
   document.getElementById("modal-location").textContent = p.location;
   document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");
@@ -192,8 +185,6 @@ if (menuToggle && mobileMenu) {
   });
 }
 
-properties = DEMO_PROPERTIES.map(normalizeProperty);
-renderProperties();
 loadProperties();
 
 
