@@ -146,7 +146,13 @@ function openModal(id) {
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
 }
 
-function closeModal() { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+function closeModal() {
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  const launcher = document.getElementById("aelo-chat-launcher");
+  if (launcher) { launcher.style.display = "flex"; launcher.style.visibility = "visible"; launcher.style.opacity = "1"; }
+}
 
 document.querySelectorAll(".filter").forEach(button => button.addEventListener("click", () => {
   document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
@@ -204,7 +210,7 @@ const launcher=document.getElementById('aelo-chat-launcher'),panel=document.getE
 const add=(text,who='bot',html=false)=>{const e=document.createElement('div');e.className='aelo-chat-msg '+who;html?e.innerHTML=text:e.textContent=text;messages.appendChild(e);messages.scrollTop=messages.scrollHeight};
 const buttons=items=>{quick.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.type='button';b.textContent=x.label;b.onclick=()=>{add(x.label,'user');x.action()};quick.appendChild(b)})};
 const open=()=>{panel.classList.add('open');panel.setAttribute('aria-hidden','false');if(!started){started=true;add('Olá! Sou o Assistente AELO. 👋\nPosso ajudar você a encontrar um imóvel, anunciar sua propriedade ou solicitar uma avaliação imobiliária. Escolha uma opção abaixo para começarmos.');main()}};
-const shut=()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true')};
+const shut=()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true');const l=document.getElementById('aelo-chat-launcher');if(l){l.style.display='flex';l.style.visibility='visible';l.style.opacity='1'}};
 const main=()=>buttons([{label:'🔎 Encontrar imóvel',action:buy},{label:'🔑 Alugar imóvel',action:rent},{label:'💰 Anunciar imóvel',action:sell},{label:'📊 Avaliação / PTAM',action:valuation},{label:'⚖️ Perícia / assistência',action:expert},{label:'📱 Falar com Fabio',action:contact}]);
 const buy=()=>{add('Ótimo. Vamos qualificar seu perfil em poucos passos. Em qual região você procura?');buttons([{label:'Lauro de Freitas',action:()=>propertyTypeStep({interest:'Compra',type:'venda',region:'Lauro de Freitas'})},{label:'Camaçari',action:()=>propertyTypeStep({interest:'Compra',type:'venda',region:'Camaçari'})},{label:'Salvador',action:()=>propertyTypeStep({interest:'Compra',type:'venda',region:'Salvador'})},{label:'Outra região',action:()=>freeRegionStep({interest:'Compra',type:'venda'})}])};
 const rent=()=>{add('Perfeito. Vamos qualificar seu perfil em poucos passos. Em qual região você procura?');buttons([{label:'Lauro de Freitas',action:()=>propertyTypeStep({interest:'Aluguel',type:'aluguel',region:'Lauro de Freitas'})},{label:'Camaçari',action:()=>propertyTypeStep({interest:'Aluguel',type:'aluguel',region:'Camaçari'})},{label:'Salvador',action:()=>propertyTypeStep({interest:'Aluguel',type:'aluguel',region:'Salvador'})},{label:'Outra região',action:()=>freeRegionStep({interest:'Aluguel',type:'aluguel'})}])};
@@ -276,6 +282,8 @@ const propertyInterest=(p)=>{
   resetCtx();
   mergeCtx(ctx);
   panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+  const launcher = document.getElementById('aelo-chat-launcher');
+  if (launcher) { launcher.style.display='none'; launcher.style.visibility='hidden'; }
   add(`Você está falando com a AELO sobre <strong>${esc(p.title)}</strong>. Como posso ajudar? 😊`,'bot',true);
   buttons([
     {label:'📋 Quero mais informações',action:()=>collectLead(interest,ctx)},

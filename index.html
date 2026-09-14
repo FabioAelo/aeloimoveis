@@ -627,6 +627,26 @@ window.AELO_SITE_VERSION='48.24';
 }
 </style>
 
+
+<style id="aelo-v48-25-mobile-assistant">
+/* V48.25 — Assistente AELO sempre acessível no mobile fora da ficha */
+@media(max-width:600px){
+  .aelo-chat-launcher{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    position:fixed !important;
+    right:12px !important;
+    bottom:max(12px, env(safe-area-inset-bottom)) !important;
+    z-index:2147483646 !important;
+    max-width:calc(100vw - 24px) !important;
+  }
+  .aelo-chat-launcher .aelo-chat-label{display:inline !important;}
+  .aelo-chat-launcher .aelo-chat-icon{width:28px!important;height:28px!important;}
+  .modal.open ~ #aelo-chat-launcher{display:none !important;}
+  .aelo-chat.open ~ *{}
+}
+</style>
 </head>
 <body>
   <header class="site-header">
@@ -782,7 +802,7 @@ window.AELO_SITE_VERSION='48.24';
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=48.23"></script>
+  <script src="script.js?v=48.25"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */
