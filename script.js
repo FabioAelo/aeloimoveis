@@ -133,6 +133,7 @@ function showGalleryImage() {
 function openModal(id) {
   const p = properties.find(item => String(item.id) === String(id));
   if (!p) return;
+  window.AELO_CURRENT_PROPERTY = p;
   currentGallery = p.gallery_urls?.length ? p.gallery_urls : [p.image_url];
   currentGalleryIndex = 0;
   document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : "");
@@ -156,7 +157,16 @@ document.querySelector(".gallery-prev").addEventListener("click", () => { if (!c
 document.querySelector(".gallery-next").addEventListener("click", () => { if (!currentGallery.length) return; currentGalleryIndex = (currentGalleryIndex + 1) % currentGallery.length; showGalleryImage(); });
 
 const modalInterest = document.querySelector(".modal-interest");
-if (modalInterest) modalInterest.addEventListener("click", () => { closeModal(); });
+if (modalInterest) modalInterest.addEventListener("click", (e) => {
+  e.preventDefault();
+  const p = window.AELO_CURRENT_PROPERTY;
+  closeModal();
+  if (p && typeof window.aeloStartPropertyInterest === "function") window.aeloStartPropertyInterest(p);
+  else {
+    const launcher = document.getElementById("aelo-chat-launcher");
+    if (launcher) launcher.click();
+  }
+});
 const modalAssistant = document.getElementById("modal-assistant");
 if (modalAssistant) modalAssistant.addEventListener("click", () => {
   const launcher = document.getElementById("aelo-chat-launcher");
@@ -259,6 +269,23 @@ const text=t=>{
   const parts=[]; if(chatCtx.interest)parts.push(chatCtx.interest.toLowerCase());if(chatCtx.propertyType)parts.push(chatCtx.propertyType.toLowerCase());if(chatCtx.region)parts.push(`em ${chatCtx.region}`);if(chatCtx.bedrooms)parts.push(`${chatCtx.bedrooms}+ quartos`);if(chatCtx.budgetLabel)parts.push(chatCtx.budgetLabel);
   add(`Perfeito! Entendi ${parts.length?'que você procura '+parts.join(', ')+'.':'sua necessidade.'} Vou usar essas informações e pedir só o que estiver faltando. 😊`);setTimeout(()=>nextQuestion(chatCtx),120);
 };
+const propertyInterest=(p)=>{
+  if(!p) return;
+  const interest = p.type==='aluguel' ? 'Aluguel' : 'Compra';
+  const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||''};
+  resetCtx();
+  mergeCtx(ctx);
+  panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+  add(`Você está falando com a AELO sobre <strong>${esc(p.title)}</strong>. Como posso ajudar? 😊`,'bot',true);
+  buttons([
+    {label:'📋 Quero mais informações',action:()=>collectLead(interest,ctx)},
+    {label:'📅 Quero agendar uma visita',action:()=>collectLead('Agendamento de visita',{...ctx,timeframe:'Solicitação de visita'})},
+    {label:'📸 Ver fotos novamente',action:()=>{shut();openModal(p.id)}},
+    {label:'📍 Quero saber sobre a localização',action:()=>{add(`Este imóvel está localizado em <strong>${esc(p.location||'localização informada no anúncio')}</strong>.`,'bot',true);buttons([{label:'📋 Tenho interesse',action:()=>collectLead(interest,ctx)},{label:'📅 Agendar visita',action:()=>collectLead('Agendamento de visita',{...ctx,timeframe:'Solicitação de visita'})},{label:'↩️ Voltar',action:()=>propertyInterest(p)}])}},
+    {label:'💬 Continuar pelo WhatsApp',action:()=>wa(`Olá! Falei com o Assistente AELO pelo site e tenho interesse no imóvel ${p.title}${p.location?` em ${p.location}`:''}${p.price_label?` — ${p.price_label}`:''}. Como posso receber mais informações?`)}
+  ]);
+};
+window.aeloStartPropertyInterest=propertyInterest;
 launcher.onclick=open;close.onclick=shut;
 })();
 
