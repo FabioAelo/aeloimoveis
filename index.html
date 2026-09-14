@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=48.17">
+  <link rel="stylesheet" href="style.css?v=48.19">
 
 <style id="aelo-gallery-v48-6">
 /* Galeria V48.6 — modelo aprovado: foto inteira + miniaturas + detalhes com rolagem própria */
@@ -284,6 +284,48 @@
   .modal-assistant{min-height:34px!important;padding:6px 10px!important;font-size:11px!important;}
   .modal-assistant-icon{width:21px!important;height:21px!important;}
   .modal-body h2{font-size:35px!important;}
+}
+</style>
+
+
+<style id="aelo-v48-19-description-mobile">
+/* V48.19 — campo Descrição maior no celular */
+@media(max-width:900px){
+  .modal-card{
+    grid-template-rows:minmax(0,47%) minmax(0,53%)!important;
+  }
+  .modal-body{
+    padding:18px 18px 16px!important;
+  }
+  .modal-body #modal-description{
+    flex:1 1 auto!important;
+    height:0!important;
+    min-height:250px!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:auto!important;
+    scrollbar-gutter:stable!important;
+    padding:14px 12px 14px 0!important;
+    margin:0 0 8px!important;
+    border-top:1px solid #e4e6e9!important;
+    border-bottom:1px solid #e4e6e9!important;
+    line-height:1.58!important;
+    font-size:15px!important;
+  }
+  .modal-body #modal-description::-webkit-scrollbar{width:8px!important;}
+  .modal-body #modal-description::-webkit-scrollbar-thumb{background:#9ea5ad!important;border-radius:999px!important;}
+  .modal-body #modal-description::-webkit-scrollbar-track{background:#eceef1!important;border-radius:999px!important;}
+}
+@media(max-width:430px){
+  .modal-card{
+    grid-template-rows:minmax(0,46%) minmax(0,54%)!important;
+  }
+  .modal-body #modal-description{
+    min-height:270px!important;
+    font-size:14.5px!important;
+  }
 }
 </style>
 
