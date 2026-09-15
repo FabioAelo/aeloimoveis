@@ -390,24 +390,14 @@ footer{background:#050607}
 .property-image{position:relative}
 .sold-badge{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;background:rgba(18,35,48,.94);color:#fff;text-align:center;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
 .property-card:has(.sold-badge) .price{color:#6f7680}
-
-/* V49 — Aluguel por temporada */
-.property-card-season .badge{background:#17304a}.property-card-season .price{color:#b17a13}.season-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 18px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#faf8f2}.season-summary span{display:flex;flex-direction:column;gap:2px;color:var(--muted);font-size:12px}.season-summary b{color:#17304a;font-size:12px}.season-summary.hidden{display:none!important}
-.quick-links{grid-template-columns:repeat(5,1fr)}
-@media(max-width:1100px){.quick-links{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){.quick-links{grid-template-columns:1fr}.season-summary{grid-template-columns:1fr}}
-
-/* V49.1 — Experiência de Aluguéis: residencial + temporada */
-.rental-intro{display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:center;margin:-4px 0 22px;padding:22px 24px;border:1px solid #eadfca;border-radius:16px;background:linear-gradient(135deg,#fbf8f0,#fff);box-shadow:0 8px 24px rgba(0,0,0,.04)}
-.rental-intro[hidden]{display:none}
-.rental-intro .eyebrow{margin:0 0 6px;color:#b17a13;font-size:11px;font-weight:800;letter-spacing:1.6px}
-.rental-intro h3{margin:0 0 6px;color:#17304a;font-size:22px}
-.rental-intro p:not(.eyebrow){margin:0;color:#697384;line-height:1.55;font-size:14px}
-.rental-intro-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mini-choice{appearance:none;text-align:left;border:1px solid #ddd4c3;border-radius:12px;background:#fff;padding:14px 15px;cursor:pointer;transition:.2s ease}
-.mini-choice:hover{transform:translateY(-1px);border-color:#b17a13;box-shadow:0 6px 16px rgba(0,0,0,.06)}
-.mini-choice strong,.mini-choice span{display:block}.mini-choice strong{color:#17304a;font-size:13px}.mini-choice span{margin-top:4px;color:#697384;font-size:11px}
-.season-empty{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:30px;border:1px solid #eadfca;border-radius:18px;background:linear-gradient(135deg,#fbf8f0,#fff);box-shadow:0 10px 28px rgba(0,0,0,.04)}
-.season-empty-icon{width:64px;height:64px;display:grid;place-items:center;border-radius:16px;background:#f7edcf;font-size:31px}
-.season-empty .eyebrow{margin:0 0 5px;color:#b17a13;font-size:11px;font-weight:800;letter-spacing:1.5px}.season-empty h3{margin:0 0 7px;color:#17304a;font-size:23px}.season-empty p:not(.eyebrow){margin:0 0 16px;max-width:760px;color:#697384;line-height:1.55;font-size:14px}.season-empty-btn{border:0;cursor:pointer;font-weight:700}
-@media(max-width:700px){.rental-intro{grid-template-columns:1fr;padding:18px}.rental-intro-actions{grid-template-columns:1fr 1fr}.season-empty{grid-template-columns:1fr;padding:22px}.season-empty-icon{width:54px;height:54px}.season-empty h3{font-size:20px}}
+/* V49.2 — Aluguéis e Temporada */
+.rental-intro{margin:0 0 26px;padding:22px 22px 20px;border:1px solid #ead9b9;border-radius:16px;background:linear-gradient(135deg,#fffdf8,#ffffff);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:center}
+.rental-intro[hidden]{display:none!important}
+.rental-intro h3{margin:4px 0 8px;font-size:22px;color:#17243a}
+.rental-intro p:not(.eyebrow){margin:0;color:#697384;line-height:1.5}
+.rental-intro-actions{display:flex;gap:10px}
+.mini-choice{min-width:190px;padding:12px 16px;border:1px solid #dfcfb0;border-radius:12px;background:#fff;text-align:left;cursor:pointer;color:#17243a}
+.mini-choice strong,.mini-choice span{display:block}.mini-choice span{margin-top:4px;font-size:12px;color:#697384}
+.season-summary{margin:0 0 16px;padding:12px 14px;border:1px solid #ead9b9;border-radius:10px;background:#fffaf0;color:#6d541f;font-size:14px;line-height:1.5}
+.season-summary.hidden{display:none!important}
+@media(max-width:760px){.rental-intro{grid-template-columns:1fr}.rental-intro-actions{display:grid;grid-template-columns:1fr 1fr}.mini-choice{min-width:0}.rental-intro h3{font-size:19px}}
