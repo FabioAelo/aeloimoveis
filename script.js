@@ -93,7 +93,18 @@ function renderProperties(filter = "todos") {
       </div>
     </article>`).join("");
 
-  if (!list.length) grid.innerHTML = `<div style="grid-column:1/-1;padding:30px 0;color:#697384">Nenhum imóvel encontrado nesta categoria.</div>`;
+  if (!list.length) {
+    if (filter === "temporada") {
+      grid.innerHTML = `<div class="season-empty"><div class="season-empty-icon">🌴</div><div><p class="eyebrow">TEMPORADA AELO</p><h3>Hospedagens selecionadas para sua próxima estadia.</h3><p>Estamos ampliando nosso portfólio de casas e apartamentos para temporada. Em breve, você poderá consultar as opções disponíveis e falar com a AELO para planejar sua estadia.</p><button type="button" class="btn btn-gold season-empty-btn" id="season-empty-contact">Encontrar hospedagem</button></div></div>`;
+      const c=document.getElementById("season-empty-contact");
+      if(c) c.addEventListener("click",()=>{ const chat=document.getElementById("aelo-chat-launcher"); if(chat) chat.click(); });
+    } else {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:30px 0;color:#697384">Nenhum imóvel encontrado nesta categoria.</div>`;
+    }
+  }
+  const rentalIntro=document.getElementById("rental-intro");
+  if(rentalIntro) rentalIntro.hidden = !["aluguel","temporada"].includes(filter);
+  document.querySelectorAll(".mini-choice").forEach(btn=>btn.onclick=()=>{ const target=btn.dataset.filterChoice; const filterBtn=document.querySelector(`.filter[data-filter="${target}"]`); if(filterBtn) filterBtn.click(); });
   document.querySelectorAll(".property-card").forEach(card => card.addEventListener("click", () => openModal(card.dataset.id)));
 }
 
