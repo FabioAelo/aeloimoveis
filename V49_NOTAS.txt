@@ -1,0 +1,12 @@
+AELO IMÓVEIS — V49 TEMPORADA
+
+Primeira etapa do módulo de aluguel por temporada.
+
+1. Execute temporada_v49.sql no SQL Editor do Supabase antes de cadastrar temporada.
+2. Publique os arquivos deste ZIP no GitHub Pages.
+3. No painel administrativo, escolha “🌴 Aluguel por temporada”.
+4. Informe diária, fim de semana, alta temporada, limpeza, mínimo de noites, hóspedes e horários.
+5. O catálogo ganha a categoria “🌴 Temporada”.
+6. O Assistente AELO ganha um fluxo específico para temporada, usando somente imóveis reais publicados.
+
+A V49 não cria reserva/pagamento online e não declara disponibilidade por data. Isso fica para a próxima etapa, com calendário de disponibilidade.

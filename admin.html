@@ -66,10 +66,22 @@
   <form id="propertyForm" class="form-grid">
     <input id="propertyId" type="hidden">
     <label>Título<input id="title" required placeholder="Ex.: Casa Áurea"></label>
-    <label>Tipo<select id="type"><option value="venda">Venda</option><option value="aluguel">Aluguel</option><option value="investimento">Investimento</option></select></label>
+    <label>Tipo<select id="type"><option value="venda">Venda</option><option value="aluguel">Aluguel residencial</option><option value="temporada">🌴 Aluguel por temporada</option><option value="investimento">Investimento</option></select></label>
     <label>Localização<input id="location" required placeholder="Bairro • Cidade, UF"></label>
-    <label>Preço<input id="price" type="number" min="0" step="0.01" required placeholder="2480000"></label>
+    <label id="priceLabelWrap"><span id="priceFieldLabel">Preço</span><input id="price" type="number" min="0" step="0.01" placeholder="2480000"></label>
     <label>Texto do preço<input id="priceLabel" placeholder="Opcional — ex.: R$ 2.480.000"></label>
+    <div id="seasonFields" class="season-fields full hidden">
+      <div class="season-fields-head"><strong>🌴 Dados da temporada</strong><small>Informações usadas no catálogo e no atendimento. A disponibilidade por data será adicionada em uma próxima etapa.</small></div>
+      <label>Diária<input id="nightlyPrice" type="number" min="0" step="0.01" placeholder="650"></label>
+      <label>Fim de semana<input id="weekendPrice" type="number" min="0" step="0.01" placeholder="750"></label>
+      <label>Alta temporada<input id="highSeasonPrice" type="number" min="0" step="0.01" placeholder="900"></label>
+      <label>Taxa de limpeza<input id="cleaningFee" type="number" min="0" step="0.01" placeholder="250"></label>
+      <label>Mínimo de noites<input id="minNights" type="number" min="1" step="1" value="1"></label>
+      <label>Máximo de hóspedes<input id="maxGuests" type="number" min="1" step="1" placeholder="8"></label>
+      <label>Check-in<input id="checkinTime" type="text" placeholder="15h"></label>
+      <label>Check-out<input id="checkoutTime" type="text" placeholder="11h"></label>
+    </div>
+    <label id="propertyCategoryWrap">Tipo de imóvel<select id="propertyCategory"><option value="">Não informado</option><option value="Casa">Casa</option><option value="Apartamento">Apartamento</option><option value="Terreno">Terreno</option><option value="Comercial">Comercial</option><option value="Chácara">Chácara</option><option value="Outro">Outro</option></select></label>
     <label>Quartos<input id="bedrooms" type="number" min="0" value="0"></label>
     <label>Suítes<input id="suites" type="number" min="0" value="0"></label>
     <label>Vagas<input id="parking" type="number" min="0" value="0"></label>
@@ -97,7 +109,7 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=48.16"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=49.0"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

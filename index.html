@@ -795,7 +795,8 @@ window.AELO_SITE_VERSION='48.26';
     <section class="quick-links" aria-label="Serviços">
       <a href="#imoveis"><span class="icon">⌂</span><span><strong>Compra</strong><small>Encontre o imóvel ideal</small></span></a>
       <a href="#imoveis"><span class="icon">▥</span><span><strong>Venda</strong><small>Valorize seu patrimônio</small></span></a>
-      <a href="#imoveis"><span class="icon">⌕</span><span><strong>Aluguel</strong><small>Segurança em cada negócio</small></span></a>
+      <a href="#imoveis" data-quick-filter="aluguel"><span class="icon">⌕</span><span><strong>Aluguel residencial</strong><small>Segurança em cada negócio</small></span></a>
+      <a href="#imoveis" data-quick-filter="temporada"><span class="icon">🌴</span><span><strong>Temporada</strong><small>Hospedagens selecionadas</small></span></a>
       <a href="#servicos"><span class="icon">◇</span><span><strong>Investimento</strong><small>Oportunidades com confiança</small></span></a>
     </section>
 
@@ -811,7 +812,8 @@ window.AELO_SITE_VERSION='48.26';
       <div class="filters" role="group" aria-label="Filtrar imóveis">
         <button class="filter active" data-filter="todos">Todos</button>
         <button class="filter" data-filter="venda">Venda</button>
-        <button class="filter" data-filter="aluguel">Aluguel</button>
+        <button class="filter" data-filter="aluguel">Aluguel residencial</button>
+        <button class="filter" data-filter="temporada">🌴 Temporada</button>
         <button class="filter" data-filter="investimento">Investimento</button>
       </div>
 
@@ -883,6 +885,7 @@ window.AELO_SITE_VERSION='48.26';
         <h2 id="modal-title"></h2>
         <p id="modal-location"></p>
         <div class="modal-meta" id="modal-meta"></div>
+        <div class="season-summary hidden" id="modal-season-summary"></div>
         <div class="modal-description-label">DESCRIÇÃO</div>
         <p id="modal-description"></p>
         <div class="modal-actions"><a class="btn btn-gold modal-interest" href="https://wa.me/5571992961212" target="_blank" rel="noopener">Tenho interesse</a></div>
