@@ -346,8 +346,10 @@
   .lead-compact-right{justify-content:flex-start!important}
   .lead-open-label{width:auto!important;text-align:left!important}
 }
-/* V49.2 — campos de temporada */
-.season-fields{grid-column:1/-1;padding:16px;border:1px solid #ead9b9;border-radius:14px;background:#fffaf0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.season-fields.hidden{display:none!important}
-.season-fields-head{grid-column:1/-1;display:flex;flex-direction:column;gap:4px}.season-fields-head small{color:#697384;line-height:1.4}
-@media(max-width:700px){.season-fields{grid-template-columns:1fr}}
+
+/* V49 — cadastro de temporada */
+.season-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:18px;border:1px solid #e2e6eb;border-radius:14px;background:#faf8f2}
+.season-fields-head{grid-column:1/-1;display:flex;flex-direction:column;gap:4px}.season-fields-head strong{font-size:16px;color:#17304a}.season-fields-head small{color:#687588;line-height:1.45}
+.season-fields label{display:flex;flex-direction:column;gap:7px;font-weight:600;font-size:13px}.season-fields input{width:100%}
+@media(max-width:900px){.season-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.season-fields{grid-template-columns:1fr}}

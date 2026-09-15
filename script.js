@@ -15,6 +15,8 @@ function normalizeProperty(p) {
   if (Number(p.suites) > 0) meta.push(`${p.suites} suítes`);
   if (Number(p.parking) > 0) meta.push(`${p.parking} vagas`);
   if (p.area_m2) meta.push(`${Number(p.area_m2).toLocaleString("pt-BR")} m²`);
+  if (p.type === "temporada" && Number(p.max_guests) > 0) meta.push(`até ${p.max_guests} hóspedes`);
+  if (p.type === "temporada" && Number(p.min_nights) > 0) meta.push(`${p.min_nights} noite${Number(p.min_nights)===1?"":"s"} mín.`);
   const gallery_urls = Array.isArray(p.gallery_urls) && p.gallery_urls.length ? p.gallery_urls : (p.image_url ? [p.image_url] : []);
   return { ...p, gallery_urls, image_url: gallery_urls[0] || p.image_url || "logo.png", badge: p.badge || String(p.type || "").toUpperCase(), price_label: p.price_label || formatPrice(p.price, p.type), meta };
 }
@@ -22,7 +24,9 @@ function normalizeProperty(p) {
 function formatPrice(value, type) {
   const n = Number(value || 0);
   const base = n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  return type === "aluguel" ? `${base}/mês` : type === "temporada" ? `${base}/noite` : base;
+  if (type === "aluguel") return `${base}/mês`;
+  if (type === "temporada") return `${base}/noite`;
+  return base;
 }
 
 
@@ -75,24 +79,32 @@ async function loadProperties() {
 
 function renderProperties(filter = "todos") {
   const list = filter === "todos" ? properties : properties.filter(p => p.type === filter);
-  const rentalIntro = document.getElementById("rental-intro");
-  if (rentalIntro) rentalIntro.hidden = !["aluguel","temporada"].includes(filter);
-
   grid.innerHTML = list.map(p => `
     <article class="property-card" data-id="${p.id}">
       <div class="property-image">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
-        <span class="badge">${p.badge}</span>${p.commercial_status==='vendido'?`<span class="sold-badge">✓ IMÓVEL VENDIDO</span>`:''}
+        <span class="badge">${p.type === "temporada" ? "TEMPORADA" : p.badge}</span>${p.commercial_status==='vendido'?`<span class="sold-badge">✓ IMÓVEL VENDIDO</span>`:''}
       </div>
       <div class="property-info">
         <h3>${p.title}</h3>
         <p class="location">${p.location}</p>
-        <div class="price">${p.type === "temporada" && p.nightly_price ? `${Number(p.nightly_price).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}/noite` : p.price_label}</div>
+        <div class="price">${p.price_label}</div>
         <div class="meta">${p.meta.map(item => `<span>${item}</span>`).join("")}</div>
       </div>
     </article>`).join("");
 
-  if (!list.length) grid.innerHTML = `<div style="grid-column:1/-1;padding:30px 0;color:#697384">Nenhum imóvel encontrado nesta categoria.</div>`;
+  if (!list.length) {
+    if (filter === "temporada") {
+      grid.innerHTML = `<div class="season-empty"><div class="season-empty-icon">🌴</div><div><p class="eyebrow">TEMPORADA AELO</p><h3>Hospedagens selecionadas para sua próxima estadia.</h3><p>Estamos ampliando nosso portfólio de casas e apartamentos para temporada. Em breve, você poderá consultar as opções disponíveis e falar com a AELO para planejar sua estadia.</p><button type="button" class="btn btn-gold season-empty-btn" id="season-empty-contact">Encontrar hospedagem</button></div></div>`;
+      const c=document.getElementById("season-empty-contact");
+      if(c) c.addEventListener("click",()=>{ const chat=document.getElementById("aelo-chat-launcher"); if(chat) chat.click(); });
+    } else {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:30px 0;color:#697384">Nenhum imóvel encontrado nesta categoria.</div>`;
+    }
+  }
+  const rentalIntro=document.getElementById("rental-intro");
+  if(rentalIntro) rentalIntro.hidden = !["aluguel","temporada"].includes(filter);
+  document.querySelectorAll(".mini-choice").forEach(btn=>btn.onclick=()=>{ const target=btn.dataset.filterChoice; const filterBtn=document.querySelector(`.filter[data-filter="${target}"]`); if(filterBtn) filterBtn.click(); });
   document.querySelectorAll(".property-card").forEach(card => card.addEventListener("click", () => openModal(card.dataset.id)));
 }
 
@@ -143,18 +155,20 @@ function openModal(id) {
   document.getElementById("modal-title").textContent = p.title;
   document.getElementById("modal-location").textContent = p.location;
   document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");
-  document.getElementById("modal-description").textContent = p.description || "Entre em contato com a Aelo para mais informações.";
-  const seasonSummary = document.getElementById("modal-season-summary");
-  if (seasonSummary) {
-    if (p.type === "temporada") {
-      const parts=[];
-      if (p.nightly_price) parts.push(`Diária: ${Number(p.nightly_price).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}`);
-      if (p.weekend_price) parts.push(`Fim de semana: ${Number(p.weekend_price).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}`);
-      if (p.max_guests) parts.push(`Até ${p.max_guests} hóspedes`);
-      if (p.min_nights) parts.push(`Mínimo: ${p.min_nights} noite${Number(p.min_nights)>1?'s':''}`);
-      seasonSummary.textContent=parts.join(" • "); seasonSummary.classList.remove("hidden");
-    } else { seasonSummary.textContent=""; seasonSummary.classList.add("hidden"); }
+  const seasonSummary=document.getElementById("modal-season-summary");
+  if(seasonSummary){
+    if(p.type === "temporada"){
+      const rows=[];
+      if(Number(p.weekend_price)>0) rows.push(`<span><b>Fim de semana</b>${formatPrice(p.weekend_price,"temporada")}</span>`);
+      if(Number(p.high_season_price)>0) rows.push(`<span><b>Alta temporada</b>${formatPrice(p.high_season_price,"temporada")}</span>`);
+      if(Number(p.cleaning_fee)>0) rows.push(`<span><b>Taxa de limpeza</b>${Number(p.cleaning_fee).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</span>`);
+      if(p.checkin_time) rows.push(`<span><b>Check-in</b>${p.checkin_time}</span>`);
+      if(p.checkout_time) rows.push(`<span><b>Check-out</b>${p.checkout_time}</span>`);
+      seasonSummary.innerHTML=rows.join("");
+      seasonSummary.classList.toggle("hidden",!rows.length);
+    }else{seasonSummary.classList.add("hidden");seasonSummary.innerHTML="";}
   }
+  document.getElementById("modal-description").textContent = p.description || "Entre em contato com a Aelo para mais informações.";
   renderGalleryThumbs();
   showGalleryImage();
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
@@ -168,16 +182,15 @@ function closeModal() {
   if (launcher) { launcher.style.display = "flex"; launcher.style.visibility = "visible"; launcher.style.opacity = "1"; }
 }
 
-function applyCatalogFilter(filter){
-  const btn=document.querySelector(`.filter[data-filter="${filter}"]`);
+document.querySelectorAll("[data-quick-filter]").forEach(link => link.addEventListener("click", () => {
+  const target=link.dataset.quickFilter;
+  const filter=document.querySelector(`.filter[data-filter="${target}"]`);
+  if(filter){document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));filter.classList.add("active");renderProperties(target);}
+}));
+document.querySelectorAll(".filter").forEach(button => button.addEventListener("click", () => {
   document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
-  renderProperties(filter);
-  document.getElementById("imoveis")?.scrollIntoView({behavior:"smooth",block:"start"});
-}
-document.querySelectorAll(".filter").forEach(button => button.addEventListener("click", () => applyCatalogFilter(button.dataset.filter)));
-document.querySelectorAll("[data-quick-filter]").forEach(button => button.addEventListener("click", e => { e.preventDefault(); applyCatalogFilter(button.dataset.quickFilter); }));
-document.querySelectorAll("[data-filter-choice]").forEach(button => button.addEventListener("click", () => applyCatalogFilter(button.dataset.filterChoice)));
+  button.classList.add("active"); renderProperties(button.dataset.filter);
+}));
 document.querySelector(".modal-close").addEventListener("click", closeModal);
 document.querySelector(".gallery-prev").addEventListener("click", () => { if (!currentGallery.length) return; currentGalleryIndex = (currentGalleryIndex - 1 + currentGallery.length) % currentGallery.length; showGalleryImage(); });
 document.querySelector(".gallery-next").addEventListener("click", () => { if (!currentGallery.length) return; currentGalleryIndex = (currentGalleryIndex + 1) % currentGallery.length; showGalleryImage(); });
@@ -232,8 +245,13 @@ const add=(text,who='bot',html=false)=>{const e=document.createElement('div');e.
 const buttons=items=>{quick.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.type='button';b.textContent=x.label;b.onclick=()=>{add(x.label,'user');x.action()};quick.appendChild(b)})};
 const open=()=>{panel.classList.add('open');panel.setAttribute('aria-hidden','false');launcher.style.display='none';launcher.style.visibility='hidden';launcher.style.opacity='0';if(!started){started=true;add('Olá! Sou o Assistente AELO. 👋\nPosso ajudar você a encontrar um imóvel, anunciar sua propriedade ou solicitar uma avaliação imobiliária. Escolha uma opção abaixo para começarmos.');main()}};
 const shut=()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true');const l=document.getElementById('aelo-chat-launcher');if(l && !document.getElementById('property-modal')?.classList.contains('open')){l.style.display='flex';l.style.visibility='visible';l.style.opacity='1'}};
-const main=()=>buttons([{label:'🔎 Encontrar imóvel',action:buy},{label:'🔑 Alugar imóvel',action:rent},{label:'💰 Anunciar imóvel',action:sell},{label:'📊 Avaliação / PTAM',action:valuation},{label:'⚖️ Perícia / assistência',action:expert},{label:'📱 Falar com Fabio',action:contact}]);
+const main=()=>buttons([{label:'🔎 Encontrar imóvel',action:buy},{label:'🔑 Alugar imóvel',action:rent},{label:'🌴 Aluguel por temporada',action:seasonRent},{label:'💰 Anunciar imóvel',action:sell},{label:'📊 Avaliação / PTAM',action:valuation},{label:'⚖️ Perícia / assistência',action:expert},{label:'📱 Falar com Fabio',action:contact}]);
 const buy=()=>{add('Ótimo. Vamos qualificar seu perfil em poucos passos. Em qual região você procura?');buttons([{label:'Lauro de Freitas',action:()=>propertyTypeStep({interest:'Compra',type:'venda',region:'Lauro de Freitas'})},{label:'Camaçari',action:()=>propertyTypeStep({interest:'Compra',type:'venda',region:'Camaçari'})},{label:'Salvador',action:()=>propertyTypeStep({interest:'Compra',type:'venda',region:'Salvador'})},{label:'Outra região',action:()=>freeRegionStep({interest:'Compra',type:'venda'})},{label:'↩️ Menu',action:main}])};
+const seasonRent=()=>{add('Ótimo! Vamos encontrar uma hospedagem por temporada. Em qual região você procura?');buttons([{label:'🌴 Lauro de Freitas',action:()=>seasonTypeStep({interest:'Temporada',type:'temporada',region:'Lauro de Freitas'})},{label:'🏖️ Camaçari / Guarajuba',action:()=>seasonTypeStep({interest:'Temporada',type:'temporada',region:'Camaçari'})},{label:'🌊 Salvador',action:()=>seasonTypeStep({interest:'Temporada',type:'temporada',region:'Salvador'})},{label:'📱 Outra região / Falar com Fábio',action:()=>wa('Olá, Fabio! Estou procurando um imóvel para aluguel por temporada em outra região.')},{label:'↩️ Menu',action:main}])};
+const seasonTypeStep=(ctx)=>{add('Que tipo de hospedagem você procura?');buttons([{label:'🏠 Casa',action:()=>seasonGuestsStep({...ctx,propertyType:'Casa'})},{label:'🏢 Apartamento',action:()=>seasonGuestsStep({...ctx,propertyType:'Apartamento'})},{label:'🔎 Outro / indiferente',action:()=>seasonGuestsStep({...ctx,propertyType:'Outro / indiferente'})}])};
+const seasonGuestsStep=(ctx)=>{add('Quantos hóspedes?');buttons([{label:'Até 2',action:()=>seasonBudgetStep({...ctx,guests:2})},{label:'3 a 5',action:()=>seasonBudgetStep({...ctx,guests:5})},{label:'6 a 8',action:()=>seasonBudgetStep({...ctx,guests:8})},{label:'9 ou mais',action:()=>seasonBudgetStep({...ctx,guests:9})},{label:'Ainda não sei',action:()=>seasonBudgetStep({...ctx,guests:0})}])};
+const seasonBudgetStep=(ctx)=>{add('Qual valor máximo por noite você pretende pagar?');buttons([{label:'Até R$ 500/noite',action:()=>seasonFinish({...ctx,budgetLabel:'até R$ 500/noite',budgetMax:500})},{label:'R$ 500 a R$ 1.000',action:()=>seasonFinish({...ctx,budgetLabel:'R$ 500 a R$ 1.000/noite',budgetMin:500,budgetMax:1000})},{label:'R$ 1.000 a R$ 2.000',action:()=>seasonFinish({...ctx,budgetLabel:'R$ 1.000 a R$ 2.000/noite',budgetMin:1000,budgetMax:2000})},{label:'Acima de R$ 2.000',action:()=>seasonFinish({...ctx,budgetLabel:'acima de R$ 2.000/noite',budgetMin:2000})},{label:'Ainda não defini',action:()=>seasonFinish({...ctx,budgetLabel:'a definir',budgetMax:Infinity})}])};
+const seasonFinish=(ctx)=>{const normLocal=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');const aliases={'Lauro de Freitas':['lauro de freitas','buraquinho','vilas do atlantico','vilas do atlântico','ipitanga','pitangueiras','jardim aeroporto','portao'],'Camaçari':['camaçari','camacari','guarajuba','barra do jacuí','barra do jacui','abrantes','jaua','jauá'],'Salvador':['salvador']};const regionOk=loc=>(aliases[ctx.region]||[normLocal(ctx.region)]).some(a=>normLocal(loc).includes(normLocal(a)));const typeOk=p=>!ctx.propertyType||ctx.propertyType==='Outro / indiferente'||normLocal([p.property_category,p.title,p.description].join(' ')).includes(normLocal(ctx.propertyType));let list=properties.filter(p=>p.type==='temporada'&&regionOk(p.location)&&typeOk(p)&&(!ctx.budgetMin||Number(p.price||0)>=ctx.budgetMin)&&(!ctx.budgetMax||Number(p.price||0)<=ctx.budgetMax)&&(!ctx.guests||Number(p.max_guests||0)>=ctx.guests));trackAeloEvent('search',{interest:'Temporada',type:'temporada',region:ctx.region,budget:ctx.budgetLabel,guests:ctx.guests,results:list.length});add(list.length?'Encontrei estas opções de temporada para você. 🌴':'Não encontrei uma opção com todos esses critérios agora. Posso te encaminhar ao Fábio para uma busca personalizada.');if(list.length){list.slice(0,4).forEach(p=>{const el=document.createElement('div');el.className='aelo-chat-property';el.innerHTML=`<img src="${p.image_url}" alt="${esc(p.title)}"><strong>${esc(p.title)}</strong><small>${esc(p.location)} · ${Number(p.max_guests||0)>0?'até '+Number(p.max_guests)+' hóspedes':'consulte hóspedes'}</small><b>${esc(p.price_label||formatPrice(p.price,'temporada'))}</b><a href="#" data-id="${p.id}">Ver imóvel</a>`;quick.appendChild(el);el.querySelector('a').onclick=e=>{e.preventDefault();openModal(p.id);shut();};});}buttons([{label:'📋 Quero deixar meu contato',action:()=>collectLead('Temporada',ctx)},{label:'📱 Falar com Fábio',action:()=>wa(`Olá, Fabio! Procuro aluguel por temporada em ${ctx.region||'outra região'}. ${ctx.guests?`Somos ${ctx.guests} hóspedes. `:''}${ctx.budgetLabel?`Orçamento: ${ctx.budgetLabel}.`:''}`)},{label:'🔄 Nova busca',action:seasonRent},{label:'↩️ Menu',action:main}]);};
 const rent=()=>{add('Perfeito. Vamos qualificar seu perfil em poucos passos. Em qual região você procura?');buttons([{label:'Lauro de Freitas',action:()=>propertyTypeStep({interest:'Aluguel',type:'aluguel',region:'Lauro de Freitas'})},{label:'Camaçari',action:()=>propertyTypeStep({interest:'Aluguel',type:'aluguel',region:'Camaçari'})},{label:'Salvador',action:()=>propertyTypeStep({interest:'Aluguel',type:'aluguel',region:'Salvador'})},{label:'Outra região',action:()=>freeRegionStep({interest:'Aluguel',type:'aluguel'})},{label:'↩️ Menu',action:main}])};
 const freeRegionStep=(ctx)=>{add('Sem problema. Escolha uma das regiões disponíveis ou fale diretamente com o Fábio para uma busca personalizada.');buttons([{label:'Vilas do Atlântico',action:()=>propertyTypeStep({...ctx,region:'Vilas do Atlântico'})},{label:'Buraquinho',action:()=>propertyTypeStep({...ctx,region:'Buraquinho'})},{label:'Ipitanga',action:()=>propertyTypeStep({...ctx,region:'Ipitanga'})},{label:'Pitangueiras',action:()=>propertyTypeStep({...ctx,region:'Pitangueiras'})},{label:'Alphaville',action:()=>propertyTypeStep({...ctx,region:'Alphaville'})},{label:'📱 Falar com Fábio',action:()=>wa('Olá, Fabio! Estou procurando um imóvel em outra região e gostaria de receber opções.') }])};
 const propertyTypeStep=(ctx)=>{add('Que tipo de imóvel você procura?');buttons([{label:'🏠 Casa',action:()=>bedroomStep({...ctx,propertyType:'Casa'})},{label:'🏢 Apartamento',action:()=>bedroomStep({...ctx,propertyType:'Apartamento'})},{label:'🌳 Terreno',action:()=>bedroomStep({...ctx,propertyType:'Terreno'})},{label:'🏬 Comercial',action:()=>bedroomStep({...ctx,propertyType:'Comercial'})},{label:'🔎 Outro / indiferente',action:()=>bedroomStep({...ctx,propertyType:'Outro / indiferente'})}])};

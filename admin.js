@@ -24,13 +24,20 @@ function syncSoldFields(){
   $('partnerNameWrap')?.classList.toggle('hidden',!partner);
   $('partnerCreciWrap')?.classList.toggle('hidden',!partner);
 }
+function syncSeasonFields(){
+  const season=$('type')?.value==='temporada';
+  $('seasonFields')?.classList.toggle('hidden',!season);
+  const label=$('priceFieldLabel'); if(label) label.textContent=season?'Diária':'Preço';
+  const p=$('price'); if(p) p.placeholder=season?'650':'2480000';
+  const pl=$('priceLabel'); if(pl) pl.placeholder=season?'Opcional — ex.: R$ 650/noite':'Opcional — ex.: R$ 2.480.000';
+}
 async function refresh() {
   const { data, error } = await client.from("properties").select("*").order("created_at", { ascending:false });
   if (error) return showMsg("saveMsg", error.message);
   $("propertyList").innerHTML = data.length ? data.map(p => `
     <article class="admin-row">
       <img src="${p.image_url || 'logo.png'}" alt="">
-      <div><h3>${p.title}</h3><p>${p.location} • ${p.type} • ${p.is_published ? 'Publicado' : 'Rascunho'}</p><p>${commercialLabel(p)}${p.price_label ? ' • '+p.price_label : ''}</p></div>
+      <div><h3>${p.title}</h3><p>${p.location} • ${p.type==='temporada'?'Temporada':p.type==='aluguel'?'Aluguel residencial':p.type} • ${p.is_published ? 'Publicado' : 'Rascunho'}</p><p>${commercialLabel(p)}${p.price_label ? ' • '+p.price_label : ''}</p></div>
       <div class="row-actions"><button class="ghost" onclick="editProperty('${p.id}')">Editar</button><button class="ghost danger" onclick="deleteProperty('${p.id}')">Excluir</button></div>
     </article>`).join("") : `<div class="card"><p>Nenhum imóvel cadastrado ainda. Clique em “+ Novo imóvel”.</p></div>`;
 }
@@ -433,18 +440,9 @@ $("logoutBtn").addEventListener("click",()=>client.auth.signOut());
 $("newBtn").addEventListener("click",()=>openEditor());
 $("cancelBtn").addEventListener("click",()=>$("editor").classList.add("hidden"));
 
-
-function syncSeasonFields(){
-  const isSeason=$("type")?.value==="temporada";
-  $("seasonFields")?.classList.toggle("hidden",!isSeason);
-  $("propertyCategoryWrap")?.classList.toggle("hidden",false);
-  const priceLabel=$("priceFieldLabel"); if(priceLabel) priceLabel.textContent=isSeason?"Valor base da diária":"Preço";
-  const priceInput=$("price"); if(priceInput) priceInput.placeholder=isSeason?"650":"2480000";
-}
-$("type")?.addEventListener("change",syncSeasonFields);
 function openEditor(p=null){
   $("editor").classList.remove("hidden"); $("dashboard").classList.add("hidden"); $("editorTitle").textContent=p?"Editar imóvel":"Novo imóvel"; $("propertyId").value=p?.id||"";
-  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("nightlyPrice").value=p?.nightly_price||""; $("weekendPrice").value=p?.weekend_price||""; $("highSeasonPrice").value=p?.high_season_price||""; $("cleaningFee").value=p?.cleaning_fee||""; $("minNights").value=p?.min_nights||1; $("maxGuests").value=p?.max_guests||""; $("checkinTime").value=p?.checkin_time||""; $("checkoutTime").value=p?.checkout_time||""; $("propertyCategory").value=p?.property_category||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; syncSoldFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); renderPhotoPreviews([]); syncSeasonFields(); window.scrollTo({top:0,behavior:"smooth"});
+  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("propertyCategory").value=p?.property_category||""; $("nightlyPrice").value=p?.type==='temporada'?(p?.price||''):(p?.nightly_price||''); $("weekendPrice").value=p?.weekend_price||''; $("highSeasonPrice").value=p?.high_season_price||''; $("cleaningFee").value=p?.cleaning_fee||''; $("minNights").value=p?.min_nights||1; $("maxGuests").value=p?.max_guests||''; $("checkinTime").value=p?.checkin_time||''; $("checkoutTime").value=p?.checkout_time||''; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; syncSoldFields(); syncSeasonFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); renderPhotoPreviews([]); window.scrollTo({top:0,behavior:"smooth"});
 }
 window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
 window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
@@ -530,12 +528,13 @@ $("propertyForm").addEventListener("submit",async e=>{
  try{
   const galleryUrls=await uploadImages($("imageFile").files,user.id);
   const imageUrl=galleryUrls[0] || null;
-  const sold=$("commercialStatus").value==="vendido"; const partner=sold && $("soldBy").value==="parceiro"; const isSeason=$("type").value==="temporada"; const payload={owner_id:user.id,title:$("title").value.trim(),type:$("type").value,badge:isSeason?"TEMPORADA":$("type").value.toUpperCase(),location:$("location").value.trim(),price:Number(isSeason?$("nightlyPrice").value:$("price").value)||0,price_label:$("priceLabel").value.trim()||null,bedrooms:Number($("bedrooms").value||0),suites:Number($("suites").value||0),parking:Number($("parking").value||0),area_m2:Number($("area").value||0)||null,image_url:imageUrl,description:$("description").value.trim(),gallery_urls:galleryUrls,is_published:$("published").checked,commercial_status:$("commercialStatus").value,sold_by:sold ? $("soldBy").value : null,partner_name:partner ? $("partnerName").value.trim()||null : null,partner_creci:partner ? $("partnerCreci").value.trim()||null : null,nightly_price:Number($("nightlyPrice").value||0)||null,weekend_price:Number($("weekendPrice").value||0)||null,high_season_price:Number($("highSeasonPrice").value||0)||null,cleaning_fee:Number($("cleaningFee").value||0)||null,min_nights:Number($("minNights").value||1),max_guests:Number($("maxGuests").value||0)||null,checkin_time:$("checkinTime").value.trim()||null,checkout_time:$("checkoutTime").value.trim()||null,property_category:$("propertyCategory").value||null};
+  const sold=$("commercialStatus").value==="vendido"; const partner=sold && $("soldBy").value==="parceiro"; const season=$("type").value==="temporada"; const price=season?Number($("nightlyPrice").value||$("price").value||0):Number($("price").value||0); const payload={owner_id:user.id,title:$("title").value.trim(),type:$("type").value,badge:season?"TEMPORADA":$("type").value.toUpperCase(),location:$("location").value.trim(),price,price_label:$("priceLabel").value.trim()||null,property_category:$("propertyCategory").value||null,nightly_price:season?price:null,weekend_price:season?(Number($("weekendPrice").value||0)||null):null,high_season_price:season?(Number($("highSeasonPrice").value||0)||null):null,cleaning_fee:season?(Number($("cleaningFee").value||0)||null):null,min_nights:season?(Number($("minNights").value||1)||1):null,max_guests:season?(Number($("maxGuests").value||0)||null):null,checkin_time:season?$("checkinTime").value.trim()||null:null,checkout_time:season?$("checkoutTime").value.trim()||null:null,bedrooms:Number($("bedrooms").value||0),suites:Number($("suites").value||0),parking:Number($("parking").value||0),area_m2:Number($("area").value||0)||null,image_url:imageUrl,description:$("description").value.trim(),gallery_urls:galleryUrls,is_published:$("published").checked,commercial_status:$("commercialStatus").value,sold_by:sold ? $("soldBy").value : null,partner_name:partner ? $("partnerName").value.trim()||null : null,partner_creci:partner ? $("partnerCreci").value.trim()||null : null};
   const id=$("propertyId").value; if(id && payload.commercial_status==="vendido" && !payload.sold_at){ const {data:oldProp}=await client.from("properties").select("sold_at,commercial_status").eq("id",id).single(); payload.sold_at=oldProp?.sold_at||new Date().toISOString(); } if(id && payload.commercial_status!=="vendido") payload.sold_at=null; const result=id?await client.from("properties").update(payload).eq("id",id):await client.from("properties").insert(payload); if(result.error) throw result.error;
   $("editor").classList.add("hidden"); $("dashboard").classList.remove("hidden"); showMsg("saveMsg",""); refresh();
  }catch(err){showMsg("saveMsg",err.message)}
 });
-$("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.addEventListener("change",syncSoldFields);
+$("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.addEventListener("change",syncSoldFields); $("type")?.addEventListener("change",syncSeasonFields);
 start();
+syncSeasonFields();
 
 loadAnalytics(30);
