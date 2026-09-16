@@ -1,0 +1,11 @@
+AELO Imóveis V50.0
+
+Novidades:
+- Calendário público de disponibilidade para imóveis de temporada.
+- Seleção de check-in, check-out e hóspedes na ficha.
+- Verificação de períodos bloqueados/reservados.
+- Cálculo estimado da estadia usando diária normal, fim de semana, tarifas especiais e taxa de limpeza.
+- Painel administrativo para bloquear períodos e cadastrar tarifas especiais.
+- Nova estrutura Supabase em temporada_v50.sql.
+
+IMPORTANTE: antes de usar calendário/quotação, execute temporada_v50.sql no SQL Editor do Supabase.

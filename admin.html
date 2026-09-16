@@ -71,7 +71,17 @@
     <label id="priceLabelWrap"><span id="priceFieldLabel">Preço</span><input id="price" type="number" min="0" step="0.01" placeholder="2480000"></label>
     <label>Texto do preço<input id="priceLabel" placeholder="Opcional — ex.: R$ 2.480.000"></label>
     <div id="seasonFields" class="season-fields full hidden">
-      <div class="season-fields-head"><strong>🌴 Dados da temporada</strong><small>Informações usadas no catálogo e no atendimento. A disponibilidade por data será adicionada em uma próxima etapa.</small></div>
+      <div class="season-fields-head"><strong>🌴 Dados da temporada</strong><small>Valores, regras e calendário da hospedagem.</small></div>
+      <div class="season-calendar-admin full" id="seasonCalendarAdmin">
+        <div class="season-admin-head"><strong>📅 Disponibilidade</strong><span>Bloqueie períodos reservados ou indisponíveis.</span></div>
+        <div class="season-admin-form"><label>Início<input id="seasonBlockStart" type="date"></label><label>Fim<input id="seasonBlockEnd" type="date"></label><label>Status<select id="seasonBlockStatus"><option value="bloqueado">Bloqueado</option><option value="reservado">Reservado</option></select></label><button type="button" class="ghost" id="addSeasonBlock">+ Bloquear período</button></div>
+        <div id="seasonBlocksList" class="season-blocks-list"></div>
+      </div>
+      <div class="season-calendar-admin full" id="seasonRatesAdmin">
+        <div class="season-admin-head"><strong>☀️ Períodos de tarifa especial</strong><span>Use para feriados, Réveillon, Carnaval ou alta temporada.</span></div>
+        <div class="season-admin-form"><label>Início<input id="seasonRateStart" type="date"></label><label>Fim<input id="seasonRateEnd" type="date"></label><label>Diária especial<input id="seasonRateValue" type="number" min="0" step="0.01" placeholder="900"></label><button type="button" class="ghost" id="addSeasonRate">+ Adicionar tarifa</button></div>
+        <div id="seasonRatesList" class="season-blocks-list"></div>
+      </div>
       <label>Diária<input id="nightlyPrice" type="number" min="0" step="0.01" placeholder="650"></label>
       <label>Fim de semana<input id="weekendPrice" type="number" min="0" step="0.01" placeholder="750"></label>
       <label>Alta temporada<input id="highSeasonPrice" type="number" min="0" step="0.01" placeholder="900"></label>
@@ -109,7 +119,7 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=49.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=50.0"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

@@ -34,4 +34,4 @@ V49.6 — correção do modal no mobile: descrição com área confortável e ro
 V49.7: correção definitiva do modal mobile; corpo da ficha rola como um único documento, descrição fica integralmente acima do botão e CTA não sobrepõe o texto.
 
 
-V49.8: correção final do modal mobile; galeria separada, corpo rolável e botão após a descrição, sem sobreposição.
+V50.0: correção final do modal mobile; galeria separada, corpo rolável e botão após a descrição, sem sobreposição.

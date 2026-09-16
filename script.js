@@ -228,6 +228,77 @@ function showGalleryImage() {
   if(wm) wm.style.display=currentGallery.length?"block":"none";
 }
 
+async function loadSeasonAvailability(propertyId){
+  const c=getSupabaseClient();
+  if(!c) return {blocks:[],rates:[]};
+  const [b,r]=await Promise.all([
+    c.from('season_blocks').select('start_date,end_date,status').eq('property_id',propertyId),
+    c.from('season_rate_periods').select('start_date,end_date,nightly_rate').eq('property_id',propertyId)
+  ]);
+  return {blocks:b.data||[],rates:r.data||[]};
+}
+function dateOnly(s){return new Date(String(s)+'T12:00:00');}
+function fmtBRL(n){return Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function nightsBetween(a,b){return Math.max(0,Math.round((dateOnly(b)-dateOnly(a))/86400000));}
+function dayBlocked(date,blocks){
+  const d=dateOnly(date);
+  return blocks.some(x=>d>=dateOnly(x.start_date)&&d<dateOnly(x.end_date));
+}
+function rateForNight(p,date,rates){
+  const d=dateOnly(date);
+  const special=rates.find(x=>d>=dateOnly(x.start_date)&&d<=dateOnly(x.end_date));
+  if(special && Number(special.nightly_rate)>0) return {value:Number(special.nightly_rate),label:'período especial'};
+  const dow=d.getDay();
+  if((dow===5||dow===6) && Number(p.weekend_price)>0) return {value:Number(p.weekend_price),label:'fim de semana'};
+  return {value:Number(p.nightly_price||p.price||0),label:'diária normal'};
+}
+function renderSeasonCalendar(p,availability,checkin,checkout){
+  const box=document.getElementById('modal-season-calendar'); if(!box)return;
+  const base=checkin?dateOnly(checkin):new Date();
+  const y=base.getFullYear(), m=base.getMonth();
+  const first=new Date(y,m,1), start=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+  const names=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  let html=names.map(x=>`<div class="season-cal-head">${x}</div>`).join('');
+  for(let i=0;i<start;i++)html+='<div class="season-cal-day muted"></div>';
+  for(let d=1;d<=days;d++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const blocked=dayBlocked(iso,availability.blocks);
+    const selected=(checkin&&iso===checkin)||(checkout&&iso===checkout);
+    html+=`<div class="season-cal-day ${blocked?'blocked ':''}${selected?'selected':''}" title="${blocked?'Indisponível':'Disponível'}">${d}</div>`;
+  }
+  box.innerHTML=html;
+}
+async function updateSeasonQuote(p){
+  const ci=document.getElementById('modal-season-checkin')?.value||'';
+  const co=document.getElementById('modal-season-checkout')?.value||'';
+  const guests=Number(document.getElementById('modal-season-guests')?.value||0);
+  const result=document.getElementById('modal-season-total'), note=document.getElementById('modal-season-availability-note');
+  if(!result||!note)return;
+  const availability=await loadSeasonAvailability(p.id);
+  renderSeasonCalendar(p,availability,ci,co);
+  if(!ci||!co){result.innerHTML='<strong>Escolha check-in e check-out</strong><div>O sistema calcula a estadia depois que as datas forem selecionadas.</div>';note.textContent='A disponibilidade final é confirmada pela AELO.';return;}
+  const nights=nightsBetween(ci,co);
+  if(co<=ci){result.innerHTML='<strong>Período inválido</strong>';note.textContent='O check-out precisa ser posterior ao check-in.';return;}
+  if(Number(p.min_nights||0)>nights){result.innerHTML=`<strong>Mínimo de ${Number(p.min_nights)} noites</strong>`;note.textContent='Escolha um período maior para continuar.';return;}
+  if(Number(p.max_guests||0)>0 && guests>Number(p.max_guests)){result.innerHTML='<strong>Quantidade de hóspedes acima do limite</strong>';note.textContent=`Esta hospedagem aceita até ${Number(p.max_guests)} hóspedes.`;return;}
+  let total=0, rows={}, blocked=false;
+  for(let i=0;i<nights;i++){const d=new Date(dateOnly(ci));d.setDate(d.getDate()+i);const iso=d.toISOString().slice(0,10);if(dayBlocked(iso,availability.blocks)){blocked=true;break;}const r=rateForNight(p,iso,availability.rates);total+=r.value;rows[r.label]=(rows[r.label]||0)+1;}
+  if(blocked){result.innerHTML='<strong>Essas datas não estão disponíveis</strong>';note.textContent='Escolha outro período no calendário ou fale com a AELO.';return;}
+  const cleaning=Number(p.cleaning_fee||0), grand=total+cleaning;
+  result.innerHTML=`<strong>${fmtBRL(grand)} estimados</strong><div>${nights} noite${nights===1?'':'s'}${cleaning?` + ${fmtBRL(cleaning)} de limpeza`:''}</div><div class="season-rate-breakdown">${Object.entries(rows).map(([k,v])=>`<span><span>${v} × ${k}</span><b>${k==='fim de semana'&&Number(p.weekend_price)>0?fmtBRL(p.weekend_price):k==='diária normal'?fmtBRL(p.nightly_price||p.price):'tarifa especial'}</b></span>`).join('')}</div>`;
+  note.textContent='Valor estimado. A confirmação da reserva e da tarifa é feita pela AELO.';
+}
+function initSeasonBooking(p){
+  const box=document.getElementById('modal-season-booking'); if(!box)return;
+  box.classList.toggle('hidden',p.type!=='temporada');
+  if(p.type!=='temporada')return;
+  const ci=document.getElementById('modal-season-checkin'), co=document.getElementById('modal-season-checkout'), g=document.getElementById('modal-season-guests');
+  const today=new Date().toISOString().slice(0,10); ci.min=today; co.min=today;
+  const refresh=()=>updateSeasonQuote(p);
+  [ci,co,g].forEach(el=>el&&el.addEventListener('change',refresh));
+  refresh();
+}
+
 function openModal(id) {
   const p = properties.find(item => String(item.id) === String(id));
   if (!p) return;
@@ -261,6 +332,7 @@ function openModal(id) {
   }
   renderGalleryThumbs();
   showGalleryImage();
+  initSeasonBooking(p);
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
 }
 

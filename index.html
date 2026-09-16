@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=49.8">
+  <link rel="stylesheet" href="style.css?v=50.0">
 
 <style id="aelo-gallery-v48-6">
 /* Galeria V48.6 — modelo aprovado: foto inteira + miniaturas + detalhes com rolagem própria */
@@ -930,6 +930,17 @@ window.AELO_SITE_VERSION='49.3';
         <p id="modal-location"></p>
         <div class="modal-meta" id="modal-meta"></div>
         <div class="season-summary hidden" id="modal-season-summary"></div>
+        <div class="season-booking-box hidden" id="modal-season-booking">
+          <div class="season-booking-head"><div><strong>🌴 Planeje sua estadia</strong><small>Selecione as datas para consultar o calendário e estimar o valor.</small></div></div>
+          <div class="season-booking-grid">
+            <label>Check-in<input id="modal-season-checkin" type="date"></label>
+            <label>Check-out<input id="modal-season-checkout" type="date"></label>
+            <label>Hóspedes<input id="modal-season-guests" type="number" min="1" step="1" placeholder="2"></label>
+          </div>
+          <div class="season-calendar" id="modal-season-calendar"></div>
+          <div class="season-booking-result" id="modal-season-total" aria-live="polite"></div>
+          <div class="season-booking-note" id="modal-season-availability-note"></div>
+        </div>
         <div class="modal-description-label">DESCRIÇÃO</div>
         <p id="modal-description"></p>
         <div class="modal-actions"><a class="btn btn-gold modal-interest" href="https://wa.me/5571992961212" target="_blank" rel="noopener">Tenho interesse</a></div>
@@ -1068,7 +1079,7 @@ window.AELO_SITE_VERSION='49.3';
 </style>
 
 <style id="aelo-v49-7-mobile-modal">
-/* V49.8 — mobile: make the details panel scroll as one document.
+/* V50.0 — mobile: make the details panel scroll as one document.
    The description must never be trapped behind the CTA. */
 @media (max-width:700px){
   .modal.open{padding:6px!important;align-items:center!important;}
@@ -1391,7 +1402,7 @@ window.AELO_SITE_VERSION='49.3';
 
 
 <style id="aelo-v49-8-mobile-final">
-/* V49.8 — correção final do modal no celular.
+/* V50.0 — correção final do modal no celular.
    A galeria fica em uma área própria; a ficha inteira rola; a descrição nunca cobre o CTA.
 */
 @media (max-width: 700px){
