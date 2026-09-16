@@ -1,0 +1,7 @@
+AELO IMOVEIS V50.4 — CENTRAL DE RESERVAS
+
+1. Execute temporada_v50_4_reservas.sql no Supabase SQL Editor.
+2. Em Settings > Data API, exponha public.season_reservations (necessário para a solicitação pública via supabase-js).
+3. Publique os arquivos da V50.4.
+4. Teste: imóvel temporada > datas > hóspedes > Tenho interesse > concluir > Central de reservas no painel.
+5. Leads continuam sendo registrados; a solicitação também cria uma reserva com status solicitada.

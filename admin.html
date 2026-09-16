@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=49.2">
+<link rel="stylesheet" href="admin.css?v=50.4">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -27,6 +27,14 @@
     <div id="analyticsEvolution" class="analytics-evolution"></div>
   </div>
 </section>
+<div class="dashboard-head leads-head collapsible-heading">
+  <button class="section-toggle standalone-toggle" type="button" data-target="reservationsContent" aria-expanded="false"><span><b>🌴 Central de reservas</b><small>Solicitações de hospedagem e acompanhamento das reservas</small></span><strong class="toggle-chevron">⌄</strong></button>
+</div>
+<div id="reservationsContent" class="collapsible-content hidden-section">
+  <div class="reservation-toolbar"><div><strong>Reservas de temporada</strong><span id="reservationResultCount">0 solicitações</span></div><button type="button" class="ghost" id="refreshReservations">Atualizar</button></div>
+  <div class="reservation-filters"><label>Status<select id="reservationStatusFilter"><option value="todos">Todos</option><option value="solicitada">🟡 Solicitada</option><option value="em_analise">🔵 Em análise</option><option value="confirmada">🟢 Confirmada</option><option value="aguardando_pagamento">💳 Aguardando pagamento</option><option value="reservada">🏡 Reservada</option><option value="concluida">✅ Concluída</option><option value="cancelada">⚫ Cancelada</option></select></label><label>Buscar<input id="reservationSearch" type="search" placeholder="Hóspede, imóvel ou WhatsApp"></label></div>
+  <div id="reservationList" class="reservation-list"><div class="reservation-empty">Carregando solicitações...</div></div>
+</div>
 <div class="dashboard-head leads-head collapsible-heading">
   <button class="section-toggle standalone-toggle" type="button" data-target="opportunitiesContent" aria-expanded="false"><span><b>🎯 Central de oportunidades</b><small>Leads, prioridades, agenda e funil comercial</small></span><strong class="toggle-chevron">⌄</strong></button>
 </div>
@@ -119,7 +127,7 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=50.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=50.4"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

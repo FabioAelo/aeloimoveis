@@ -308,6 +308,39 @@ async function loadAnalytics(days=30){
 }
 document.getElementById('analyticsPeriod')?.addEventListener('change',e=>loadAnalytics(e.target.value));
 
+let allReservations = [];
+const RES_STATUS = {
+  solicitada:{label:'Solicitada',icon:'🟡'}, em_analise:{label:'Em análise',icon:'🔵'}, confirmada:{label:'Confirmada',icon:'🟢'}, aguardando_pagamento:{label:'Aguardando pagamento',icon:'💳'}, reservada:{label:'Reservada',icon:'🏡'}, concluida:{label:'Concluída',icon:'✅'}, cancelada:{label:'Cancelada',icon:'⚫'}
+};
+function reservationDate(v){return v?new Date(v+'T12:00:00').toLocaleDateString('pt-BR'): '—';}
+function renderReservations(){
+  const box=document.getElementById('reservationList'); if(!box) return;
+  const search=(document.getElementById('reservationSearch')?.value||'').trim().toLowerCase();
+  const status=document.getElementById('reservationStatusFilter')?.value||'todos';
+  const filtered=allReservations.filter(r=>{
+    const hay=[r.guest_name,r.guest_whatsapp,r.property?.title,r.property?.location].filter(Boolean).join(' ').toLowerCase();
+    return (!search||hay.includes(search)) && (status==='todos'||r.status===status);
+  });
+  const count=document.getElementById('reservationResultCount'); if(count) count.textContent=`${filtered.length} ${filtered.length===1?'solicitação':'solicitações'}`;
+  if(!filtered.length){box.innerHTML='<div class="reservation-empty">Nenhuma solicitação de reserva encontrada.</div>';return;}
+  box.innerHTML=filtered.map(r=>{
+    const meta=RES_STATUS[r.status]||{label:r.status||'Solicitação',icon:'📌'};
+    const total=r.estimated_total||'Valor a confirmar';
+    return `<article class="reservation-card"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button></div></article>`;
+  }).join('');
+  box.querySelectorAll('[data-save-res]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveRes;const status=document.querySelector(`[data-res-status="${id}"]`)?.value;if(!status)return;const {error}=await client.from('season_reservations').update({status,updated_at:new Date().toISOString()}).eq('id',id);if(error)return alert(error.message);await refreshReservations();});
+  box.querySelectorAll('[data-res-wa]').forEach(btn=>btn.onclick=()=>{const r=allReservations.find(x=>x.id===btn.dataset.resWa);if(!r)return;const n=String(r.guest_whatsapp||'').replace(/\D/g,'');if(n.length<10||n.length>11)return alert('WhatsApp inválido ou incompleto.');const msg=`Olá, ${r.guest_name||''}! Aqui é o Fábio Aelo. Recebi sua solicitação para ${r.property?.title||'a hospedagem'} no período de ${reservationDate(r.checkin)} a ${reservationDate(r.checkout)}, para ${r.guests||'a definir'} hóspedes. Vou confirmar a disponibilidade e os próximos passos.`;window.open(`https://wa.me/55${n}?text=${encodeURIComponent(msg)}`,'_blank','noopener');});
+}
+async function refreshReservations(){
+  const box=document.getElementById('reservationList'); if(!box) return;
+  const {data,error}=await client.from('season_reservations').select('*, property:properties(title,location)').order('created_at',{ascending:false}).limit(200);
+  if(error){box.innerHTML=`<div class="reservation-empty">Não foi possível carregar as reservas: ${escapeHtml(error.message)}</div>`;return;}
+  allReservations=data||[]; renderReservations();
+}
+document.getElementById('reservationSearch')?.addEventListener('input',renderReservations);
+document.getElementById('reservationStatusFilter')?.addEventListener('change',renderReservations);
+document.getElementById('refreshReservations')?.addEventListener('click',refreshReservations);
+
 async function refreshLeads(){
   const box=document.getElementById('leadList'); if(!box) return;
   const [leadRes, interactionRes] = await Promise.all([
@@ -445,7 +478,7 @@ async function start() {
   client.auth.onAuthStateChange((_event, session) => showSession(session));
 }
 function showSession(session) {
-  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); refreshLeads(); }
+  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); refreshLeads(); refreshReservations(); }
   else { $("dashboard").classList.add("hidden"); $("editor").classList.add("hidden"); $("loginCard").classList.remove("hidden"); $("logoutBtn").classList.add("hidden"); }
 }
 function showMsg(id,text){$(id).textContent=text||""}
