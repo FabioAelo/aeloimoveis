@@ -9,3 +9,5 @@ Novidades:
 - Nova estrutura Supabase em temporada_v50.sql.
 
 IMPORTANTE: antes de usar calendário/quotação, execute temporada_v50.sql no SQL Editor do Supabase.
+
+V50.1 — refinamento do modal: corpo de detalhes rolável, descrição sem scroll interno, calendário acessível e botão Tenho interesse sticky ao final do conteúdo, com layout responsivo. Cache atualizado para 50.1.

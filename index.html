@@ -960,7 +960,7 @@ window.AELO_SITE_VERSION='49.3';
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=49.6"></script>
+  <script src="script.js?v=50.1"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */
@@ -1208,6 +1208,148 @@ window.AELO_SITE_VERSION='49.3';
   .modal-body h2{font-size:31px!important;}
   .modal-body #modal-description{min-height:180px!important;font-size:14.5px!important;}
   .modal-body .season-summary{grid-template-columns:1fr 1fr!important;gap:8px 10px!important;}
+}
+</style>
+
+
+<style id="aelo-v50-1-modal-layout">
+/* V50.1 — modal de imóvel: conteúdo acessível até o fim, desktop e mobile */
+.modal.open .modal-card{
+  overflow:hidden!important;
+}
+.modal.open .modal-body{
+  display:block!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  box-sizing:border-box!important;
+  -webkit-overflow-scrolling:touch!important;
+  scrollbar-width:thin!important;
+  padding-bottom:22px!important;
+}
+.modal.open .modal-body > *{
+  max-width:100%!important;
+}
+.modal.open .modal-body #modal-description{
+  display:block!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  flex:none!important;
+  overflow:visible!important;
+  margin:0 0 18px!important;
+  padding-right:2px!important;
+  white-space:pre-line!important;
+  line-height:1.65!important;
+}
+.modal.open .modal-body .season-booking-box{
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  flex:none!important;
+}
+.modal.open .modal-body .season-calendar{
+  min-height:0!important;
+}
+.modal.open .modal-body .modal-actions{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:8!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  padding:12px 0 4px!important;
+  margin:0!important;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 22%)!important;
+}
+.modal.open .modal-body .modal-interest{
+  position:static!important;
+  display:inline-flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  min-width:180px!important;
+  min-height:44px!important;
+  height:44px!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+@media(max-width:900px){
+  .modal.open .modal-card{
+    width:96vw!important;
+    height:calc(100dvh - 16px)!important;
+    max-height:calc(100dvh - 16px)!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:minmax(0,35%) minmax(0,65%)!important;
+  }
+  .modal.open .modal-gallery{
+    min-height:0!important;
+    height:100%!important;
+  }
+  .modal.open .modal-gallery-stage{
+    min-height:0!important;
+    height:auto!important;
+    flex:1 1 auto!important;
+  }
+  .modal.open .gallery-thumbs{
+    flex:0 0 62px!important;
+    height:62px!important;
+    min-height:62px!important;
+  }
+  .modal.open .modal-body{
+    height:100%!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    padding:18px 16px 18px!important;
+  }
+  .modal.open .modal-body h2{
+    font-size:32px!important;
+    line-height:1.08!important;
+  }
+  .modal.open .modal-body .modal-meta{
+    max-width:100%!important;
+  }
+  .modal.open .modal-body .season-summary{
+    margin-bottom:14px!important;
+  }
+  .modal.open .modal-body .season-booking-box{
+    margin:14px 0 18px!important;
+    padding:14px!important;
+  }
+  .modal.open .modal-body .modal-description-label{
+    margin-top:6px!important;
+  }
+  .modal.open .modal-body #modal-description{
+    font-size:14px!important;
+    line-height:1.6!important;
+    padding-right:0!important;
+    margin-bottom:18px!important;
+  }
+  .modal.open .modal-body .modal-actions{
+    padding:12px 0 4px!important;
+  }
+  .modal.open .modal-body .modal-interest{
+    width:100%!important;
+    min-width:0!important;
+  }
+}
+@media(max-width:430px){
+  .modal.open .modal-card{
+    width:calc(100vw - 12px)!important;
+    height:calc(100dvh - 8px)!important;
+    max-height:calc(100dvh - 8px)!important;
+    grid-template-rows:minmax(0,33%) minmax(0,67%)!important;
+  }
+  .modal.open .modal-body{
+    padding:14px 12px 16px!important;
+  }
+  .modal.open .modal-body h2{
+    font-size:30px!important;
+  }
+  .modal.open .modal-interest{
+    height:46px!important;
+    min-height:46px!important;
+  }
 }
 </style>
 
