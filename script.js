@@ -18,7 +18,10 @@ function normalizeProperty(p) {
   if (p.type === "temporada" && Number(p.max_guests) > 0) meta.push(`até ${p.max_guests} hóspedes`);
   if (p.type === "temporada" && Number(p.min_nights) > 0) meta.push(`${p.min_nights} noite${Number(p.min_nights)===1?"":"s"} mín.`);
   const gallery_urls = Array.isArray(p.gallery_urls) && p.gallery_urls.length ? p.gallery_urls : (p.image_url ? [p.image_url] : []);
-  return { ...p, gallery_urls, image_url: gallery_urls[0] || p.image_url || "logo.png", badge: p.badge || String(p.type || "").toUpperCase(), price_label: p.price_label || formatPrice(p.price, p.type), meta };
+  const seasonPrice = Number(p.nightly_price) > 0 ? Number(p.nightly_price) : Number(p.price || 0);
+  const normalized = { ...p, gallery_urls, image_url: gallery_urls[0] || p.image_url || "logo.png", badge: p.badge || String(p.type || "").toUpperCase(), price_label: p.price_label || formatPrice(p.type === "temporada" ? seasonPrice : p.price, p.type), meta };
+  normalized.nightly_price = seasonPrice;
+  return normalized;
 }
 
 function formatPrice(value, type) {
@@ -77,6 +80,84 @@ async function loadProperties() {
   renderProperties(document.querySelector(".filter.active")?.dataset.filter || "todos");
 }
 
+function openSeasonSearch(prefill={}) {
+  const panel=document.getElementById("season-search");
+  if(!panel) return;
+  panel.hidden=false;
+  const set=(id,value)=>{const el=document.getElementById(id);if(el && value!==undefined) el.value=value;};
+  set("season-location",prefill.location||"");
+  set("season-checkin",prefill.checkin||"");
+  set("season-checkout",prefill.checkout||"");
+  set("season-guests",String(prefill.guests||0));
+  set("season-property-type",prefill.propertyType||"");
+  set("season-budget",String(prefill.budget||0));
+  const note=document.getElementById("season-search-note");
+  if(note && !prefill.keepNote) note.textContent="";
+  requestAnimationFrame(()=>panel.scrollIntoView({behavior:"smooth",block:"center"}));
+}
+function closeSeasonSearch(){const panel=document.getElementById("season-search");if(panel) panel.hidden=true;}
+function normSeason(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+function seasonRegionMatch(location, query){
+  const q=normSeason(query), loc=normSeason(location);
+  if(!q) return true;
+  const aliases={
+    "lauro de freitas":["lauro de freitas","buraquinho","vilas do atlantico","ipitanga","pitangueiras","jardim aeroporto","portao"],
+    "vilas do atlantico":["vilas do atlantico","lauro de freitas"],
+    "camacari":["camacari","guarajuba","barra do jacui","abrantes","jaua"],
+    "salvador":["salvador"]
+  };
+  const options=aliases[q]||[q];
+  return options.some(a=>loc.includes(a));
+}
+function seasonTypeMatch(p,type){
+  if(!type) return true;
+  const hay=normSeason([p.property_category,p.title,p.description].join(" "));
+  return hay.includes(normSeason(type));
+}
+function renderSeasonSearchResults(list,ctx={}){
+  const results=document.getElementById("season-results"), note=document.getElementById("season-search-note");
+  if(!results) return;
+  results.innerHTML="";
+  if(note){
+    const period=ctx.checkin&&ctx.checkout?` Período: ${new Date(ctx.checkin+'T12:00:00').toLocaleDateString('pt-BR')} a ${new Date(ctx.checkout+'T12:00:00').toLocaleDateString('pt-BR')}.`:"";
+    note.textContent=list.length?`${list.length} ${list.length===1?'hospedagem encontrada':'hospedagens encontradas'}.${period}`:`Nenhuma hospedagem encontrada com esses filtros.${period}`;
+  }
+  if(!list.length){
+    results.innerHTML=`<div class="season-no-results"><strong>Não encontramos uma opção com todos esses critérios.</strong><span>Você pode ampliar a busca ou falar com a AELO para uma procura personalizada.</span><div><button type="button" class="btn btn-gold" id="season-contact-search">Falar com a AELO</button></div></div>`;
+    const c=document.getElementById("season-contact-search");
+    if(c)c.addEventListener("click",()=>{const msg=`Olá, Fabio! Procuro aluguel por temporada.${ctx.location?` Região: ${ctx.location}.`:''}${ctx.checkin?` Check-in: ${ctx.checkin}.`:''}${ctx.checkout?` Check-out: ${ctx.checkout}.`:''}${ctx.guests?` Hóspedes: ${ctx.guests}.`:''}${ctx.propertyType?` Tipo: ${ctx.propertyType}.`:''}${ctx.budget?` Diária máxima: R$ ${Number(ctx.budget).toLocaleString('pt-BR')}.`:''}`;window.open('https://wa.me/5571992961212?text='+encodeURIComponent(msg),'_blank');});
+    return;
+  }
+  list.slice(0,8).forEach(p=>{
+    const card=document.createElement("article"); card.className="season-result-card";
+    const guests=Number(p.max_guests||0)>0?`até ${Number(p.max_guests)} hóspedes`:"consulte hóspedes";
+    card.innerHTML=`<div class="season-result-image"><img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy"></div><div class="season-result-body"><p class="eyebrow">TEMPORADA</p><h4>${esc(p.title)}</h4><p class="season-result-location">${esc(p.location)}</p><div class="season-result-meta"><span>👨‍👩‍👧 ${guests}</span>${Number(p.min_nights||0)>0?`<span>🌙 mínimo ${Number(p.min_nights)} noites</span>`:''}</div><strong class="season-result-price">${esc(p.price_label||formatPrice(p.nightly_price||p.price,'temporada'))}</strong><button type="button" class="season-result-view" data-id="${esc(p.id)}">Ver imóvel</button></div>`;
+    results.appendChild(card);
+    card.querySelector(".season-result-view").addEventListener("click",()=>openModal(p.id));
+  });
+}
+function runSeasonSearch(){
+  const location=document.getElementById("season-location")?.value.trim()||"";
+  const checkin=document.getElementById("season-checkin")?.value||"";
+  const checkout=document.getElementById("season-checkout")?.value||"";
+  const guests=Number(document.getElementById("season-guests")?.value||0);
+  const propertyType=document.getElementById("season-property-type")?.value||"";
+  const budget=Number(document.getElementById("season-budget")?.value||0);
+  let list=properties.filter(p=>p.type==='temporada'&&seasonRegionMatch(p.location,location)&&seasonTypeMatch(p,propertyType)&&(!guests||Number(p.max_guests||0)>=guests)&&(!budget||Number(p.nightly_price||p.price||0)<=budget));
+  if(checkin&&checkout&&checkout<checkin){
+    const note=document.getElementById("season-search-note"); if(note) note.textContent="Confira as datas: o check-out precisa ser posterior ao check-in.";
+    renderSeasonSearchResults([],{}); return;
+  }
+  trackAeloEvent('search',{interest:'Temporada',type:'temporada',region:location||'qualquer',checkin,checkout,guests,propertyType,budget,results:list.length});
+  renderSeasonSearchResults(list,{location,checkin,checkout,guests,propertyType,budget});
+}
+function initSeasonSearch(){
+  const form=document.getElementById("season-search-form");
+  if(form)form.addEventListener("submit",e=>{e.preventDefault();runSeasonSearch();});
+  const close=document.getElementById("season-search-close"); if(close)close.addEventListener("click",closeSeasonSearch);
+  const clear=document.getElementById("season-search-clear"); if(clear)clear.addEventListener("click",()=>{form?.reset();const r=document.getElementById('season-results');const n=document.getElementById('season-search-note');if(r)r.innerHTML='';if(n)n.textContent='';});
+}
+
 function renderProperties(filter = "todos") {
   const list = filter === "todos" ? properties : properties.filter(p => p.type === filter);
   grid.innerHTML = list.map(p => `
@@ -97,13 +178,15 @@ function renderProperties(filter = "todos") {
     if (filter === "temporada") {
       grid.innerHTML = `<div class="season-empty"><div class="season-empty-icon">🌴</div><div><p class="eyebrow">TEMPORADA AELO</p><h3>Hospedagens selecionadas para sua próxima estadia.</h3><p>Estamos ampliando nosso portfólio de casas e apartamentos para temporada. Em breve, você poderá consultar as opções disponíveis e falar com a AELO para planejar sua estadia.</p><button type="button" class="btn btn-gold season-empty-btn" id="season-empty-contact">Encontrar hospedagem</button></div></div>`;
       const c=document.getElementById("season-empty-contact");
-      if(c) c.addEventListener("click",()=>{ const chat=document.getElementById("aelo-chat-launcher"); if(chat) chat.click(); });
+      if(c) c.addEventListener("click",()=>openSeasonSearch());
     } else {
       grid.innerHTML = `<div style="grid-column:1/-1;padding:30px 0;color:#697384">Nenhum imóvel encontrado nesta categoria.</div>`;
     }
   }
   const rentalIntro=document.getElementById("rental-intro");
   if(rentalIntro) rentalIntro.hidden = !["aluguel","temporada"].includes(filter);
+  const seasonPanel=document.getElementById("season-search");
+  if(seasonPanel && filter !== "temporada") seasonPanel.hidden=true;
   document.querySelectorAll(".mini-choice").forEach(btn=>btn.onclick=()=>{ const target=btn.dataset.filterChoice; const filterBtn=document.querySelector(`.filter[data-filter="${target}"]`); if(filterBtn) filterBtn.click(); });
   document.querySelectorAll(".property-card").forEach(card => card.addEventListener("click", () => openModal(card.dataset.id)));
 }
@@ -234,10 +317,11 @@ if (menuToggle && mobileMenu) {
   });
 }
 
+initSeasonSearch();
 loadProperties();
 
 
-/* V48.28 — Assistente AELO Inteligente, guiado por botões e catálogo real */
+/* V49.3 — Busca de temporada + Assistente AELO Inteligente, guiado por botões e catálogo real */
 /* V32.1 — Assistente AELO: qualificação na ordem região > tipo > quartos > valor > prazo */
 (function initAeloAssistant(){
 const launcher=document.getElementById('aelo-chat-launcher'),panel=document.getElementById('aelo-chat'),close=document.getElementById('aelo-chat-close'),messages=document.getElementById('aelo-chat-messages'),quick=document.getElementById('aelo-chat-quick'); if(!launcher||!panel)return; let started=false;

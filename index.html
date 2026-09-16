@@ -533,7 +533,7 @@
 </style>
 <script>
 /* V48.22 cache/version marker */
-window.AELO_SITE_VERSION='49.2';
+window.AELO_SITE_VERSION='49.3';
 </script>
 
 <style id="aelo-v48-24-mobile-final">
@@ -822,6 +822,28 @@ window.AELO_SITE_VERSION='49.2';
         <button class="filter" data-filter="investimento">Investimento</button>
       </div>
 
+      <section class="season-search" id="season-search" hidden aria-label="Buscar hospedagem por temporada">
+        <div class="season-search-head">
+          <div>
+            <p class="eyebrow">BUSCA DE TEMPORADA</p>
+            <h3>Encontre uma hospedagem para a sua estadia.</h3>
+            <p>Escolha região, período, hóspedes e faixa de diária. A disponibilidade final é confirmada pela AELO.</p>
+          </div>
+          <button type="button" class="season-search-close" id="season-search-close" aria-label="Fechar busca">×</button>
+        </div>
+        <form class="season-search-form" id="season-search-form">
+          <label><span>📍 Região ou bairro</span><input id="season-location" name="location" type="text" placeholder="Ex.: Vilas do Atlântico" autocomplete="off"></label>
+          <label><span>📅 Check-in</span><input id="season-checkin" name="checkin" type="date"></label>
+          <label><span>📅 Check-out</span><input id="season-checkout" name="checkout" type="date"></label>
+          <label><span>👨‍👩‍👧 Hóspedes</span><select id="season-guests" name="guests"><option value="0">Qualquer quantidade</option><option value="2">Até 2</option><option value="4">Até 4</option><option value="6">Até 6</option><option value="8">Até 8</option><option value="10">Até 10</option><option value="12">Até 12</option></select></label>
+          <label><span>🏠 Tipo</span><select id="season-property-type" name="propertyType"><option value="">Casa ou apartamento</option><option value="Casa">Casa</option><option value="Apartamento">Apartamento</option></select></label>
+          <label><span>💰 Diária máxima</span><select id="season-budget" name="budget"><option value="0">Sem limite</option><option value="500">Até R$ 500</option><option value="1000">Até R$ 1.000</option><option value="1500">Até R$ 1.500</option><option value="2000">Até R$ 2.000</option><option value="3000">Até R$ 3.000</option></select></label>
+          <div class="season-search-actions"><button class="btn btn-gold" type="submit">🔎 Encontrar hospedagens</button><button class="season-clear" type="button" id="season-search-clear">Limpar filtros</button></div>
+        </form>
+        <div class="season-search-note" id="season-search-note" aria-live="polite"></div>
+        <div class="season-results" id="season-results"></div>
+      </section>
+
       <div class="property-grid" id="property-grid"></div>
     </section>
 
@@ -910,7 +932,7 @@ window.AELO_SITE_VERSION='49.2';
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=49.2"></script>
+  <script src="script.js?v=49.3"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */

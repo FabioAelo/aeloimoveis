@@ -17,3 +17,14 @@ V49.2 — MANUTENÇÃO
 2. Atualizado window.AELO_SITE_VERSION para 49.2.
 3. Mantida a estrutura do Storage e do carregamento de imagens da V49.1.
 4. Nenhuma policy do Supabase ou dado de imóvel foi alterado por esta versão.
+
+
+V49.3 — BUSCA DE TEMPORADA
+1. O botão “Encontrar hospedagem” agora abre uma busca de temporada real dentro da página.
+2. A busca usa imóveis reais publicados do catálogo AELO.
+3. Filtros: região/bairro, check-in, check-out, hóspedes, tipo de imóvel e diária máxima.
+4. A diária utiliza nightly_price quando preenchido, com fallback para price.
+5. Datas são usadas para qualificação da busca; a versão ainda não declara disponibilidade automática por data.
+6. Resultados permitem abrir a ficha completa do imóvel.
+7. Quando não há resultado, há encaminhamento para a AELO via WhatsApp.
+8. Mantidas RLS, Data API e demais tabelas sem alterações.
