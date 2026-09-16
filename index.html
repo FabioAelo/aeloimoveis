@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=49.7">
+  <link rel="stylesheet" href="style.css?v=49.8">
 
 <style id="aelo-gallery-v48-6">
 /* Galeria V48.6 — modelo aprovado: foto inteira + miniaturas + detalhes com rolagem própria */
@@ -1068,7 +1068,7 @@ window.AELO_SITE_VERSION='49.3';
 </style>
 
 <style id="aelo-v49-7-mobile-modal">
-/* V49.7 — mobile: make the details panel scroll as one document.
+/* V49.8 — mobile: make the details panel scroll as one document.
    The description must never be trapped behind the CTA. */
 @media (max-width:700px){
   .modal.open{padding:6px!important;align-items:center!important;}
@@ -1388,3 +1388,162 @@ window.AELO_SITE_VERSION='49.3';
   .modal-body .modal-interest{min-width:170px!important;min-height:42px!important;height:42px!important;}
 }
 </style>
+
+
+<style id="aelo-v49-8-mobile-final">
+/* V49.8 — correção final do modal no celular.
+   A galeria fica em uma área própria; a ficha inteira rola; a descrição nunca cobre o CTA.
+*/
+@media (max-width: 700px){
+  .modal.open{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    padding:5px!important;
+    box-sizing:border-box!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+  .modal.open .modal-card{
+    width:97vw!important;
+    height:calc(100dvh - 10px)!important;
+    max-height:calc(100dvh - 10px)!important;
+    min-height:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    grid-template-columns:none!important;
+    grid-template-rows:none!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+  .modal.open .modal-gallery{
+    flex:0 0 34%!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .modal.open .modal-gallery-stage{
+    height:calc(100% - 64px)!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .modal.open .modal-gallery #modal-image{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+  }
+  .modal.open .gallery-thumbs{
+    flex:0 0 64px!important;
+    height:64px!important;
+    min-height:64px!important;
+    padding:5px 8px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+  }
+  .modal.open .modal-body{
+    flex:1 1 66%!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    padding:14px 14px 22px!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-gutter:stable!important;
+  }
+  .modal.open .modal-type-row,
+  .modal.open .modal-body h2,
+  .modal.open .modal-body #modal-location,
+  .modal.open .modal-body .modal-meta,
+  .modal.open .modal-body .season-summary,
+  .modal.open .modal-description-label{
+    flex:none!important;
+  }
+  .modal.open .modal-body h2{
+    font-size:31px!important;
+    line-height:1.06!important;
+    margin:0 0 6px!important;
+  }
+  .modal.open .modal-body #modal-location{margin:0 0 9px!important;}
+  .modal.open .modal-body .modal-meta{
+    margin:0 0 10px!important;
+    padding:8px 2px!important;
+    overflow:visible!important;
+    white-space:normal!important;
+    line-height:1.5!important;
+  }
+  .modal.open .modal-body .season-summary{
+    margin:0 0 14px!important;
+    padding:11px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px 10px!important;
+  }
+  .modal.open .modal-description-label{
+    display:block!important;
+    margin:0 0 6px!important;
+  }
+  .modal.open .modal-body #modal-description{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+    margin:0 0 18px!important;
+    padding:12px!important;
+    border:1px solid #dfe3e7!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    line-height:1.55!important;
+    font-size:14.5px!important;
+    white-space:pre-wrap!important;
+  }
+  .modal.open .modal-body .modal-actions{
+    display:flex!important;
+    position:static!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:54px!important;
+    margin:0!important;
+    padding:4px 0 10px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:#fff!important;
+    box-shadow:none!important;
+    z-index:auto!important;
+  }
+  .modal.open .modal-body .modal-interest{
+    display:inline-flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:static!important;
+    width:auto!important;
+    min-width:180px!important;
+    height:44px!important;
+    min-height:44px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 22px!important;
+    font-size:14px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+    border-radius:999px!important;
+  }
+}
+@media (max-width:430px){
+  .modal.open .modal-gallery{flex-basis:33%!important;}
+  .modal.open .modal-gallery-stage{height:calc(100% - 62px)!important;}
+  .modal.open .gallery-thumbs{height:62px!important;min-height:62px!important;flex-basis:62px!important;}
+  .modal.open .modal-body{padding:12px 12px 20px!important;}
+  .modal.open .modal-body h2{font-size:30px!important;}
+  .modal.open .modal-body #modal-description{font-size:14px!important;}
+}
+</style>
+
