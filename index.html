@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=49.2">
+  <link rel="stylesheet" href="style.css?v=49.7">
 
 <style id="aelo-gallery-v48-6">
 /* Galeria V48.6 — modelo aprovado: foto inteira + miniaturas + detalhes com rolagem própria */
@@ -1066,6 +1066,140 @@ window.AELO_SITE_VERSION='49.3';
   .modal-body .modal-interest{min-width:170px!important;height:42px!important;}
 }
 </style>
+
+<style id="aelo-v49-7-mobile-modal">
+/* V49.7 — mobile: make the details panel scroll as one document.
+   The description must never be trapped behind the CTA. */
+@media (max-width:700px){
+  .modal.open{padding:6px!important;align-items:center!important;}
+  .modal-card{
+    width:calc(100vw - 12px)!important;
+    height:calc(100dvh - 12px)!important;
+    max-height:calc(100dvh - 12px)!important;
+    min-height:0!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:36% 64%!important;
+    overflow:hidden!important;
+    border-radius:12px!important;
+  }
+  .modal-gallery{
+    min-height:0!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  .modal-gallery-stage{
+    height:calc(100% - 64px)!important;
+    min-height:0!important;
+  }
+  .modal-gallery #modal-image{height:100%!important;min-height:0!important;object-fit:contain!important;}
+  .gallery-thumbs{
+    height:64px!important;
+    flex-basis:64px!important;
+    padding:5px 8px!important;
+  }
+  .gallery-thumb{width:68px!important;height:54px!important;flex-basis:68px!important;}
+
+  /* The body itself scrolls. Nothing is position-sticky over the description. */
+  .modal-body{
+    min-height:0!important;
+    height:100%!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    padding:18px 16px 24px!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-gutter:stable!important;
+  }
+  .modal-body .modal-type-row,
+  .modal-body h2,
+  .modal-body #modal-location,
+  .modal-body .modal-meta,
+  .modal-body .season-summary,
+  .modal-description-label,
+  .modal-body #modal-description,
+  .modal-body .modal-actions{flex:none!important;}
+
+  .modal-type-row{min-height:0!important;margin:0 0 8px!important;}
+  .modal-body h2{font-size:32px!important;line-height:1.08!important;margin:0 0 6px!important;}
+  .modal-body #modal-location{font-size:15px!important;line-height:1.4!important;margin:0 0 10px!important;}
+  .modal-body .modal-meta{
+    display:block!important;
+    margin:0 0 12px!important;
+    padding:10px 0!important;
+    overflow:visible!important;
+    white-space:normal!important;
+    line-height:1.55!important;
+  }
+  .modal-body .season-summary{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px 14px!important;
+    margin:0 0 16px!important;
+    padding:12px!important;
+    border-radius:12px!important;
+    box-sizing:border-box!important;
+  }
+  .modal-body .season-summary.hidden{display:none!important;}
+  .modal-description-label{
+    display:block!important;
+    margin:0 0 7px!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+    letter-spacing:.16em!important;
+  }
+  .modal-body #modal-description{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:170px!important;
+    max-height:none!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+    margin:0 0 18px!important;
+    padding:12px 12px 14px!important;
+    border:1px solid #dfe3e7!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    line-height:1.58!important;
+    font-size:15px!important;
+    white-space:pre-wrap!important;
+  }
+  .modal-body .modal-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-height:56px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:4px 0 8px!important;
+    background:#fff!important;
+    position:static!important;
+    box-shadow:none!important;
+    z-index:auto!important;
+  }
+  .modal-body .modal-interest{
+    display:inline-flex!important;
+    width:auto!important;
+    min-width:180px!important;
+    min-height:44px!important;
+    height:44px!important;
+    position:static!important;
+    font-size:14px!important;
+    border-radius:999px!important;
+  }
+}
+@media (max-width:430px){
+  .modal-card{grid-template-rows:34% 66%!important;}
+  .modal-body{padding:16px 14px 22px!important;}
+  .modal-body h2{font-size:31px!important;}
+  .modal-body #modal-description{min-height:180px!important;font-size:14.5px!important;}
+  .modal-body .season-summary{grid-template-columns:1fr 1fr!important;gap:8px 10px!important;}
+}
+</style>
+
 </body>
 </html>
 
