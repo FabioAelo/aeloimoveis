@@ -507,15 +507,43 @@ const text=t=>{
   const parts=[]; if(chatCtx.interest)parts.push(chatCtx.interest.toLowerCase());if(chatCtx.propertyType)parts.push(chatCtx.propertyType.toLowerCase());if(chatCtx.region)parts.push(`em ${chatCtx.region}`);if(chatCtx.bedrooms)parts.push(`${chatCtx.bedrooms}+ quartos`);if(chatCtx.budgetLabel)parts.push(chatCtx.budgetLabel);
   add(`Perfeito! Entendi ${parts.length?'que você procura '+parts.join(', ')+'.':'sua necessidade.'} Vou usar essas informações e pedir só o que estiver faltando. 😊`);setTimeout(()=>nextQuestion(chatCtx),120);
 };
+const getSeasonBookingContext=()=>{
+  const ci=document.getElementById('modal-season-checkin')?.value||'';
+  const co=document.getElementById('modal-season-checkout')?.value||'';
+  const guests=Number(document.getElementById('modal-season-guests')?.value||0);
+  const totalEl=document.getElementById('modal-season-total');
+  const totalText=totalEl?.innerText||'';
+  const valid=!!ci&&!!co&&co>ci&&(!totalText.includes('Indisponíveis')&&!totalText.includes('indisponíveis')&&!totalText.includes('Período inválido')&&!totalText.includes('Mínimo')&&!totalText.includes('acima do limite'));
+  return {checkin:ci,checkout:co,guests,totalText,valid};
+};
 const propertyInterest=(p)=>{
   if(!p) return;
   const interest = p.type==='temporada' ? 'Temporada' : (p.type==='aluguel' ? 'Aluguel' : 'Compra');
-  const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||''};
+  const booking=p.type==='temporada'?getSeasonBookingContext():{};
+  const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||'',checkin:booking.checkin||'',checkout:booking.checkout||'',guests:booking.guests||0,estimatedTotal:booking.totalText||''};
   resetCtx();
   mergeCtx(ctx);
   panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
   const launcher = document.getElementById('aelo-chat-launcher');
   if (launcher) { launcher.style.display='none'; launcher.style.visibility='hidden'; }
+  if(p.type==='temporada'){
+    const period=ctx.checkin&&ctx.checkout?` de <strong>${esc(ctx.checkin)}</strong> a <strong>${esc(ctx.checkout)}</strong>`:' para as datas que você selecionou';
+    const guests=ctx.guests?` para <strong>${ctx.guests} hóspede${ctx.guests===1?'':'s'}</strong>`:'';
+    add(`Você está falando com a AELO sobre <strong>${esc(p.title)}</strong>. ${period}${guests}. 😊`,'bot',true);
+    if(!ctx.checkin||!ctx.checkout){
+      add('Antes de solicitar a reserva, precisamos selecionar o período da hospedagem. Volte ao imóvel e escolha as datas.','bot');
+      buttons([{label:'📅 Voltar para as datas',action:()=>{shut();openModal(p.id)}},{label:'📱 Falar com Fábio',action:()=>wa(`Olá! Tenho interesse no imóvel ${p.title}${p.location?` em ${p.location}`:''} para aluguel por temporada.`)}]);
+      return;
+    }
+    add('Posso continuar com a sua solicitação de hospedagem. Você quer avançar para o atendimento da AELO?','bot');
+    buttons([
+      {label:'🏡 Sim, quero solicitar',action:()=>seasonClosingStart(p,ctx)},
+      {label:'💬 Quero tirar uma dúvida',action:()=>seasonQuestionStep(p,ctx)},
+      {label:'📸 Ver fotos novamente',action:()=>{shut();openModal(p.id)}},
+      {label:'📍 Saber sobre a localização',action:()=>{add(`O imóvel está localizado em <strong>${esc(p.location||'localização informada no anúncio')}</strong>.`,'bot',true);buttons([{label:'🏡 Continuar solicitação',action:()=>seasonClosingStart(p,ctx)},{label:'↩️ Voltar',action:()=>propertyInterest(p)}])}}
+    ]);
+    return;
+  }
   add(`Você está falando com a AELO sobre <strong>${esc(p.title)}</strong>. Como posso ajudar? 😊`,'bot',true);
   buttons([
     {label:'📋 Quero mais informações',action:()=>collectLead(interest,ctx)},
@@ -524,6 +552,51 @@ const propertyInterest=(p)=>{
     {label:'📍 Quero saber sobre a localização',action:()=>{add(`Este imóvel está localizado em <strong>${esc(p.location||'localização informada no anúncio')}</strong>.`,'bot',true);buttons([{label:'📋 Tenho interesse',action:()=>collectLead(interest,ctx)},{label:'📅 Agendar visita',action:()=>collectLead('Agendamento de visita',{...ctx,timeframe:'Solicitação de visita'})},{label:'↩️ Voltar',action:()=>propertyInterest(p)}])}},
     {label:'💬 Continuar pelo WhatsApp',action:()=>wa(`Olá! Falei com o Assistente AELO pelo site e tenho interesse no imóvel ${p.title}${p.location?` em ${p.location}`:''}${p.price_label?` — ${p.price_label}`:''}. Como posso receber mais informações?`)}
   ]);
+};
+const seasonQuestionStep=(p,ctx)=>{
+  add('Claro. O que você gostaria de saber sobre esta hospedagem?','bot');
+  buttons([
+    {label:'💰 Sobre o valor',action:()=>{add('A tarifa é apresentada como estimativa e pode variar conforme o período. A AELO confirma o valor final antes da reserva.','bot');buttons([{label:'🏡 Continuar solicitação',action:()=>seasonClosingStart(p,ctx)},{label:'↩️ Voltar',action:()=>propertyInterest(p)}])}},
+    {label:'📅 Sobre disponibilidade',action:()=>{add('As datas selecionadas serão verificadas pela AELO antes da confirmação. O calendário do anúncio serve para consulta de disponibilidade.','bot');buttons([{label:'🏡 Solicitar esta hospedagem',action:()=>seasonClosingStart(p,ctx)},{label:'↩️ Voltar',action:()=>propertyInterest(p)}])}},
+    {label:'🏠 Sobre o imóvel',action:()=>{add(`Este anúncio é o <strong>${esc(p.title)}</strong>, em <strong>${esc(p.location||'localização informada')}</strong>.`,'bot',true);buttons([{label:'🏡 Quero solicitar',action:()=>seasonClosingStart(p,ctx)},{label:'📸 Ver fotos',action:()=>{shut();openModal(p.id)}}])}},
+    {label:'💬 Falar com Fábio',action:()=>wa(seasonWaMessage(p,ctx))}
+  ]);
+};
+const seasonClosingStart=(p,ctx)=>{
+  add('Ótimo. Vamos concluir sua solicitação de hospedagem em poucos passos. Primeiro, como posso chamar você?','bot');
+  const wrap=document.createElement('div'); wrap.className='aelo-season-lead-step';
+  wrap.innerHTML=`<label>Seu nome<input class="season-lead-name" type="text" autocomplete="name" placeholder="Digite seu nome"></label><button type="button" class="aelo-lead-submit season-next-name">Continuar</button><p class="aelo-lead-status" role="status"></p>`;
+  quick.innerHTML=''; quick.appendChild(wrap); requestAnimationFrame(()=>{quick.scrollTop=quick.scrollHeight;});
+  wrap.querySelector('.season-next-name').onclick=()=>{const name=wrap.querySelector('.season-lead-name').value.trim(); if(!name){wrap.querySelector('.aelo-lead-status').textContent='Informe seu nome para continuar.';return;} seasonClosingPhone(p,{...ctx,name});};
+};
+const seasonClosingPhone=(p,ctx)=>{
+  add(`Prazer, ${esc(ctx.name.split(' ')[0])}! Agora me informe seu WhatsApp para a AELO confirmar a disponibilidade e retornar para você.`,'bot',true);
+  const wrap=document.createElement('div'); wrap.className='aelo-season-lead-step';
+  wrap.innerHTML=`<label>WhatsApp<input class="season-lead-phone" type="tel" autocomplete="tel" placeholder="(71) 99999-9999"></label><button type="button" class="aelo-lead-submit season-next-phone">Continuar</button><p class="aelo-lead-status" role="status"></p>`;
+  quick.innerHTML=''; quick.appendChild(wrap); requestAnimationFrame(()=>{quick.scrollTop=quick.scrollHeight;});
+  wrap.querySelector('.season-next-phone').onclick=()=>{const phone=wrap.querySelector('.season-lead-phone').value.trim(); if(!phone){wrap.querySelector('.aelo-lead-status').textContent='Informe seu WhatsApp para continuar.';return;} seasonClosingNote(p,{...ctx,phone});};
+};
+const seasonClosingNote=(p,ctx)=>{
+  add('Última pergunta: existe alguma observação ou necessidade especial para essa estadia?','bot');
+  buttons([{label:'✅ Não, pode prosseguir',action:()=>seasonClosingReview(p,{...ctx,note:''})},{label:'📝 Quero informar',action:()=>{const wrap=document.createElement('div');wrap.className='aelo-season-lead-step';wrap.innerHTML=`<label>Observação <span>(opcional)</span><textarea class="season-lead-note" rows="3" placeholder="Ex.: criança, horário previsto de chegada, necessidade específica..."></textarea></label><button type="button" class="aelo-lead-submit season-next-note">Continuar</button>`;quick.innerHTML='';quick.appendChild(wrap);wrap.querySelector('.season-next-note').onclick=()=>seasonClosingReview(p,{...ctx,note:wrap.querySelector('.season-lead-note').value.trim()});}}]);
+};
+const seasonClosingReview=(p,ctx)=>{
+  add('Perfeito. Confira sua solicitação antes de eu encaminhar para a AELO:','bot');
+  const period=ctx.checkin&&ctx.checkout?`${ctx.checkin} → ${ctx.checkout}`:'datas a confirmar';
+  const summary=`<div class="aelo-lead-card"><strong>${esc(p.title)}</strong><small>${esc(p.location||'')}<br>📅 ${esc(period)}<br>👥 ${ctx.guests||'A definir'} hóspede${Number(ctx.guests)===1?'':'s'}${ctx.estimatedTotal?`<br>💰 ${esc(ctx.estimatedTotal)}`:''}<br>👤 ${esc(ctx.name)}<br>📱 ${esc(ctx.phone)}</small>${ctx.note?`<small>📝 ${esc(ctx.note)}</small>`:''}</div>`;
+  add(summary,'bot',true);
+  buttons([{label:'📨 Enviar solicitação',action:()=>seasonSubmitLead(p,ctx)},{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Alterar informações',action:()=>seasonClosingStart(p,ctx)}]);
+};
+const seasonWaMessage=(p,ctx)=>`Olá, Fábio! Vim pelo site AELO e gostaria de solicitar a hospedagem do imóvel ${p.title}${p.location?` em ${p.location}`:''}. Período: ${ctx.checkin||'a definir'} a ${ctx.checkout||'a definir'}. Hóspedes: ${ctx.guests||'a definir'}. ${ctx.estimatedTotal?`Valor estimado informado no site: ${ctx.estimatedTotal}. `:''}Meu nome é ${ctx.name||'a informar'} e meu WhatsApp é ${ctx.phone||'a informar'}.${ctx.note?` Observação: ${ctx.note}`:''}`;
+const seasonSubmitLead=async(p,ctx)=>{
+  add('Enviando sua solicitação para a AELO...','bot');
+  const client=getSupabaseClient();
+  if(!client){add('Não consegui conectar ao atendimento agora. Você pode continuar pelo WhatsApp.','bot');buttons([{label:'💬 Abrir WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))}]);return;}
+  const detail=[`Imóvel: ${p.title}`,`Localização: ${p.location||'não informada'}`,`Check-in: ${ctx.checkin||'a definir'}`,`Check-out: ${ctx.checkout||'a definir'}`,`Hóspedes: ${ctx.guests||'a definir'}`,ctx.estimatedTotal?`Valor estimado: ${ctx.estimatedTotal}`:null,ctx.note?`Observação: ${ctx.note}`:null].filter(Boolean).join(' | ');
+  const {error}=await client.from('leads').insert({name:ctx.name,whatsapp:ctx.phone,interest:'Solicitação de reserva - Temporada',region:p.location||null,message:detail,source:'site-temporada',bedrooms:Number(p.bedrooms||0),property_id:p.id});
+  if(error){console.error(error);add('Não foi possível registrar a solicitação agora. Mas seus dados já estão preenchidos para continuar pelo WhatsApp.','bot');buttons([{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Tentar novamente',action:()=>seasonClosingReview(p,ctx)}]);return;}
+  add(`Solicitação enviada com sucesso, ${esc(ctx.name.split(' ')[0])}! 🎉 A AELO recebeu os dados da hospedagem e poderá confirmar a disponibilidade com você pelo WhatsApp.`,'bot',true);
+  buttons([{label:'💬 Falar com Fábio agora',action:()=>wa(seasonWaMessage(p,ctx))},{label:'📸 Ver imóvel novamente',action:()=>{shut();openModal(p.id)}},{label:'↩️ Voltar ao menu',action:main}]);
 };
 window.aeloStartPropertyInterest=propertyInterest;
 launcher.onclick=open;close.onclick=shut;
