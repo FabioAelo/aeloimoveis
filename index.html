@@ -949,7 +949,7 @@ window.AELO_SITE_VERSION='49.3';
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=49.4"></script>
+  <script src="script.js?v=49.6"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */
@@ -967,6 +967,103 @@ window.AELO_SITE_VERSION='49.3';
   .aelo-chat{left:5px!important;right:5px!important}
   .aelo-chat-messages{flex-basis:135px!important;height:135px!important;max-height:135px!important}
   .aelo-chat-quick button{font-size:10.5px!important;padding:7px 8px!important}
+}
+</style>
+
+<style id="aelo-v49-6-mobile-description-fix">
+/* V49.6 — mobile: descrição com área confortável, corpo rolável e botão sem sobreposição */
+@media (max-width: 900px){
+  .modal-card{
+    height:calc(100dvh - 16px)!important;
+    max-height:calc(100dvh - 16px)!important;
+    grid-template-rows:minmax(0,34%) minmax(0,66%)!important;
+  }
+  .modal-body{
+    height:100%!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    padding:14px 16px 10px!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .modal-body .modal-type-row,
+  .modal-body h2,
+  .modal-body #modal-location,
+  .modal-body .modal-meta,
+  .modal-body .season-summary,
+  .modal-description-label{
+    flex:none!important;
+  }
+  .modal-body h2{font-size:32px!important;line-height:1.06!important;margin:0 0 5px!important;}
+  .modal-body #modal-location{margin:0 0 7px!important;}
+  .modal-body .modal-meta{margin:0 0 9px!important;}
+  .modal-body .season-summary{margin:0 0 10px!important;}
+  .modal-description-label{display:block!important;margin:4px 0 6px!important;}
+  .modal-body #modal-description{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:150px!important;
+    max-height:240px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    box-sizing:border-box!important;
+    margin:0 0 10px!important;
+    padding:12px 12px 14px 0!important;
+    border:1px solid #dfe3e7!important;
+    border-radius:10px!important;
+    line-height:1.58!important;
+    font-size:14.5px!important;
+    background:#fff!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .modal-body .modal-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:54px!important;
+    height:54px!important;
+    margin:0 -16px!important;
+    padding:6px 16px!important;
+    background:rgba(255,255,255,.98)!important;
+    position:sticky!important;
+    bottom:0!important;
+    z-index:20!important;
+    box-shadow:0 -8px 16px rgba(255,255,255,.98)!important;
+  }
+  .modal-body .modal-interest{
+    width:auto!important;
+    min-width:180px!important;
+    min-height:42px!important;
+    height:42px!important;
+    padding:0 22px!important;
+    font-size:13px!important;
+  }
+}
+@media (max-width:430px){
+  .modal-card{
+    width:97vw!important;
+    height:calc(100dvh - 10px)!important;
+    max-height:calc(100dvh - 10px)!important;
+    grid-template-rows:minmax(0,32%) minmax(0,68%)!important;
+  }
+  .modal-body{padding:10px 12px 8px!important;}
+  .modal-body h2{font-size:30px!important;line-height:1.06!important;}
+  .modal-body #modal-description{
+    min-height:150px!important;
+    max-height:230px!important;
+    font-size:14px!important;
+    line-height:1.52!important;
+  }
+  .modal-body .modal-actions{
+    min-height:52px!important;
+    height:52px!important;
+    margin:0 -12px!important;
+    padding:5px 12px!important;
+  }
+  .modal-body .modal-interest{min-width:170px!important;height:42px!important;}
 }
 </style>
 </body>

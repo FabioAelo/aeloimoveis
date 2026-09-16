@@ -242,6 +242,8 @@ function openModal(id) {
   if(seasonSummary){
     if(p.type === "temporada"){
       const rows=[];
+      const normalNightly = Number(p.nightly_price) > 0 ? Number(p.nightly_price) : Number(p.price || 0);
+      if(normalNightly > 0) rows.push(`<span><b>Diária normal</b>${formatPrice(normalNightly,"temporada")}</span>`);
       if(Number(p.weekend_price)>0) rows.push(`<span><b>Fim de semana</b>${formatPrice(p.weekend_price,"temporada")}</span>`);
       if(Number(p.high_season_price)>0) rows.push(`<span><b>Alta temporada</b>${formatPrice(p.high_season_price,"temporada")}</span>`);
       if(Number(p.cleaning_fee)>0) rows.push(`<span><b>Taxa de limpeza</b>${Number(p.cleaning_fee).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</span>`);

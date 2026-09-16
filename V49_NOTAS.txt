@@ -28,3 +28,5 @@ V49.3 — BUSCA DE TEMPORADA
 6. Resultados permitem abrir a ficha completa do imóvel.
 7. Quando não há resultado, há encaminhamento para a AELO via WhatsApp.
 8. Mantidas RLS, Data API e demais tabelas sem alterações.
+
+V49.6 — correção do modal no mobile: descrição com área confortável e rolagem, corpo da ficha rolável e botão Tenho interesse sticky sem sobreposição.
