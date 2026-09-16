@@ -747,6 +747,23 @@ window.AELO_SITE_VERSION='49.3';
 .aelo-chat-launcher[style*="display: none"]{display:none!important;}
 .aelo-chat-launcher.aelo-chat-launcher-hidden{display:none!important;visibility:hidden!important;opacity:0!important;}
 </style>
+<style id="aelo-v49-4-modal-fix">
+.modal-body #modal-description{
+  display:block!important;
+  min-height:72px!important;
+  max-height:190px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  white-space:pre-line!important;
+  padding:10px 12px!important;
+  border:1px solid #dfe3e7!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-sizing:border-box!important;
+}
+.modal-body #modal-description.is-empty{color:#687587!important;font-style:italic!important;}
+@media(max-width:900px){.modal-body #modal-description{max-height:none!important;min-height:90px!important;}}
+</style>
 </head>
 <body>
   <header class="site-header">
@@ -932,7 +949,7 @@ window.AELO_SITE_VERSION='49.3';
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=49.3"></script>
+  <script src="script.js?v=49.4"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */

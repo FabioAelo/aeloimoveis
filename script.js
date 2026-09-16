@@ -251,7 +251,12 @@ function openModal(id) {
       seasonSummary.classList.toggle("hidden",!rows.length);
     }else{seasonSummary.classList.add("hidden");seasonSummary.innerHTML="";}
   }
-  document.getElementById("modal-description").textContent = p.description || "Entre em contato com a Aelo para mais informações.";
+  const desc = String(p.description || p.descricao || p.details || "").trim();
+  const descEl = document.getElementById("modal-description");
+  if (descEl) {
+    descEl.textContent = desc || "Entre em contato com a AELO para mais informações sobre este imóvel.";
+    descEl.classList.toggle("is-empty", !desc);
+  }
   renderGalleryThumbs();
   showGalleryImage();
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
@@ -282,12 +287,16 @@ const modalInterest = document.querySelector(".modal-interest");
 if (modalInterest) modalInterest.addEventListener("click", (e) => {
   e.preventDefault();
   const p = window.AELO_CURRENT_PROPERTY;
+  if (!p) return;
   closeModal();
-  if (p && typeof window.aeloStartPropertyInterest === "function") window.aeloStartPropertyInterest(p);
-  else {
-    const launcher = document.getElementById("aelo-chat-launcher");
-    if (launcher) launcher.click();
+  if (typeof window.aeloStartPropertyInterest === "function") {
+    window.aeloStartPropertyInterest(p);
+    return;
   }
+  const phone = "5571992961212";
+  const price = p.price_label || (p.type === "temporada" && Number(p.nightly_price) > 0 ? formatPrice(p.nightly_price, "temporada") : "");
+  const msg = `Olá! Tenho interesse no imóvel ${p.title || "anunciado no site AELO"}${p.location ? `, em ${p.location}` : ""}${price ? ` — ${price}` : ""}. Gostaria de receber mais informações.`;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
 });
 const modalAssistant = document.getElementById("modal-assistant");
 if (modalAssistant) modalAssistant.addEventListener("click", () => {
@@ -426,7 +435,7 @@ const text=t=>{
 };
 const propertyInterest=(p)=>{
   if(!p) return;
-  const interest = p.type==='aluguel' ? 'Aluguel' : 'Compra';
+  const interest = p.type==='temporada' ? 'Temporada' : (p.type==='aluguel' ? 'Aluguel' : 'Compra');
   const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||''};
   resetCtx();
   mergeCtx(ctx);
