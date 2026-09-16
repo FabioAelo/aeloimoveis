@@ -10,3 +10,10 @@ Primeira etapa do módulo de aluguel por temporada.
 6. O Assistente AELO ganha um fluxo específico para temporada, usando somente imóveis reais publicados.
 
 A V49 não cria reserva/pagamento online e não declara disponibilidade por data. Isso fica para a próxima etapa, com calendário de disponibilidade.
+
+
+V49.2 — MANUTENÇÃO
+1. Atualizados os cache-busters dos recursos públicos e do painel para 49.2.
+2. Atualizado window.AELO_SITE_VERSION para 49.2.
+3. Mantida a estrutura do Storage e do carregamento de imagens da V49.1.
+4. Nenhuma policy do Supabase ou dado de imóvel foi alterado por esta versão.

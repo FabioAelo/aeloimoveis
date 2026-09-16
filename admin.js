@@ -456,7 +456,7 @@ function loadImageFromFile(file){
   });
 }
 function loadImageFromUrl(url){
-  return new Promise((resolve,reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=reject; img.src=url+'?v=48.2'; });
+  return new Promise((resolve,reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=reject; img.src=url+'?v=49.2'; });
 }
 async function createAeloWatermarkedPhoto(file, index=0){
   // V48.10: a logo is NOT burned into the uploaded image.
