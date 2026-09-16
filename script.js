@@ -362,7 +362,9 @@ if (modalInterest) modalInterest.addEventListener("click", (e) => {
   e.preventDefault();
   const p = window.AELO_CURRENT_PROPERTY;
   if (!p) return;
-  closeModal();
+  // Para temporada, mantemos a ficha do imóvel aberta durante todo o atendimento.
+  // Assim o cliente nunca perde o contexto, fotos, valores e datas enquanto conversa com a AELO.
+  if (p.type !== "temporada") closeModal();
   if (typeof window.aeloStartPropertyInterest === "function") {
     window.aeloStartPropertyInterest(p);
     return;
@@ -596,7 +598,7 @@ const seasonSubmitLead=async(p,ctx)=>{
   const {error}=await client.from('leads').insert({name:ctx.name,whatsapp:ctx.phone,interest:'Solicitação de reserva - Temporada',region:p.location||null,message:detail,source:'site-temporada',bedrooms:Number(p.bedrooms||0),property_id:p.id});
   if(error){console.error(error);add('Não foi possível registrar a solicitação agora. Mas seus dados já estão preenchidos para continuar pelo WhatsApp.','bot');buttons([{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Tentar novamente',action:()=>seasonClosingReview(p,ctx)}]);return;}
   add(`Solicitação enviada com sucesso, ${esc(ctx.name.split(' ')[0])}! 🎉 A AELO recebeu os dados da hospedagem e poderá confirmar a disponibilidade com você pelo WhatsApp.`,'bot',true);
-  buttons([{label:'💬 Falar com Fábio agora',action:()=>wa(seasonWaMessage(p,ctx))},{label:'📸 Ver imóvel novamente',action:()=>{shut();openModal(p.id)}},{label:'↩️ Voltar ao menu',action:main}]);
+  buttons([{label:'💬 Confirmar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'📸 Continuar vendo o imóvel',action:()=>{shut();openModal(p.id)}},{label:'↩️ Voltar ao menu',action:()=>{shut();closeModal();main()}}]);
 };
 window.aeloStartPropertyInterest=propertyInterest;
 launcher.onclick=open;close.onclick=shut;

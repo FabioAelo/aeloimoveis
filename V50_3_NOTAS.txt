@@ -1,0 +1,8 @@
+AELO Imóveis — V50.3
+
+- Atendimento de temporada permanece sobre a ficha do imóvel, sem voltar para a home.
+- O contexto do imóvel, datas, hóspedes e valor estimado é preservado durante a conversa.
+- Após envio da solicitação, o cliente pode continuar vendo o imóvel ou confirmar pelo WhatsApp.
+- Botão de retorno ao menu fecha o atendimento e a ficha explicitamente.
+- Cache do script atualizado para 50.3.
+- Nenhuma configuração do Supabase foi alterada.
