@@ -1,0 +1,7 @@
+AELO IMÓVEIS — V50.8 — Correção da Central de Reservas
+
+1. Corrige o botão “Salvar status” na lista e na tela detalhada da reserva.
+2. A atualização agora confirma que o registro realmente foi alterado; se não houver permissão, mostra mensagem clara em vez de parecer que o botão não funciona.
+3. Mostra “Salvando…” e “Salvo ✓” para dar retorno visual.
+4. Atualiza o cache-buster para admin.js?v=50.8 e script.js?v=50.8.
+5. Mantém os ajustes visuais da V50.7 e não altera o layout do tablet.
