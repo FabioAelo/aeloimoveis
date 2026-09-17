@@ -1,0 +1,7 @@
+V50.7 — Refinamento visual da temporada
+
+- Mantém integralmente o layout e funcionalidades aprovados da V50.6.
+- Não inclui novas alterações específicas para tablet; essa etapa já foi validada pelo usuário.
+- Substitui o ícone de palmeira verde 🌴 por um ícone neutro de calendário 📅 nas opções e fluxos de temporada.
+- Não altera Supabase, banco de dados, reservas, leads ou regras de disponibilidade.
+- Atualiza o cache do style.css para v50.7.
