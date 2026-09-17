@@ -325,7 +325,20 @@ function renderReservations(){
   if(!filtered.length){box.innerHTML='<div class="reservation-empty">Nenhuma solicitação de reserva encontrada.</div>';return;}
   box.innerHTML=filtered.map(r=>{
     const meta=RES_STATUS[r.status]||{label:r.status||'Solicitação',icon:'📌'};
-    const total=(r.estimated_total!==null&&r.estimated_total!==undefined)?`R$ ${Number(r.estimated_total).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'Valor a confirmar';
+    const calcReservationTotal=(r)=>{
+      if(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0) return Number(r.estimated_total);
+      const p=r.property||{}; const ci=r.checkin,co=r.checkout;
+      if(!ci||!co)return null;
+      const start=new Date(ci+'T12:00:00'),end=new Date(co+'T12:00:00'); let total=0;
+      for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){
+        const dow=d.getDay(); const weekend=(dow===5||dow===6);
+        const rate=weekend&&Number(p.weekend_price)>0?Number(p.weekend_price):Number(p.nightly_price||0);
+        if(!rate)return null; total+=rate;
+      }
+      total+=Number(p.cleaning_fee||0); return total||null;
+    };
+    const calculatedTotal=calcReservationTotal(r);
+    const total=calculatedTotal!==null?`R$ ${calculatedTotal.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'Valor a confirmar';
     return `<article class="reservation-card" data-open-reservation="${r.id}"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button><button type="button" class="reservation-open-btn" data-open-reservation="${r.id}">Abrir reserva e calendário →</button></div></article>`;
   }).join('');
   box.querySelectorAll('[data-open-reservation]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();openReservationDetail(btn.dataset.openReservation);});
@@ -334,7 +347,7 @@ function renderReservations(){
 }
 async function refreshReservations(){
   const box=document.getElementById('reservationList'); if(!box) return;
-  const {data,error}=await client.from('season_reservations').select('*, property:properties(title,location)').order('created_at',{ascending:false}).limit(200);
+  const {data,error}=await client.from('season_reservations').select('*, property:properties(title,location,nightly_price,weekend_price,cleaning_fee)').order('created_at',{ascending:false}).limit(200);
   if(error){box.innerHTML=`<div class="reservation-empty">Não foi possível carregar as reservas: ${escapeHtml(error.message)}</div>`;return;}
   allReservations=data||[]; renderReservations();
 }

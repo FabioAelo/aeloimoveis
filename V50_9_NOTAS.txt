@@ -1,0 +1,7 @@
+AELO IMÓVEIS — V50.9 — Correção do valor estimado da hospedagem
+
+1. Ao enviar uma solicitação de temporada, o sistema agora recalcula o valor diretamente pelos dados do imóvel, datas, tarifa de fim de semana, tarifas especiais e taxa de limpeza, sem depender apenas do valor exibido no modal.
+2. A Central de Reservas agora consegue exibir o valor estimado de reservas antigas que tenham estimated_total vazio, usando a diária cadastrada, diária de fim de semana e taxa de limpeza.
+3. O número de hóspedes continua sendo usado para validar o limite da hospedagem; a tarifa permanece por diária, salvo se houver regra de preço por hóspede cadastrada.
+4. Atualizado cache-buster para V50.9.
+5. Mantidos layout, tablet e demais funcionalidades da V50.8.

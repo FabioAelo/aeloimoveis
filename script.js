@@ -593,14 +593,33 @@ const seasonClosingReview=(p,ctx)=>{
   buttons([{label:'📨 Enviar solicitação',action:()=>seasonSubmitLead(p,ctx)},{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Alterar informações',action:()=>seasonClosingStart(p,ctx)}]);
 };
 const seasonWaMessage=(p,ctx)=>`Olá, Fábio! Vim pelo site AELO e gostaria de solicitar a hospedagem do imóvel ${p.title}${p.location?` em ${p.location}`:''}. Período: ${ctx.checkin||'a definir'} a ${ctx.checkout||'a definir'}. Hóspedes: ${ctx.guests||'a definir'}. ${ctx.estimatedTotal!==null&&ctx.estimatedTotal!==undefined?`Valor estimado informado no site: ${fmtBRL(Number(ctx.estimatedTotal))}. `:''}Meu nome é ${ctx.name||'a informar'} e meu WhatsApp é ${ctx.phone||'a informar'}.${ctx.note?` Observação: ${ctx.note}`:''}`;
+const calculateSeasonReservationEstimate=async(p,ctx)=>{
+  const ci=ctx.checkin||'', co=ctx.checkout||'';
+  const guests=Number(ctx.guests||2);
+  if(!ci||!co||co<=ci) return null;
+  if(Number(p.max_guests||0)>0 && guests>Number(p.max_guests)) return null;
+  const availability=await loadSeasonAvailability(p.id);
+  const nights=nightsBetween(ci,co);
+  if(!nights || Number(p.min_nights||0)>nights) return null;
+  let total=0;
+  for(let i=0;i<nights;i++){
+    const d=new Date(dateOnly(ci)); d.setDate(d.getDate()+i);
+    const iso=d.toISOString().slice(0,10);
+    if(dayBlocked(iso,availability.blocks)) return null;
+    total+=rateForNight(p,iso,availability.rates).value;
+  }
+  return total+Number(p.cleaning_fee||0);
+};
 const seasonSubmitLead=async(p,ctx)=>{
   add('Enviando sua solicitação para a AELO...','bot');
   const client=getSupabaseClient();
   if(!client){add('Não consegui conectar ao atendimento agora. Você pode continuar pelo WhatsApp.','bot');buttons([{label:'💬 Abrir WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))}]);return;}
-  const detail=[`Imóvel: ${p.title}`,`Localização: ${p.location||'não informada'}`,`Check-in: ${ctx.checkin||'a definir'}`,`Check-out: ${ctx.checkout||'a definir'}`,`Hóspedes: ${ctx.guests||'a definir'}`,ctx.estimatedTotal?`Valor estimado: ${ctx.estimatedTotal}`:null,ctx.note?`Observação: ${ctx.note}`:null].filter(Boolean).join(' | ');
+  const calculatedEstimate=await calculateSeasonReservationEstimate(p,ctx);
+  const finalEstimate=Number(ctx.estimatedTotal)>0?Number(ctx.estimatedTotal):calculatedEstimate;
+  const detail=[`Imóvel: ${p.title}`,`Localização: ${p.location||'não informada'}`,`Check-in: ${ctx.checkin||'a definir'}`,`Check-out: ${ctx.checkout||'a definir'}`,`Hóspedes: ${ctx.guests||'a definir'}`,finalEstimate?`Valor estimado: ${fmtBRL(finalEstimate)}`:null,ctx.note?`Observação: ${ctx.note}`:null].filter(Boolean).join(' | ');
   const {data:lead,error:leadError}=await client.from('leads').insert({name:ctx.name,whatsapp:ctx.phone,interest:'Solicitação de reserva - Temporada',region:p.location||null,message:detail,source:'site-temporada',bedrooms:Number(p.bedrooms||0),property_id:p.id}).select('id').single();
   if(leadError){console.error(leadError);add('Não foi possível registrar a solicitação agora. Mas seus dados já estão preenchidos para continuar pelo WhatsApp.','bot');buttons([{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Tentar novamente',action:()=>seasonClosingReview(p,ctx)}]);return;}
-  const reservationPayload={property_id:p.id,lead_id:lead?.id||null,guest_name:ctx.name,guest_whatsapp:ctx.phone,checkin:ctx.checkin||null,checkout:ctx.checkout||null,guests:Number(ctx.guests||2),estimated_total:Number(ctx.estimatedTotal)||null,note:ctx.note||null,status:'solicitada'};
+  const reservationPayload={property_id:p.id,lead_id:lead?.id||null,guest_name:ctx.name,guest_whatsapp:ctx.phone,checkin:ctx.checkin||null,checkout:ctx.checkout||null,guests:Number(ctx.guests||2),estimated_total:finalEstimate||null,note:ctx.note||null,status:'solicitada'};
   const {error:reservationError}=await client.from('season_reservations').insert(reservationPayload);
   if(reservationError){console.error(reservationError);add('Seu contato foi registrado, mas não consegui criar a solicitação de reserva automaticamente. A AELO poderá continuar pelo WhatsApp.','bot');buttons([{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Tentar novamente',action:()=>seasonClosingReview(p,ctx)}]);return;}
   add(`Solicitação enviada com sucesso, ${esc(ctx.name.split(' ')[0])}! 🎉 A AELO recebeu sua solicitação de hospedagem e ela agora está na Central de Reservas para confirmação.`,'bot',true);
