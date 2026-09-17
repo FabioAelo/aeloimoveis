@@ -1,0 +1,7 @@
+V51.1 — Ajuste do rodapé
+- Instagram reposicionado para a área de informações do rodapé, sem sobreposição com o Assistente AELO.
+- Adicionado ícone discreto ao lado de @fabioaeloimoveis.
+- Link do Instagram abre em nova aba.
+- Mantidos TCP Soluções em TI e todas as demais funcionalidades da V51.0.
+- Sem alterações no Supabase.
+- Cache-buster atualizado para V51.1.
