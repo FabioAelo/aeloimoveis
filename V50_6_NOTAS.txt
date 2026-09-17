@@ -1,0 +1,7 @@
+V50.6 — Tela cheia do imóvel no desktop
+
+- Modal do imóvel ocupa 100vw x 100vh em telas desktop.
+- Remove margem externa/padding do overlay no desktop.
+- Mantém galeria à esquerda e detalhes à direita.
+- Mantém o layout mobile da V50.5 sem alteração.
+- Cache do style.css atualizado para v50.6.
