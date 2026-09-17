@@ -1,0 +1,10 @@
+AELO IMÓVEIS — V51.6
+
+Ajuste visual da Central de Reservas:
+- Períodos reservados/bloqueados passam a aparecer em vermelho.
+- Legenda atualizada para “Reservado / bloqueado”.
+- Solicitações continuam em amarelo e períodos ocupados por outras solicitações permanecem diferenciados.
+- Mantém a correção do Valor Estimado da V51.5.
+- Mantém a regra de intervalo da reserva sem bloquear o dia de checkout.
+- Não altera o layout do tablet.
+- Não exige novo SQL.

@@ -447,7 +447,7 @@ function renderReservationCalendar(){
     const d=new Date(y,m,1-start+i); const key=d.toISOString().slice(0,10); const other=allReservations.find(x=>x.id!==reservationDetailId&&x.property_id===current?.property_id&&inRange(key,x.checkin,x.checkout)&&!['cancelada','concluida'].includes(x.status));
     const block=reservationBlocks.find(x=>inRange(key,x.start_date,x.end_date));
     const selected=current&&inRange(key,current.checkin,current.checkout);
-    const outside=d.getMonth()!==m; const classes=['reservation-day']; if(outside)classes.push('is-outside'); if(selected)classes.push('is-selected'); if(other)classes.push('is-busy'); if(block)classes.push('is-blocked'); if(key===dateKey(current?.checkin))classes.push('is-checkin'); if(key===dateKey(current?.checkout))classes.push('is-checkout');
+    const outside=d.getMonth()!==m; const classes=['reservation-day']; if(outside)classes.push('is-outside'); if(selected)classes.push('is-selected'); if(other)classes.push('is-busy'); if(block)classes.push('is-blocked'); if(block?.status==='reservado')classes.push('is-reserved'); if(key===dateKey(current?.checkin))classes.push('is-checkin'); if(key===dateKey(current?.checkout))classes.push('is-checkout');
     let titleText='Disponível'; if(block)titleText=block.status==='reservado'?'Reservado':'Bloqueado'; if(other)titleText=`${RES_STATUS[other.status]?.label||'Ocupado'} — ${other.guest_name||'Outra reserva'}`; if(selected)titleText='Período desta solicitação';
     cells.push(`<button type="button" class="${classes.join(' ')}" title="${escapeHtml(titleText)}" ${outside?'tabindex="-1"':''}><span>${d.getDate()}</span>${selected?'<i>•</i>':''}</button>`);
   }
