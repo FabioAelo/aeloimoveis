@@ -10,6 +10,19 @@ if (!ready) {
   $("loginCard").classList.add("hidden");
 }
 
+let partnerBrokers=[];
+let partnerTableAvailable=true;
+function partnerErrorText(error){const msg=String(error?.message||'');return /relation .*partner_brokers.* does not exist|could not find the table|42P01/i.test(msg);}
+async function loadPartnerBrokers(){const list=$('partnerList');if(!client)return;const {data,error}=await client.from('partner_brokers').select('id,name,creci,whatsapp,email,active,created_at').order('active',{ascending:false}).order('name');if(error){partnerBrokers=[];partnerTableAvailable=false;if(list)list.innerHTML=partnerErrorText(error)?'<div class="partner-setup-note"><strong>Cadastro de parceiros ainda não ativado.</strong><span>Execute o SQL <b>corretores_parceiros_v51_11.sql</b> no Supabase. Enquanto isso, o cadastro manual do parceiro continua disponível no imóvel.</span></div>':`<div class="partner-setup-note">${escapeHtml(error.message)}</div>`;renderPartnerSelect();return;}partnerTableAvailable=true;partnerBrokers=data||[];renderPartnerSelect();renderPartnerList();}
+function renderPartnerSelect(selectedId=''){const select=$('partnerBrokerSelect');if(!select)return;const active=partnerBrokers.filter(p=>p.active!==false);select.innerHTML='<option value="">Selecione um parceiro cadastrado</option>'+active.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}${p.creci?' · '+escapeHtml(p.creci):''}</option>`).join('')+'<option value="__manual__">Outro / digitar manualmente</option>';if(selectedId)select.value=active.some(p=>p.id===selectedId)?selectedId:'__manual__';}
+function renderPartnerList(){const box=$('partnerList');if(!box)return;if(!partnerBrokers.length){box.innerHTML='<div class="partner-empty">Nenhum corretor parceiro cadastrado ainda.</div>';return;}box.innerHTML=partnerBrokers.map(p=>`<div class="partner-row"><div class="partner-main"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.creci||'CRECI não informado')}${p.whatsapp?' · '+escapeHtml(p.whatsapp):''}</span></div><span class="partner-status ${p.active===false?'inactive':'active'}">${p.active===false?'Inativo':'Ativo'}</span><div class="partner-actions"><button type="button" class="ghost mini" data-edit-partner="${p.id}">Editar</button><button type="button" class="ghost mini danger" data-delete-partner="${p.id}">Excluir</button></div></div>`).join('');box.querySelectorAll('[data-edit-partner]').forEach(b=>b.onclick=()=>editPartnerBroker(b.dataset.editPartner));box.querySelectorAll('[data-delete-partner]').forEach(b=>b.onclick=()=>deletePartnerBroker(b.dataset.deletePartner));}
+function clearPartnerForm(){['partnerBrokerId','partnerBrokerName','partnerBrokerCreci','partnerBrokerWhatsapp','partnerBrokerEmail'].forEach(id=>{const el=$(id);if(el)el.value='';});if($('partnerBrokerActive'))$('partnerBrokerActive').checked=true;}
+function editPartnerBroker(id){const p=partnerBrokers.find(x=>x.id===id);if(!p)return;$('partnerBrokerId').value=p.id;$('partnerBrokerName').value=p.name||'';$('partnerBrokerCreci').value=p.creci||'';$('partnerBrokerWhatsapp').value=p.whatsapp||'';$('partnerBrokerEmail').value=p.email||'';$('partnerBrokerActive').checked=p.active!==false;$('partnersContent')?.classList.remove('hidden-section');$('partnerBrokerName')?.focus();}
+async function deletePartnerBroker(id){const p=partnerBrokers.find(x=>x.id===id);if(!p)return;if(!confirm(`Excluir o cadastro de ${p.name}? Isso não apaga imóveis nem reservas.`))return;const {error}=await client.from('partner_brokers').delete().eq('id',id);if(error){showMsg('partnerMsg',error.message);return;}clearPartnerForm();showMsg('partnerMsg','Corretor parceiro excluído.');loadPartnerBrokers();}
+async function savePartnerBroker(){const name=$('partnerBrokerName')?.value.trim();if(!name){showMsg('partnerMsg','Informe o nome do corretor.');return;}const payload={name,creci:$('partnerBrokerCreci')?.value.trim()||null,whatsapp:$('partnerBrokerWhatsapp')?.value.trim()||null,email:$('partnerBrokerEmail')?.value.trim()||null,active:$('partnerBrokerActive')?.checked!==false};const id=$('partnerBrokerId')?.value;const result=id?await client.from('partner_brokers').update(payload).eq('id',id):await client.from('partner_brokers').insert(payload);if(result.error){showMsg('partnerMsg',result.error.message);return;}showMsg('partnerMsg',id?'Corretor atualizado.':'Corretor cadastrado.');clearPartnerForm();loadPartnerBrokers();}
+function syncPartnerSelection(){const select=$('partnerBrokerSelect'),id=select?.value;if(!id||id==='__manual__')return;const p=partnerBrokers.find(x=>x.id===id);if(!p)return;$('partnerName').value=p.name||'';$('partnerCreci').value=p.creci||'';}
+function initPartnerManager(){$('savePartnerBroker')?.addEventListener('click',savePartnerBroker);$('cancelPartnerBroker')?.addEventListener('click',()=>{clearPartnerForm();showMsg('partnerMsg','');});$('refreshPartners')?.addEventListener('click',loadPartnerBrokers);$('partnerBrokerSelect')?.addEventListener('change',()=>{syncPartnerSelection();syncSoldFields();});}
+
 function commercialLabel(p){
   const s=p.commercial_status||'disponivel';
   if(s==='vendido') return p.sold_by==='parceiro' ? `🔵 Vendido por corretor parceiro${p.partner_name ? ' — '+p.partner_name : ''}` : '🏆 Vendido pela AELO';
@@ -21,8 +34,11 @@ function syncSoldFields(){
   const sold=$('commercialStatus')?.value==='vendido';
   const partner=sold && $('soldBy')?.value==='parceiro';
   $('soldByWrap')?.classList.toggle('hidden',!sold);
-  $('partnerNameWrap')?.classList.toggle('hidden',!partner);
-  $('partnerCreciWrap')?.classList.toggle('hidden',!partner);
+  $('partnerBrokerWrap')?.classList.toggle('hidden',!partner);
+  const manual=$('partnerBrokerSelect')?.value==='__manual__' || !partner;
+  $('partnerNameWrap')?.classList.toggle('hidden',!partner || !manual);
+  $('partnerCreciWrap')?.classList.toggle('hidden',!partner || !manual);
+  if(partner && $('partnerBrokerSelect')?.value && $('partnerBrokerSelect').value!=='__manual__') syncPartnerSelection();
 }
 function syncSeasonFields(){
   const season=$('type')?.value==='temporada';
@@ -725,7 +741,7 @@ async function start() {
   client.auth.onAuthStateChange((_event, session) => showSession(session));
 }
 function showSession(session) {
-  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); refreshLeads(); refreshReservations(); }
+  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); refreshLeads(); refreshReservations(); loadPartnerBrokers(); }
   else { $("dashboard").classList.add("hidden"); $("editor").classList.add("hidden"); $("loginCard").classList.remove("hidden"); $("logoutBtn").classList.add("hidden"); }
 }
 function showMsg(id,text){$(id).textContent=text||""}
@@ -737,7 +753,7 @@ $("cancelBtn").addEventListener("click",()=>$("editor").classList.add("hidden"))
 
 function openEditor(p=null){
   $("editor").classList.remove("hidden"); $("dashboard").classList.add("hidden"); $("editorTitle").textContent=p?"Editar imóvel":"Novo imóvel"; $("propertyId").value=p?.id||"";
-  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("propertyCategory").value=p?.property_category||""; $("nightlyPrice").value=p?.type==='temporada'?(p?.price||''):(p?.nightly_price||''); $("weekendPrice").value=p?.weekend_price||''; $("highSeasonPrice").value=p?.high_season_price||''; $("cleaningFee").value=p?.cleaning_fee||''; $("minNights").value=p?.min_nights||1; $("maxGuests").value=p?.max_guests||''; $("checkinTime").value=p?.checkin_time||''; $("checkoutTime").value=p?.checkout_time||''; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; syncSoldFields(); syncSeasonFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); renderPhotoPreviews([]); loadSeasonManagers(p?.id||""); window.scrollTo({top:0,behavior:"smooth"});
+  $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("propertyCategory").value=p?.property_category||""; $("nightlyPrice").value=p?.type==='temporada'?(p?.price||''):(p?.nightly_price||''); $("weekendPrice").value=p?.weekend_price||''; $("highSeasonPrice").value=p?.high_season_price||''; $("cleaningFee").value=p?.cleaning_fee||''; $("minNights").value=p?.min_nights||1; $("maxGuests").value=p?.max_guests||''; $("checkinTime").value=p?.checkin_time||''; $("checkoutTime").value=p?.checkout_time||''; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; renderPartnerSelect(); const matchedPartner=partnerBrokers.find(x=>x.name===p?.partner_name && (x.creci||"")===(p?.partner_creci||"")); $("partnerBrokerSelect").value=matchedPartner?.id||((p?.partner_name||p?.partner_creci)?"__manual__":""); syncSoldFields(); syncSeasonFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); renderPhotoPreviews([]); loadSeasonManagers(p?.id||""); window.scrollTo({top:0,behavior:"smooth"});
 }
 window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
 window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
@@ -828,7 +844,7 @@ $("propertyForm").addEventListener("submit",async e=>{
   $("editor").classList.add("hidden"); $("dashboard").classList.remove("hidden"); showMsg("saveMsg",""); refresh();
  }catch(err){showMsg("saveMsg",err.message)}
 });
-$("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.addEventListener("change",syncSoldFields); $("type")?.addEventListener("change",syncSeasonFields);
+$("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.addEventListener("change",syncSoldFields); $("partnerBrokerSelect")?.addEventListener("change",()=>{syncPartnerSelection();syncSoldFields();}); $("type")?.addEventListener("change",syncSeasonFields); initPartnerManager();
 start();
 syncSeasonFields();
 

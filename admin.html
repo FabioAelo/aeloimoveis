@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=51.6">
+<link rel="stylesheet" href="admin.css?v=51.11">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -34,6 +34,25 @@
   <div class="reservation-toolbar"><div><strong>Reservas de temporada</strong><span id="reservationResultCount">0 solicitações</span></div><button type="button" class="ghost" id="refreshReservations">Atualizar</button></div>
   <div class="reservation-filters"><label>Status<select id="reservationStatusFilter"><option value="todos">Todos</option><option value="solicitada">🟡 Solicitada</option><option value="em_analise">🔵 Em análise</option><option value="confirmada">🟢 Confirmada</option><option value="aguardando_pagamento">💳 Aguardando pagamento</option><option value="reservada">🏡 Reservada</option><option value="concluida">✅ Concluída</option><option value="cancelada">⚫ Cancelada</option></select></label><label>Buscar<input id="reservationSearch" type="search" placeholder="Hóspede, imóvel ou WhatsApp"></label></div>
   <div id="reservationList" class="reservation-list"><div class="reservation-empty">Carregando solicitações...</div></div>
+</div>
+<div class="dashboard-head leads-head collapsible-heading">
+  <button class="section-toggle standalone-toggle" type="button" data-target="partnersContent" aria-expanded="false"><span><b>🤝 Corretores parceiros</b><small>Cadastre e mantenha sua rede de parceiros atualizada</small></span><strong class="toggle-chevron">⌄</strong></button>
+</div>
+<div id="partnersContent" class="collapsible-content hidden-section">
+  <div class="partner-manager">
+    <div class="partner-manager-head"><div><p class="eyebrow">REDE AELO</p><h2>Corretores parceiros.</h2><p>Cadastre nome, CRECI e contatos para reutilizar o parceiro no cadastro dos imóveis.</p></div><button type="button" class="ghost" id="refreshPartners">Atualizar</button></div>
+    <div class="partner-form">
+      <input id="partnerBrokerId" type="hidden">
+      <label>Nome completo<input id="partnerBrokerName" type="text" placeholder="Nome do corretor"></label>
+      <label>CRECI<input id="partnerBrokerCreci" type="text" placeholder="Ex.: CRECI 31.100"></label>
+      <label>WhatsApp<input id="partnerBrokerWhatsapp" type="tel" placeholder="(71) 99999-9999"></label>
+      <label>E-mail<input id="partnerBrokerEmail" type="email" placeholder="corretor@email.com"></label>
+      <label class="partner-active-check"><input id="partnerBrokerActive" type="checkbox" checked> Parceiro ativo</label>
+      <div class="partner-form-actions"><button type="button" class="primary" id="savePartnerBroker">Salvar corretor</button><button type="button" class="ghost" id="cancelPartnerBroker">Limpar</button></div>
+    </div>
+    <p id="partnerMsg" class="msg"></p>
+    <div id="partnerList" class="partner-list"><div class="reservation-empty">Carregando corretores...</div></div>
+  </div>
 </div>
 <div class="dashboard-head leads-head collapsible-heading">
   <button class="section-toggle standalone-toggle" type="button" data-target="opportunitiesContent" aria-expanded="false"><span><b>🎯 Central de oportunidades</b><small>Leads, prioridades, agenda e funil comercial</small></span><strong class="toggle-chevron">⌄</strong></button>
@@ -107,6 +126,7 @@
     <label>Situação comercial<select id="commercialStatus"><option value="disponivel">🟢 Disponível</option><option value="negociacao">🟡 Em negociação</option><option value="vendido">🏆 Vendido</option><option value="indisponivel">⚫ Indisponível</option></select></label>
     <div id="soldByWrap" class="sold-by-grid hidden full">
   <label>Venda realizada por<select id="soldBy"><option value="aelo">AELO</option><option value="parceiro">Corretor parceiro</option></select></label>
+  <label id="partnerBrokerWrap" class="hidden">Corretor parceiro<select id="partnerBrokerSelect"><option value="">Selecione um parceiro cadastrado</option></select></label>
   <label id="partnerNameWrap" class="hidden">Nome do corretor parceiro<input id="partnerName" type="text" placeholder="Nome completo"></label>
   <label id="partnerCreciWrap" class="hidden">CRECI do corretor parceiro<input id="partnerCreci" type="text" placeholder="Ex.: CRECI 31.100"></label>
 </div>
@@ -155,7 +175,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=51.10"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=51.11"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

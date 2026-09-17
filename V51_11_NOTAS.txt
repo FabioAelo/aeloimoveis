@@ -1,0 +1,8 @@
+AELO Imóveis — V51.11
+- Ícone de calendário da Temporada ajustado ao estilo dos demais ícones.
+- Assistente ampliado no desktop; mobile preservado.
+- Interface usa “Falar com o corretor”.
+- Terreno não pergunta quantidade de quartos.
+- Novo painel de cadastro de corretores parceiros.
+- Parceiros podem ser selecionados no cadastro de imóveis vendidos por parceiro.
+- Incluído corretores_parceiros_v51_11.sql com RLS por proprietário.
