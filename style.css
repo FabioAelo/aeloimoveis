@@ -155,6 +155,8 @@ footer{background:#050607}
 .footer-info{display:flex;flex-direction:column;gap:7px;line-height:1.5}
 .footer-social a{color:#fff;text-decoration:none;font-weight:600}
 .footer-social a:hover{color:var(--gold-light)}
+.footer-developer{font-size:11px;opacity:.62;letter-spacing:.01em}.footer-developer a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;transition:opacity .2s,border-color .2s}.footer-developer a:hover{opacity:1;border-color:currentColor}
+
 @media(max-width:700px){.site-footer{grid-template-columns:1fr;gap:14px;padding:24px 25px}.footer-brand img{width:145px}.footer-info{gap:5px}.footer-social{margin-top:2px}}
 
 /* Correção final do cabeçalho: logo inteira, sem corte */

@@ -1,0 +1,7 @@
+AELO IMÓVEIS — V51.0 — Crédito discreto do desenvolvedor
+
+1. Adicionado no rodapé público o crédito “Sistema desenvolvido por TCP Soluções em TI”.
+2. O nome TCP Soluções em TI é clicável e abre https://www.tcpsolucoes.com em nova aba.
+3. Aplicado de forma discreta, mantendo a identidade visual AELO.
+4. Mantidos os demais recursos e layouts da V50.9.
+5. Nenhuma alteração no Supabase ou no fluxo de reservas.
