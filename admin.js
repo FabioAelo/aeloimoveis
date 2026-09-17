@@ -325,9 +325,10 @@ function renderReservations(){
   if(!filtered.length){box.innerHTML='<div class="reservation-empty">Nenhuma solicitação de reserva encontrada.</div>';return;}
   box.innerHTML=filtered.map(r=>{
     const meta=RES_STATUS[r.status]||{label:r.status||'Solicitação',icon:'📌'};
-    const total=r.estimated_total||'Valor a confirmar';
-    return `<article class="reservation-card"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button></div></article>`;
+    const total=(r.estimated_total!==null&&r.estimated_total!==undefined)?`R$ ${Number(r.estimated_total).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'Valor a confirmar';
+    return `<article class="reservation-card" data-open-reservation="${r.id}"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button><button type="button" class="reservation-open-btn" data-open-reservation="${r.id}">Abrir reserva e calendário →</button></div></article>`;
   }).join('');
+  box.querySelectorAll('[data-open-reservation]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();openReservationDetail(btn.dataset.openReservation);});
   box.querySelectorAll('[data-save-res]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveRes;const status=document.querySelector(`[data-res-status="${id}"]`)?.value;if(!status)return;const {error}=await client.from('season_reservations').update({status,updated_at:new Date().toISOString()}).eq('id',id);if(error)return alert(error.message);await refreshReservations();});
   box.querySelectorAll('[data-res-wa]').forEach(btn=>btn.onclick=()=>{const r=allReservations.find(x=>x.id===btn.dataset.resWa);if(!r)return;const n=String(r.guest_whatsapp||'').replace(/\D/g,'');if(n.length<10||n.length>11)return alert('WhatsApp inválido ou incompleto.');const msg=`Olá, ${r.guest_name||''}! Aqui é o Fábio Aelo. Recebi sua solicitação para ${r.property?.title||'a hospedagem'} no período de ${reservationDate(r.checkin)} a ${reservationDate(r.checkout)}, para ${r.guests||'a definir'} hóspedes. Vou confirmar a disponibilidade e os próximos passos.`;window.open(`https://wa.me/55${n}?text=${encodeURIComponent(msg)}`,'_blank','noopener');});
 }
@@ -340,6 +341,83 @@ async function refreshReservations(){
 document.getElementById('reservationSearch')?.addEventListener('input',renderReservations);
 document.getElementById('reservationStatusFilter')?.addEventListener('change',renderReservations);
 document.getElementById('refreshReservations')?.addEventListener('click',refreshReservations);
+
+let reservationDetailId=null;
+let reservationDetailMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let reservationBlocks=[];
+
+function dateKey(v){return v?String(v).slice(0,10):'';}
+function addDaysKey(key,days){const d=new Date(key+'T12:00:00');d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);}
+function inRange(key,start,end){return !!start&&!!end&&key>=dateKey(start)&&key<dateKey(end);}
+function brl(v){return (v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+
+async function openReservationDetail(id){
+  const r=allReservations.find(x=>x.id===id); if(!r)return;
+  reservationDetailId=id;
+  const checkin=new Date((r.checkin||new Date().toISOString().slice(0,10))+'T12:00:00');
+  reservationDetailMonth=new Date(checkin.getFullYear(),checkin.getMonth(),1);
+  const modal=document.getElementById('reservationDetailModal');
+  modal?.classList.add('is-open'); modal?.setAttribute('aria-hidden','false'); document.body.classList.add('reservation-detail-open');
+  document.getElementById('reservationDetailTitle').textContent=r.property?.title||'Reserva de temporada';
+  document.getElementById('reservationDetailSubtitle').textContent=`${reservationDate(r.checkin)} → ${reservationDate(r.checkout)} · ${r.guests||'—'} hóspedes`;
+  document.getElementById('reservationPropertyTitle').textContent=r.property?.title||'Imóvel de temporada';
+  document.getElementById('reservationPropertyLocation').textContent=r.property?.location||'Localização não informada';
+  document.getElementById('reservationGuestName').textContent=r.guest_name||'Não informado';
+  document.getElementById('reservationGuestPhone').textContent=r.guest_whatsapp||'—';
+  document.getElementById('reservationCheckin').textContent=reservationDate(r.checkin);
+  document.getElementById('reservationCheckout').textContent=reservationDate(r.checkout);
+  document.getElementById('reservationGuests').textContent=`${r.guests||'—'} hóspede${Number(r.guests)===1?'':'s'}`;
+  document.getElementById('reservationTotal').textContent=brl(r.estimated_total);
+  document.getElementById('reservationDetailNote').textContent=r.note||'Nenhuma observação informada.';
+  document.getElementById('reservationDetailNoteWrap').classList.toggle('is-empty',!r.note);
+  const sel=document.getElementById('reservationDetailStatus'); sel.innerHTML=Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join(''); sel.value=r.status||'solicitada';
+  await loadReservationBlocks(r.property_id);
+  renderReservationCalendar();
+}
+async function loadReservationBlocks(propertyId){
+  reservationBlocks=[];
+  if(!propertyId||!client)return;
+  const {data}=await client.from('season_blocks').select('start_date,end_date,reason').eq('property_id',propertyId).limit(200);
+  reservationBlocks=data||[];
+}
+function closeReservationDetail(){
+  document.getElementById('reservationDetailModal')?.classList.remove('is-open');
+  document.getElementById('reservationDetailModal')?.setAttribute('aria-hidden','true');
+  document.body.classList.remove('reservation-detail-open'); reservationDetailId=null;
+}
+function renderReservationCalendar(){
+  const grid=document.getElementById('reservationCalendarGrid'), title=document.getElementById('reservationCalendarMonth'); if(!grid||!title)return;
+  const y=reservationDetailMonth.getFullYear(), m=reservationDetailMonth.getMonth();
+  title.textContent=new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric'}).format(reservationDetailMonth).replace(/^./,c=>c.toUpperCase());
+  const first=new Date(y,m,1), last=new Date(y,m+1,0);
+  const cells=[]; const start=first.getDay(); const total=Math.ceil((start+last.getDate())/7)*7;
+  const current=allReservations.find(x=>x.id===reservationDetailId);
+  for(let i=0;i<total;i++){
+    const d=new Date(y,m,1-start+i); const key=d.toISOString().slice(0,10); const other=allReservations.find(x=>x.id!==reservationDetailId&&x.property_id===current?.property_id&&inRange(key,x.checkin,x.checkout)&&!['cancelada','concluida'].includes(x.status));
+    const block=reservationBlocks.find(x=>inRange(key,x.start_date,x.end_date));
+    const selected=current&&inRange(key,current.checkin,current.checkout);
+    const outside=d.getMonth()!==m; const classes=['reservation-day']; if(outside)classes.push('is-outside'); if(selected)classes.push('is-selected'); if(other)classes.push('is-busy'); if(block)classes.push('is-blocked'); if(key===dateKey(current?.checkin))classes.push('is-checkin'); if(key===dateKey(current?.checkout))classes.push('is-checkout');
+    let titleText='Disponível'; if(block)titleText=block.reason?`Bloqueado: ${block.reason}`:'Bloqueado'; if(other)titleText=`${RES_STATUS[other.status]?.label||'Ocupado'} — ${other.guest_name||'Outra reserva'}`; if(selected)titleText='Período desta solicitação';
+    cells.push(`<button type="button" class="${classes.join(' ')}" title="${escapeHtml(titleText)}" ${outside?'tabindex="-1"':''}><span>${d.getDate()}</span>${selected?'<i>•</i>':''}</button>`);
+  }
+  grid.innerHTML=cells.join('');
+}
+document.getElementById('closeReservationDetail')?.addEventListener('click',closeReservationDetail);
+document.getElementById('reservationPrevMonth')?.addEventListener('click',()=>{reservationDetailMonth.setMonth(reservationDetailMonth.getMonth()-1);renderReservationCalendar();});
+document.getElementById('reservationNextMonth')?.addEventListener('click',()=>{reservationDetailMonth.setMonth(reservationDetailMonth.getMonth()+1);renderReservationCalendar();});
+document.getElementById('reservationDetailModal')?.addEventListener('click',e=>{if(e.target.id==='reservationDetailModal')closeReservationDetail();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&reservationDetailId)closeReservationDetail();});
+document.getElementById('reservationDetailSave')?.addEventListener('click',async()=>{
+  const r=allReservations.find(x=>x.id===reservationDetailId); if(!r)return; const status=document.getElementById('reservationDetailStatus')?.value; if(!status)return;
+  const btn=document.getElementById('reservationDetailSave'); btn.disabled=true;
+  const {error}=await client.from('season_reservations').update({status,updated_at:new Date().toISOString()}).eq('id',r.id); btn.disabled=false;
+  if(error)return alert(error.message); await refreshReservations(); const updated=allReservations.find(x=>x.id===r.id); if(updated){document.getElementById('reservationDetailStatus').value=updated.status||status; renderReservationCalendar();}
+});
+document.getElementById('reservationDetailWhatsApp')?.addEventListener('click',()=>{
+  const r=allReservations.find(x=>x.id===reservationDetailId); if(!r)return; const n=String(r.guest_whatsapp||'').replace(/\D/g,''); if(n.length<10||n.length>11)return alert('WhatsApp inválido ou incompleto.');
+  const msg=`Olá, ${r.guest_name||''}! Aqui é o Fábio Aelo. Recebi sua solicitação para ${r.property?.title||'a hospedagem'} no período de ${reservationDate(r.checkin)} a ${reservationDate(r.checkout)}, para ${r.guests||'a definir'} hóspedes. Vou confirmar a disponibilidade e os próximos passos.`;
+  window.open(`https://wa.me/55${n}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
+});
 
 async function refreshLeads(){
   const box=document.getElementById('leadList'); if(!box) return;

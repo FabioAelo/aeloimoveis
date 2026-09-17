@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=50.4">
+<link rel="stylesheet" href="admin.css?v=50.5">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -28,7 +28,7 @@
   </div>
 </section>
 <div class="dashboard-head leads-head collapsible-heading">
-  <button class="section-toggle standalone-toggle" type="button" data-target="reservationsContent" aria-expanded="false"><span><b>🌴 Central de reservas</b><small>Solicitações de hospedagem e acompanhamento das reservas</small></span><strong class="toggle-chevron">⌄</strong></button>
+  <button class="section-toggle standalone-toggle" type="button" data-target="reservationsContent" aria-expanded="false"><span><b>▣ Central de reservas</b><small>Solicitações de hospedagem e acompanhamento das reservas</small></span><strong class="toggle-chevron">⌄</strong></button>
 </div>
 <div id="reservationsContent" class="collapsible-content hidden-section">
   <div class="reservation-toolbar"><div><strong>Reservas de temporada</strong><span id="reservationResultCount">0 solicitações</span></div><button type="button" class="ghost" id="refreshReservations">Atualizar</button></div>
@@ -127,7 +127,34 @@
   </form>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=50.4"></script>
+<div id="reservationDetailModal" class="reservation-detail-modal" aria-hidden="true">
+  <div class="reservation-detail-shell" role="dialog" aria-modal="true" aria-labelledby="reservationDetailTitle">
+    <header class="reservation-detail-header">
+      <div><p class="eyebrow">CENTRAL DE RESERVAS</p><h2 id="reservationDetailTitle">Reserva de temporada</h2><p id="reservationDetailSubtitle">Detalhes da hospedagem</p></div>
+      <button type="button" class="reservation-detail-close" id="closeReservationDetail" aria-label="Fechar">×</button>
+    </header>
+    <div class="reservation-detail-body">
+      <section class="reservation-calendar-panel">
+        <div class="reservation-calendar-head"><button type="button" class="calendar-nav" id="reservationPrevMonth">‹</button><strong id="reservationCalendarMonth">—</strong><button type="button" class="calendar-nav" id="reservationNextMonth">›</button></div>
+        <div class="reservation-weekdays"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+        <div id="reservationCalendarGrid" class="reservation-calendar-grid"></div>
+        <div class="reservation-calendar-legend"><span><i class="legend-free"></i>Disponível</span><span><i class="legend-selected"></i>Solicitação</span><span><i class="legend-busy"></i>Ocupado</span><span><i class="legend-blocked"></i>Bloqueado</span></div>
+      </section>
+      <aside class="reservation-detail-side">
+        <div class="reservation-detail-property"><p class="eyebrow">HOSPEDAGEM</p><h3 id="reservationPropertyTitle">—</h3><span id="reservationPropertyLocation">—</span></div>
+        <div class="reservation-detail-grid">
+          <div><small>Hóspede</small><b id="reservationGuestName">—</b></div><div><small>WhatsApp</small><b id="reservationGuestPhone">—</b></div>
+          <div><small>Check-in</small><b id="reservationCheckin">—</b></div><div><small>Check-out</small><b id="reservationCheckout">—</b></div>
+          <div><small>Hóspedes</small><b id="reservationGuests">—</b></div><div><small>Valor estimado</small><b id="reservationTotal">—</b></div>
+        </div>
+        <div class="reservation-detail-note" id="reservationDetailNoteWrap"><small>Observação</small><p id="reservationDetailNote">—</p></div>
+        <label class="reservation-detail-status"><span>Status da solicitação</span><select id="reservationDetailStatus"></select></label>
+        <div class="reservation-detail-actions"><button type="button" class="primary" id="reservationDetailSave">Salvar status</button><button type="button" class="ghost" id="reservationDetailWhatsApp">💬 WhatsApp</button></div>
+      </aside>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=50.5"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
