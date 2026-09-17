@@ -1,0 +1,5 @@
+V51.2 — Ajuste visual do Instagram no rodapé
+- Ícone do Instagram fixado em 18x18 px e escopo CSS restrito ao rodapé.
+- Ícone alinhado ao lado de @fabioaeloimoveis.
+- Instagram posicionado antes do crédito da TCP Soluções em TI.
+- Mantidos os demais recursos e layouts da V51.1.
