@@ -324,14 +324,17 @@ async function deleteTestReservation(id){
   const r=allReservations.find(x=>x.id===id); if(!r||!isTestReservation(r)) return;
   const label=`${r.guest_name||'sem nome'} — ${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}`;
   if(!confirm(`Excluir SOMENTE o registro de TESTE?\n\n${label}\n\nA reserva e o bloqueio automático deste teste serão removidos. O Lead será mantido. Reservas reais não são afetadas.`)) return;
-  const {error}=await client.from('season_reservations').delete().eq('id',id);
+  const {data:deleted,error}=await client.from('season_reservations').delete().eq('id',id).select('id').maybeSingle();
   if(error){alert(`Não foi possível excluir o teste: ${error.message}`);return;}
+  if(!deleted){alert('O registro de teste não foi excluído. A sessão administrativa pode não ter permissão para apagar esta reserva.');return;}
   if(r.property_id&&r.checkin&&r.checkout){
     const {error:blockError}=await client.from('season_blocks').delete().eq('property_id',r.property_id).eq('start_date',dateKey(r.checkin)).eq('end_date',dateKey(r.checkout)).eq('status','reservado');
     if(blockError) console.warn('bloqueio do teste não removido',blockError);
   }
   setMarkedTestReservations(getMarkedTestReservations().filter(x=>x!==id));
+  allReservations=allReservations.filter(x=>x.id!==id);
   if(reservationDetailId===id) closeReservationDetail();
+  renderReservations();
   await refreshReservations();
 }
 function renderReservationDetailTestActions(){
@@ -484,8 +487,9 @@ function renderReservationCalendar(){
     const d=new Date(y,m,1-start+i); const key=d.toISOString().slice(0,10); const other=allReservations.find(x=>x.id!==reservationDetailId&&x.property_id===current?.property_id&&inRange(key,x.checkin,x.checkout)&&!['cancelada','concluida'].includes(x.status));
     const block=reservationBlocks.find(x=>inRange(key,x.start_date,x.end_date));
     const selected=current&&inRange(key,current.checkin,current.checkout);
-    const outside=d.getMonth()!==m; const classes=['reservation-day']; if(outside)classes.push('is-outside'); if(selected)classes.push('is-selected'); if(other)classes.push('is-busy'); if(block)classes.push('is-blocked'); if(block?.status==='reservado')classes.push('is-reserved'); if(key===dateKey(current?.checkin))classes.push('is-checkin'); if(key===dateKey(current?.checkout))classes.push('is-checkout');
-    let titleText='Disponível'; if(block)titleText=block.status==='reservado'?'Reservado':'Bloqueado'; if(other)titleText=`${RES_STATUS[other.status]?.label||'Ocupado'} — ${other.guest_name||'Outra reserva'}`; if(selected)titleText='Período desta solicitação';
+    const currentIsActive=current&&['confirmada','aguardando_pagamento','reservada'].includes(current.status);
+    const outside=d.getMonth()!==m; const classes=['reservation-day']; if(outside)classes.push('is-outside'); if(selected && !currentIsActive)classes.push('is-selected'); if(other)classes.push('is-busy'); if(block)classes.push('is-blocked'); if(block?.status==='reservado')classes.push('is-reserved'); if(selected && currentIsActive)classes.push('is-reserved'); if(key===dateKey(current?.checkin))classes.push('is-checkin'); if(key===dateKey(current?.checkout))classes.push('is-checkout');
+    let titleText='Disponível'; if(block)titleText=block.status==='reservado'?'Reservado':'Bloqueado'; if(other)titleText=`${RES_STATUS[other.status]?.label||'Ocupado'} — ${other.guest_name||'Outra reserva'}`; if(selected)titleText=currentIsActive?'Período reservado':'Período desta solicitação';
     cells.push(`<button type="button" class="${classes.join(' ')}" title="${escapeHtml(titleText)}" ${outside?'tabindex="-1"':''}><span>${d.getDate()}</span>${selected?'<i>•</i>':''}</button>`);
   }
   grid.innerHTML=cells.join('');
@@ -521,24 +525,56 @@ async function saveReservationStatus(id,status,btn){
   const original=btn?.textContent||'Salvar status';
   if(btn){btn.disabled=true;btn.textContent='Salvando…';}
   try{
-    const {data,error}=await client.from('season_reservations').update({status,updated_at:new Date().toISOString()}).eq('id',id).select('id,status').maybeSingle();
-    if(error) throw error;
-    if(!data) throw new Error('A atualização não foi aplicada. Verifique se sua sessão administrativa está ativa e se você tem permissão para atualizar esta reserva.');
-    await syncReservationBlock(id,status);
-    if(btn){btn.textContent='Salvo ✓';}
+    // 1) Salva SOMENTE o status da reserva primeiro.
+    // Não usamos .select() na mesma operação: isso evita que uma falha
+    // de retorno do PostgREST seja confundida com falha de atualização.
+    const {error:updateError}=await client
+      .from('season_reservations')
+      .update({status,updated_at:new Date().toISOString()})
+      .eq('id',id);
+    if(updateError) throw updateError;
+
+    // 2) Confirma no banco que o status realmente foi gravado.
+    const {data:check,error:checkError}=await client
+      .from('season_reservations')
+      .select('id,status')
+      .eq('id',id)
+      .maybeSingle();
+    if(checkError) throw checkError;
+    if(!check || check.status!==status){
+      throw new Error('O status não foi confirmado pelo banco de dados. Verifique sua sessão administrativa e as permissões da reserva.');
+    }
+
+    const local=allReservations.find(x=>x.id===id);
+    if(local) local.status=status;
+    if(btn)btn.textContent='Status salvo ✓';
+
+    // 3) Sincroniza o calendário separadamente. Se houver problema no
+    // bloqueio, o status continua salvo e mostramos a informação ao usuário.
+    let blockError=null;
+    try{
+      await syncReservationBlock(id,status);
+    }catch(err){
+      blockError=err;
+      console.error('Falha ao sincronizar bloqueio:',err);
+    }
+
     await refreshReservations();
     const updated=allReservations.find(x=>x.id===id);
-    if(updated){
+    if(reservationDetailId===id && updated){
       const detail=document.getElementById('reservationDetailStatus');
-      if(detail&&reservationDetailId===id) detail.value=updated.status||status;
-      if(reservationDetailId===id) renderReservationCalendar();
+      if(detail) detail.value=updated.status||status;
+      await loadReservationBlocks(updated.property_id);
+      renderReservationCalendar();
     }
-    setTimeout(()=>{if(btn)btn.textContent=original;},1200);
+
+    if(blockError){
+      alert(`Status salvo com sucesso como “${RES_STATUS[status]?.label||status}”.\n\nO calendário não pôde sincronizar o bloqueio: ${blockError.message||blockError}`);
+    }
+    setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent=original;}},1200);
   }catch(error){
     if(btn){btn.disabled=false;btn.textContent=original;}
-    alert(error?.message||'Não foi possível salvar o status. A reserva não foi considerada bloqueada até a operação ser concluída.');
-  }finally{
-    if(btn&&btn.textContent==='Salvando…')btn.disabled=false;
+    alert(error?.message||'Não foi possível salvar o status.');
   }
 }
 

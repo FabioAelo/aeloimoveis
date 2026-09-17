@@ -1,0 +1,9 @@
+V51.9 — Central de Reservas: status, bloqueio e testes
+- Salvar status confirma a atualização da reserva antes de sincronizar o calendário.
+- Se a sincronização do bloqueio falhar, o sistema informa separadamente o erro.
+- Reservas em status ativo (Confirmada, Aguardando pagamento ou Reservada) passam a ter período destacado em vermelho no calendário.
+- O dia de checkout continua fora do intervalo ocupado.
+- Exclusão de registro de teste agora exige retorno real do DELETE; se nenhum registro for apagado, o sistema informa o problema.
+- Após exclusão bem-sucedida, a reserva é removida imediatamente da lista e o bloqueio automático correspondente é removido.
+- Reservas reais continuam protegidas contra exclusão.
+- Cache-buster atualizado para 51.9.
