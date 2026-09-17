@@ -8,7 +8,7 @@ create table if not exists public.season_reservations (
   checkin date not null,
   checkout date not null,
   guests integer check (guests is null or guests > 0),
-  estimated_total text,
+  estimated_total numeric(14,2),
   note text,
   status text not null default 'solicitada' check (status in ('solicitada','em_analise','confirmada','aguardando_pagamento','reservada','concluida','cancelada')),
   created_at timestamptz not null default now(),

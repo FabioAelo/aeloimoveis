@@ -276,15 +276,16 @@ async function updateSeasonQuote(p){
   if(!result||!note)return;
   const availability=await loadSeasonAvailability(p.id);
   renderSeasonCalendar(p,availability,ci,co);
-  if(!ci||!co){result.innerHTML='<strong>Escolha check-in e check-out</strong><div>O sistema calcula a estadia depois que as datas forem selecionadas.</div>';note.textContent='A disponibilidade final é confirmada pela AELO.';return;}
+  if(!ci||!co){result.dataset.estimatedTotal='';result.innerHTML='<strong>Escolha check-in e check-out</strong><div>O sistema calcula a estadia depois que as datas forem selecionadas.</div>';note.textContent='A disponibilidade final é confirmada pela AELO.';return;}
   const nights=nightsBetween(ci,co);
-  if(co<=ci){result.innerHTML='<strong>Período inválido</strong>';note.textContent='O check-out precisa ser posterior ao check-in.';return;}
-  if(Number(p.min_nights||0)>nights){result.innerHTML=`<strong>Mínimo de ${Number(p.min_nights)} noites</strong>`;note.textContent='Escolha um período maior para continuar.';return;}
-  if(Number(p.max_guests||0)>0 && guests>Number(p.max_guests)){result.innerHTML='<strong>Quantidade de hóspedes acima do limite</strong>';note.textContent=`Esta hospedagem aceita até ${Number(p.max_guests)} hóspedes.`;return;}
+  if(co<=ci){result.dataset.estimatedTotal='';result.innerHTML='<strong>Período inválido</strong>';note.textContent='O check-out precisa ser posterior ao check-in.';return;}
+  if(Number(p.min_nights||0)>nights){result.dataset.estimatedTotal='';result.innerHTML=`<strong>Mínimo de ${Number(p.min_nights)} noites</strong>`;note.textContent='Escolha um período maior para continuar.';return;}
+  if(Number(p.max_guests||0)>0 && guests>Number(p.max_guests)){result.dataset.estimatedTotal='';result.innerHTML='<strong>Quantidade de hóspedes acima do limite</strong>';note.textContent=`Esta hospedagem aceita até ${Number(p.max_guests)} hóspedes.`;return;}
   let total=0, rows={}, blocked=false;
   for(let i=0;i<nights;i++){const d=new Date(dateOnly(ci));d.setDate(d.getDate()+i);const iso=d.toISOString().slice(0,10);if(dayBlocked(iso,availability.blocks)){blocked=true;break;}const r=rateForNight(p,iso,availability.rates);total+=r.value;rows[r.label]=(rows[r.label]||0)+1;}
-  if(blocked){result.innerHTML='<strong>Essas datas não estão disponíveis</strong>';note.textContent='Escolha outro período no calendário ou fale com a AELO.';return;}
+  if(blocked){result.dataset.estimatedTotal='';result.innerHTML='<strong>Essas datas não estão disponíveis</strong>';note.textContent='Escolha outro período no calendário ou fale com a AELO.';return;}
   const cleaning=Number(p.cleaning_fee||0), grand=total+cleaning;
+  result.dataset.estimatedTotal=String(grand);
   result.innerHTML=`<strong>${fmtBRL(grand)} estimados</strong><div>${nights} noite${nights===1?'':'s'}${cleaning?` + ${fmtBRL(cleaning)} de limpeza`:''}</div><div class="season-rate-breakdown">${Object.entries(rows).map(([k,v])=>`<span><span>${v} × ${k}</span><b>${k==='fim de semana'&&Number(p.weekend_price)>0?fmtBRL(p.weekend_price):k==='diária normal'?fmtBRL(p.nightly_price||p.price):'tarifa especial'}</b></span>`).join('')}</div>`;
   note.textContent='Valor estimado. A confirmação da reserva e da tarifa é feita pela AELO.';
 }
@@ -515,14 +516,15 @@ const getSeasonBookingContext=()=>{
   const guests=Number(document.getElementById('modal-season-guests')?.value||0);
   const totalEl=document.getElementById('modal-season-total');
   const totalText=totalEl?.innerText||'';
-  const valid=!!ci&&!!co&&co>ci&&(!totalText.includes('Indisponíveis')&&!totalText.includes('indisponíveis')&&!totalText.includes('Período inválido')&&!totalText.includes('Mínimo')&&!totalText.includes('acima do limite'));
-  return {checkin:ci,checkout:co,guests,totalText,valid};
+  const estimatedTotal=Number(totalEl?.dataset?.estimatedTotal||0);
+  const valid=!!ci&&!!co&&co>ci&&estimatedTotal>=0&&(!totalText.includes('Indisponíveis')&&!totalText.includes('indisponíveis')&&!totalText.includes('Período inválido')&&!totalText.includes('Mínimo')&&!totalText.includes('acima do limite'));
+  return {checkin:ci,checkout:co,guests,totalText,estimatedTotal,valid};
 };
 const propertyInterest=(p)=>{
   if(!p) return;
   const interest = p.type==='temporada' ? 'Temporada' : (p.type==='aluguel' ? 'Aluguel' : 'Compra');
   const booking=p.type==='temporada'?getSeasonBookingContext():{};
-  const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||'',checkin:booking.checkin||'',checkout:booking.checkout||'',guests:booking.guests||0,estimatedTotal:booking.totalText||''};
+  const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||'',checkin:booking.checkin||'',checkout:booking.checkout||'',guests:booking.guests||0,estimatedTotal:booking.estimatedTotal||null,estimatedTotalLabel:booking.totalText||''};
   resetCtx();
   mergeCtx(ctx);
   panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
@@ -585,11 +587,11 @@ const seasonClosingNote=(p,ctx)=>{
 const seasonClosingReview=(p,ctx)=>{
   add('Perfeito. Confira sua solicitação antes de eu encaminhar para a AELO:','bot');
   const period=ctx.checkin&&ctx.checkout?`${ctx.checkin} → ${ctx.checkout}`:'datas a confirmar';
-  const summary=`<div class="aelo-lead-card"><strong>${esc(p.title)}</strong><small>${esc(p.location||'')}<br>📅 ${esc(period)}<br>👥 ${ctx.guests||'A definir'} hóspede${Number(ctx.guests)===1?'':'s'}${ctx.estimatedTotal?`<br>💰 ${esc(ctx.estimatedTotal)}`:''}<br>👤 ${esc(ctx.name)}<br>📱 ${esc(ctx.phone)}</small>${ctx.note?`<small>📝 ${esc(ctx.note)}</small>`:''}</div>`;
+  const summary=`<div class="aelo-lead-card"><strong>${esc(p.title)}</strong><small>${esc(p.location||'')}<br>📅 ${esc(period)}<br>👥 ${ctx.guests||'A definir'} hóspede${Number(ctx.guests)===1?'':'s'}${ctx.estimatedTotal!==null&&ctx.estimatedTotal!==undefined?`<br>💰 ${fmtBRL(Number(ctx.estimatedTotal))} estimados`:''}<br>👤 ${esc(ctx.name)}<br>📱 ${esc(ctx.phone)}</small>${ctx.note?`<small>📝 ${esc(ctx.note)}</small>`:''}</div>`;
   add(summary,'bot',true);
   buttons([{label:'📨 Enviar solicitação',action:()=>seasonSubmitLead(p,ctx)},{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Alterar informações',action:()=>seasonClosingStart(p,ctx)}]);
 };
-const seasonWaMessage=(p,ctx)=>`Olá, Fábio! Vim pelo site AELO e gostaria de solicitar a hospedagem do imóvel ${p.title}${p.location?` em ${p.location}`:''}. Período: ${ctx.checkin||'a definir'} a ${ctx.checkout||'a definir'}. Hóspedes: ${ctx.guests||'a definir'}. ${ctx.estimatedTotal?`Valor estimado informado no site: ${ctx.estimatedTotal}. `:''}Meu nome é ${ctx.name||'a informar'} e meu WhatsApp é ${ctx.phone||'a informar'}.${ctx.note?` Observação: ${ctx.note}`:''}`;
+const seasonWaMessage=(p,ctx)=>`Olá, Fábio! Vim pelo site AELO e gostaria de solicitar a hospedagem do imóvel ${p.title}${p.location?` em ${p.location}`:''}. Período: ${ctx.checkin||'a definir'} a ${ctx.checkout||'a definir'}. Hóspedes: ${ctx.guests||'a definir'}. ${ctx.estimatedTotal!==null&&ctx.estimatedTotal!==undefined?`Valor estimado informado no site: ${fmtBRL(Number(ctx.estimatedTotal))}. `:''}Meu nome é ${ctx.name||'a informar'} e meu WhatsApp é ${ctx.phone||'a informar'}.${ctx.note?` Observação: ${ctx.note}`:''}`;
 const seasonSubmitLead=async(p,ctx)=>{
   add('Enviando sua solicitação para a AELO...','bot');
   const client=getSupabaseClient();
@@ -597,7 +599,7 @@ const seasonSubmitLead=async(p,ctx)=>{
   const detail=[`Imóvel: ${p.title}`,`Localização: ${p.location||'não informada'}`,`Check-in: ${ctx.checkin||'a definir'}`,`Check-out: ${ctx.checkout||'a definir'}`,`Hóspedes: ${ctx.guests||'a definir'}`,ctx.estimatedTotal?`Valor estimado: ${ctx.estimatedTotal}`:null,ctx.note?`Observação: ${ctx.note}`:null].filter(Boolean).join(' | ');
   const {data:lead,error:leadError}=await client.from('leads').insert({name:ctx.name,whatsapp:ctx.phone,interest:'Solicitação de reserva - Temporada',region:p.location||null,message:detail,source:'site-temporada',bedrooms:Number(p.bedrooms||0),property_id:p.id}).select('id').single();
   if(leadError){console.error(leadError);add('Não foi possível registrar a solicitação agora. Mas seus dados já estão preenchidos para continuar pelo WhatsApp.','bot');buttons([{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Tentar novamente',action:()=>seasonClosingReview(p,ctx)}]);return;}
-  const reservationPayload={property_id:p.id,lead_id:lead?.id||null,guest_name:ctx.name,guest_whatsapp:ctx.phone,checkin:ctx.checkin||null,checkout:ctx.checkout||null,guests:Number(ctx.guests||0)||null,estimated_total:ctx.estimatedTotal||null,note:ctx.note||null,status:'solicitada'};
+  const reservationPayload={property_id:p.id,lead_id:lead?.id||null,guest_name:ctx.name,guest_whatsapp:ctx.phone,checkin:ctx.checkin||null,checkout:ctx.checkout||null,guests:Number(ctx.guests||0)||null,estimated_total:Number(ctx.estimatedTotal)||null,note:ctx.note||null,status:'solicitada'};
   const {error:reservationError}=await client.from('season_reservations').insert(reservationPayload);
   if(reservationError){console.error(reservationError);add('Seu contato foi registrado, mas não consegui criar a solicitação de reserva automaticamente. A AELO poderá continuar pelo WhatsApp.','bot');buttons([{label:'💬 Continuar pelo WhatsApp',action:()=>wa(seasonWaMessage(p,ctx))},{label:'↩️ Tentar novamente',action:()=>seasonClosingReview(p,ctx)}]);return;}
   add(`Solicitação enviada com sucesso, ${esc(ctx.name.split(' ')[0])}! 🎉 A AELO recebeu sua solicitação de hospedagem e ela agora está na Central de Reservas para confirmação.`,'bot',true);
