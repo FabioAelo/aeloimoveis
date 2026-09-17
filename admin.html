@@ -150,11 +150,12 @@
         <div class="reservation-detail-note" id="reservationDetailNoteWrap"><small>Observação</small><p id="reservationDetailNote">—</p></div>
         <label class="reservation-detail-status"><span>Status da solicitação</span><select id="reservationDetailStatus"></select></label>
         <div class="reservation-detail-actions"><button type="button" class="primary" id="reservationDetailSave">Salvar status</button><button type="button" class="ghost" id="reservationDetailWhatsApp">💬 WhatsApp</button></div>
+        <div id="reservationDetailTestActions" class="reservation-test-actions" aria-live="polite"></div>
       </aside>
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=51.7"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=51.8"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

@@ -1,0 +1,7 @@
+V51.8 — Gestão segura de registros de teste
+- Adicionada identificação de registros de teste (nome/observação contendo “teste” ou marcação manual local).
+- Exclusão disponível somente para registros identificados como teste.
+- Exclusão remove a season_reservations e o bloqueio automático correspondente, preservando o Lead.
+- Reservas reais não recebem botão de exclusão; podem apenas ser marcadas manualmente como teste antes da exclusão.
+- Confirmação obrigatória antes da exclusão.
+- Atualizado cache-buster para 51.8.

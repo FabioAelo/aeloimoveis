@@ -309,6 +309,40 @@ async function loadAnalytics(days=30){
 document.getElementById('analyticsPeriod')?.addEventListener('change',e=>loadAnalytics(e.target.value));
 
 let allReservations = [];
+
+const TEST_RESERVATION_KEY='aelo_test_reservations_v1';
+function getMarkedTestReservations(){try{return JSON.parse(localStorage.getItem(TEST_RESERVATION_KEY)||'[]')}catch{return[]}}
+function setMarkedTestReservations(ids){localStorage.setItem(TEST_RESERVATION_KEY,JSON.stringify(ids))}
+function isTestReservation(r){
+  if(!r) return false;
+  const hay=[r.guest_name,r.note].filter(Boolean).join(' ').toLowerCase();
+  return getMarkedTestReservations().includes(r.id) || hay.includes('teste');
+}
+function markReservationAsTest(id){const ids=getMarkedTestReservations();if(!ids.includes(id)){ids.push(id);setMarkedTestReservations(ids)};renderReservations();if(reservationDetailId===id)renderReservationDetailTestActions();}
+function unmarkReservationAsTest(id){setMarkedTestReservations(getMarkedTestReservations().filter(x=>x!==id));renderReservations();if(reservationDetailId===id)renderReservationDetailTestActions();}
+async function deleteTestReservation(id){
+  const r=allReservations.find(x=>x.id===id); if(!r||!isTestReservation(r)) return;
+  const label=`${r.guest_name||'sem nome'} — ${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}`;
+  if(!confirm(`Excluir SOMENTE o registro de TESTE?\n\n${label}\n\nA reserva e o bloqueio automático deste teste serão removidos. O Lead será mantido. Reservas reais não são afetadas.`)) return;
+  const {error}=await client.from('season_reservations').delete().eq('id',id);
+  if(error){alert(`Não foi possível excluir o teste: ${error.message}`);return;}
+  if(r.property_id&&r.checkin&&r.checkout){
+    const {error:blockError}=await client.from('season_blocks').delete().eq('property_id',r.property_id).eq('start_date',dateKey(r.checkin)).eq('end_date',dateKey(r.checkout)).eq('status','reservado');
+    if(blockError) console.warn('bloqueio do teste não removido',blockError);
+  }
+  setMarkedTestReservations(getMarkedTestReservations().filter(x=>x!==id));
+  if(reservationDetailId===id) closeReservationDetail();
+  await refreshReservations();
+}
+function renderReservationDetailTestActions(){
+  const box=document.getElementById('reservationDetailTestActions'); if(!box)return;
+  const r=allReservations.find(x=>x.id===reservationDetailId); if(!r){box.innerHTML='';return;}
+  if(isTestReservation(r)) box.innerHTML=`<button type="button" class="reservation-test-delete" id="reservationDetailDeleteTest">🗑️ Excluir registro de TESTE</button><button type="button" class="reservation-test-unmark" id="reservationDetailUnmarkTest">Remover marca de teste</button>`;
+  else box.innerHTML=`<button type="button" class="reservation-test-mark" id="reservationDetailMarkTest">Marcar como TESTE</button>`;
+  box.querySelector('#reservationDetailDeleteTest')?.addEventListener('click',()=>deleteTestReservation(r.id));
+  box.querySelector('#reservationDetailUnmarkTest')?.addEventListener('click',()=>unmarkReservationAsTest(r.id));
+  box.querySelector('#reservationDetailMarkTest')?.addEventListener('click',()=>markReservationAsTest(r.id));
+}
 const RES_STATUS = {
   solicitada:{label:'Solicitada',icon:'🟡'}, em_analise:{label:'Em análise',icon:'🔵'}, confirmada:{label:'Confirmada',icon:'🟢'}, aguardando_pagamento:{label:'Aguardando pagamento',icon:'💳'}, reservada:{label:'Reservada',icon:'🏡'}, concluida:{label:'Concluída',icon:'✅'}, cancelada:{label:'Cancelada',icon:'⚫'}
 };
@@ -327,10 +361,12 @@ function renderReservations(){
     const meta=RES_STATUS[r.status]||{label:r.status||'Solicitação',icon:'📌'};
     const calculatedTotal=(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0)?Number(r.estimated_total):null;
     const total=calculatedTotal!==null?`R$ ${calculatedTotal.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'Valor a confirmar';
-    return `<article class="reservation-card" data-open-reservation="${r.id}"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button><button type="button" class="reservation-open-btn" data-open-reservation="${r.id}">Abrir reserva e calendário →</button></div></article>`;
+    return `<article class="reservation-card" data-open-reservation="${r.id}"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button>${isTestReservation(r)?`<button type="button" class="reservation-test-delete" data-delete-test="${r.id}">🗑️ Excluir teste</button>`:`<button type="button" class="reservation-test-mark" data-mark-test="${r.id}">Marcar como teste</button>`}<button type="button" class="reservation-open-btn" data-open-reservation="${r.id}">Abrir reserva e calendário →</button></div></article>`;
   }).join('');
   box.querySelectorAll('[data-open-reservation]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();openReservationDetail(btn.dataset.openReservation);});
   box.querySelectorAll('[data-save-res]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveRes;const status=document.querySelector(`[data-res-status="${id}"]`)?.value;if(!status)return;await saveReservationStatus(id,status,btn);});
+  box.querySelectorAll('[data-delete-test]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();deleteTestReservation(btn.dataset.deleteTest);});
+  box.querySelectorAll('[data-mark-test]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();markReservationAsTest(btn.dataset.markTest);});
   box.querySelectorAll('[data-res-wa]').forEach(btn=>btn.onclick=()=>{const r=allReservations.find(x=>x.id===btn.dataset.resWa);if(!r)return;const n=String(r.guest_whatsapp||'').replace(/\D/g,'');if(n.length<10||n.length>11)return alert('WhatsApp inválido ou incompleto.');const msg=`Olá, ${r.guest_name||''}! Aqui é o Fábio Aelo. Recebi sua solicitação para ${r.property?.title||'a hospedagem'} no período de ${reservationDate(r.checkin)} a ${reservationDate(r.checkout)}, para ${r.guests||'a definir'} hóspedes. Vou confirmar a disponibilidade e os próximos passos.`;window.open(`https://wa.me/55${n}?text=${encodeURIComponent(msg)}`,'_blank','noopener');});
   const missing=filtered.filter(r=>!(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0));
   if(missing.length && client){
@@ -424,6 +460,7 @@ async function openReservationDetail(id){
   const sel=document.getElementById('reservationDetailStatus'); sel.innerHTML=Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join(''); sel.value=r.status||'solicitada';
   await loadReservationBlocks(r.property_id);
   renderReservationCalendar();
+  renderReservationDetailTestActions();
 }
 async function loadReservationBlocks(propertyId){
   reservationBlocks=[];
