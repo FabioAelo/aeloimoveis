@@ -1,0 +1,10 @@
+AELO IMÓVEIS — V51.5
+
+Correções da Central de Reservas:
+- Corrige o Valor Estimado que aparecia como “—” em reservas antigas sem estimated_total.
+- Recalcula o valor pela mesma lógica do site público: períodos especiais, fim de semana, diária normal e taxa de limpeza.
+- O valor calculado é gravado na reserva quando estava ausente.
+- A tela detalhada mostra “Calculando…” e depois o valor encontrado.
+- Mantém o bloqueio de reservas da V51.4.
+- Atualiza cache-buster para V51.5.
+- Não altera o layout do tablet nem exige novo SQL.

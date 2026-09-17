@@ -325,25 +325,19 @@ function renderReservations(){
   if(!filtered.length){box.innerHTML='<div class="reservation-empty">Nenhuma solicitação de reserva encontrada.</div>';return;}
   box.innerHTML=filtered.map(r=>{
     const meta=RES_STATUS[r.status]||{label:r.status||'Solicitação',icon:'📌'};
-    const calcReservationTotal=(r)=>{
-      if(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0) return Number(r.estimated_total);
-      const p=r.property||{}; const ci=r.checkin,co=r.checkout;
-      if(!ci||!co)return null;
-      const start=new Date(ci+'T12:00:00'),end=new Date(co+'T12:00:00'); let total=0;
-      for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){
-        const dow=d.getDay(); const weekend=(dow===5||dow===6);
-        const rate=weekend&&Number(p.weekend_price)>0?Number(p.weekend_price):Number(p.nightly_price||0);
-        if(!rate)return null; total+=rate;
-      }
-      total+=Number(p.cleaning_fee||0); return total||null;
-    };
-    const calculatedTotal=calcReservationTotal(r);
+    const calculatedTotal=(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0)?Number(r.estimated_total):null;
     const total=calculatedTotal!==null?`R$ ${calculatedTotal.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'Valor a confirmar';
     return `<article class="reservation-card" data-open-reservation="${r.id}"><div class="reservation-main"><div class="reservation-title"><strong>${escapeHtml(r.property?.title||'Imóvel de temporada')}</strong><span>${meta.icon} ${meta.label}</span></div><div class="reservation-grid"><div><small>Hóspede</small><b>${escapeHtml(r.guest_name||'Não informado')}</b><span>📱 ${escapeHtml(r.guest_whatsapp||'—')}</span></div><div><small>Período</small><b>${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}</b><span>👥 ${r.guests||'—'} hóspedes</span></div><div><small>Valor estimado</small><b>${escapeHtml(total)}</b><span>${escapeHtml(r.property?.location||'')}</span></div></div>${r.note?`<div class="reservation-note">📝 ${escapeHtml(r.note)}</div>`:''}</div><div class="reservation-actions"><label>Status<select data-res-status="${r.id}">${Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}</select></label><button type="button" class="primary" data-save-res="${r.id}">Salvar status</button><button type="button" class="ghost" data-res-wa="${r.id}">💬 WhatsApp</button><button type="button" class="reservation-open-btn" data-open-reservation="${r.id}">Abrir reserva e calendário →</button></div></article>`;
   }).join('');
   box.querySelectorAll('[data-open-reservation]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();openReservationDetail(btn.dataset.openReservation);});
   box.querySelectorAll('[data-save-res]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveRes;const status=document.querySelector(`[data-res-status="${id}"]`)?.value;if(!status)return;await saveReservationStatus(id,status,btn);});
   box.querySelectorAll('[data-res-wa]').forEach(btn=>btn.onclick=()=>{const r=allReservations.find(x=>x.id===btn.dataset.resWa);if(!r)return;const n=String(r.guest_whatsapp||'').replace(/\D/g,'');if(n.length<10||n.length>11)return alert('WhatsApp inválido ou incompleto.');const msg=`Olá, ${r.guest_name||''}! Aqui é o Fábio Aelo. Recebi sua solicitação para ${r.property?.title||'a hospedagem'} no período de ${reservationDate(r.checkin)} a ${reservationDate(r.checkout)}, para ${r.guests||'a definir'} hóspedes. Vou confirmar a disponibilidade e os próximos passos.`;window.open(`https://wa.me/55${n}?text=${encodeURIComponent(msg)}`,'_blank','noopener');});
+  const missing=filtered.filter(r=>!(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0));
+  if(missing.length && client){
+    Promise.all(missing.map(r=>ensureReservationEstimate(r).catch(error=>{console.error('estimate',r.id,error);return null;}))).then(()=>{
+      if(missing.some(r=>r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0)) renderReservations();
+    });
+  }
 }
 async function refreshReservations(){
   const box=document.getElementById('reservationList'); if(!box) return;
@@ -364,6 +358,43 @@ function addDaysKey(key,days){const d=new Date(key+'T12:00:00');d.setDate(d.getD
 function inRange(key,start,end){return !!start&&!!end&&key>=dateKey(start)&&key<dateKey(end);}
 function brl(v){return (v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
 
+async function calculateReservationTotal(r){
+  if(!r?.checkin||!r?.checkout||!r?.property_id) return null;
+  const start=dateKey(r.checkin), end=dateKey(r.checkout);
+  if(!start||!end||end<=start) return null;
+  const p=r.property||{};
+  const guests=Number(r.guests||2);
+  if(Number(p.max_guests||0)>0 && guests>Number(p.max_guests)) return null;
+  const {data:rates,error}=await client.from('season_rate_periods').select('start_date,end_date,nightly_rate').eq('property_id',r.property_id);
+  if(error) throw error;
+  let total=0;
+  for(let d=new Date(start+'T12:00:00'); d<new Date(end+'T12:00:00'); d.setDate(d.getDate()+1)){
+    const iso=d.toISOString().slice(0,10);
+    const special=(rates||[]).find(x=>iso>=dateKey(x.start_date)&&iso<=dateKey(x.end_date)&&Number(x.nightly_rate)>0);
+    let rate=special?Number(special.nightly_rate):0;
+    if(!rate){
+      const dow=d.getDay();
+      rate=((dow===5||dow===6)&&Number(p.weekend_price)>0)?Number(p.weekend_price):Number(p.nightly_price||p.price||0);
+    }
+    if(!rate) return null;
+    total+=rate;
+  }
+  total+=Number(p.cleaning_fee||0);
+  return total>0?total:null;
+}
+
+async function ensureReservationEstimate(r){
+  if(!r) return null;
+  if(r.estimated_total!==null&&r.estimated_total!==undefined&&Number(r.estimated_total)>0) return Number(r.estimated_total);
+  const calculated=await calculateReservationTotal(r);
+  if(calculated!==null){
+    const {error}=await client.from('season_reservations').update({estimated_total:calculated}).eq('id',r.id);
+    if(error) throw error;
+    r.estimated_total=calculated;
+  }
+  return calculated;
+}
+
 async function openReservationDetail(id){
   const r=allReservations.find(x=>x.id===id); if(!r)return;
   reservationDetailId=id;
@@ -380,7 +411,14 @@ async function openReservationDetail(id){
   document.getElementById('reservationCheckin').textContent=reservationDate(r.checkin);
   document.getElementById('reservationCheckout').textContent=reservationDate(r.checkout);
   document.getElementById('reservationGuests').textContent=`${r.guests||'—'} hóspede${Number(r.guests)===1?'':'s'}`;
-  document.getElementById('reservationTotal').textContent=brl(r.estimated_total);
+  document.getElementById('reservationTotal').textContent='Calculando…';
+  try{
+    const estimate=await ensureReservationEstimate(r);
+    document.getElementById('reservationTotal').textContent=brl(estimate);
+  }catch(error){
+    console.error(error);
+    document.getElementById('reservationTotal').textContent=brl(r.estimated_total);
+  }
   document.getElementById('reservationDetailNote').textContent=r.note||'Nenhuma observação informada.';
   document.getElementById('reservationDetailNoteWrap').classList.toggle('is-empty',!r.note);
   const sel=document.getElementById('reservationDetailStatus'); sel.innerHTML=Object.entries(RES_STATUS).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join(''); sel.value=r.status||'solicitada';
