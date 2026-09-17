@@ -420,6 +420,27 @@ document.getElementById('reservationPrevMonth')?.addEventListener('click',()=>{r
 document.getElementById('reservationNextMonth')?.addEventListener('click',()=>{reservationDetailMonth.setMonth(reservationDetailMonth.getMonth()+1);renderReservationCalendar();});
 document.getElementById('reservationDetailModal')?.addEventListener('click',e=>{if(e.target.id==='reservationDetailModal')closeReservationDetail();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&reservationDetailId)closeReservationDetail();});
+async function syncReservationBlock(id,status){
+  if(!client||!id) return;
+  const reservation=allReservations.find(x=>x.id===id);
+  if(!reservation) return;
+  const activeStatuses=['confirmada','reservada'];
+  const shouldBlock=activeStatuses.includes(status) && reservation.checkin && reservation.checkout && reservation.property_id;
+  const reason=`Reserva automática: ${id}`;
+  if(shouldBlock){
+    const {data:existing,error:findError}=await client.from('season_blocks').select('id').eq('property_id',reservation.property_id).eq('reason',reason).limit(1);
+    if(findError) throw findError;
+    if(!existing?.length){
+      const {data:{user}}=await client.auth.getUser();
+      const {error}=await client.from('season_blocks').insert({property_id:reservation.property_id,start_date:dateKey(reservation.checkin),end_date:dateKey(reservation.checkout),status:'reservada',reason,created_by:user?.id||null});
+      if(error) throw error;
+    }
+  }else{
+    const {error}=await client.from('season_blocks').delete().eq('property_id',reservation.property_id).eq('reason',reason);
+    if(error) throw error;
+  }
+}
+
 async function saveReservationStatus(id,status,btn){
   if(!id||!status||!client)return;
   const original=btn?.textContent||'Salvar status';
@@ -428,6 +449,7 @@ async function saveReservationStatus(id,status,btn){
     const {data,error}=await client.from('season_reservations').update({status,updated_at:new Date().toISOString()}).eq('id',id).select('id,status').maybeSingle();
     if(error) throw error;
     if(!data) throw new Error('A atualização não foi aplicada. Verifique se sua sessão administrativa está ativa e se você tem permissão para atualizar esta reserva.');
+    await syncReservationBlock(id,status);
     if(btn){btn.textContent='Salvo ✓';}
     await refreshReservations();
     const updated=allReservations.find(x=>x.id===id);
@@ -439,7 +461,7 @@ async function saveReservationStatus(id,status,btn){
     setTimeout(()=>{if(btn)btn.textContent=original;},1200);
   }catch(error){
     if(btn){btn.disabled=false;btn.textContent=original;}
-    alert(error?.message||'Não foi possível salvar o status.');
+    alert(error?.message||'Não foi possível salvar o status. A reserva não foi considerada bloqueada até a operação ser concluída.');
   }finally{
     if(btn&&btn.textContent==='Salvando…')btn.disabled=false;
   }

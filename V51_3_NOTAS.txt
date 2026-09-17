@@ -1,0 +1,8 @@
+AELO Imóveis — V51.3
+
+Gestão de reservas:
+- Ao marcar uma reserva como Confirmada ou Reservada, o sistema cria automaticamente um bloqueio do período no imóvel.
+- O bloqueio automático aparece no calendário público e impede novas solicitações para o período.
+- Ao cancelar ou concluir a reserva, o bloqueio automático correspondente é removido.
+- Bloqueios manuais existentes não são removidos, pois o sistema identifica os bloqueios automáticos pelo motivo interno da reserva.
+- Mantidos layout, tablet, fluxo público, Leads e Supabase sem alterações estruturais.
