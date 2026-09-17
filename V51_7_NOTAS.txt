@@ -1,0 +1,4 @@
+
+V51.7 NOTAS
+- Correção do cache-buster do admin.js para garantir carregamento da lógica atual da Central de Reservas.
+- Mantidos cálculo de valor, calendário e bloqueios da V51.6.
