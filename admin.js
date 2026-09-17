@@ -390,7 +390,7 @@ async function openReservationDetail(id){
 async function loadReservationBlocks(propertyId){
   reservationBlocks=[];
   if(!propertyId||!client)return;
-  const {data}=await client.from('season_blocks').select('start_date,end_date,reason').eq('property_id',propertyId).limit(200);
+  const {data}=await client.from('season_blocks').select('start_date,end_date,status').eq('property_id',propertyId).limit(200);
   reservationBlocks=data||[];
 }
 function closeReservationDetail(){
@@ -410,7 +410,7 @@ function renderReservationCalendar(){
     const block=reservationBlocks.find(x=>inRange(key,x.start_date,x.end_date));
     const selected=current&&inRange(key,current.checkin,current.checkout);
     const outside=d.getMonth()!==m; const classes=['reservation-day']; if(outside)classes.push('is-outside'); if(selected)classes.push('is-selected'); if(other)classes.push('is-busy'); if(block)classes.push('is-blocked'); if(key===dateKey(current?.checkin))classes.push('is-checkin'); if(key===dateKey(current?.checkout))classes.push('is-checkout');
-    let titleText='Disponível'; if(block)titleText=block.reason?`Bloqueado: ${block.reason}`:'Bloqueado'; if(other)titleText=`${RES_STATUS[other.status]?.label||'Ocupado'} — ${other.guest_name||'Outra reserva'}`; if(selected)titleText='Período desta solicitação';
+    let titleText='Disponível'; if(block)titleText=block.status==='reservado'?'Reservado':'Bloqueado'; if(other)titleText=`${RES_STATUS[other.status]?.label||'Ocupado'} — ${other.guest_name||'Outra reserva'}`; if(selected)titleText='Período desta solicitação';
     cells.push(`<button type="button" class="${classes.join(' ')}" title="${escapeHtml(titleText)}" ${outside?'tabindex="-1"':''}><span>${d.getDate()}</span>${selected?'<i>•</i>':''}</button>`);
   }
   grid.innerHTML=cells.join('');
@@ -426,17 +426,17 @@ async function syncReservationBlock(id,status){
   if(!reservation) return;
   const activeStatuses=['confirmada','reservada'];
   const shouldBlock=activeStatuses.includes(status) && reservation.checkin && reservation.checkout && reservation.property_id;
-  const reason=`Reserva automática: ${id}`;
+  const startDate=dateKey(reservation.checkin), endDate=dateKey(reservation.checkout);
   if(shouldBlock){
-    const {data:existing,error:findError}=await client.from('season_blocks').select('id').eq('property_id',reservation.property_id).eq('reason',reason).limit(1);
+    const {data:existing,error:findError}=await client.from('season_blocks').select('id').eq('property_id',reservation.property_id).eq('start_date',startDate).eq('end_date',endDate).eq('status','reservado').limit(1);
     if(findError) throw findError;
     if(!existing?.length){
       const {data:{user}}=await client.auth.getUser();
-      const {error}=await client.from('season_blocks').insert({property_id:reservation.property_id,start_date:dateKey(reservation.checkin),end_date:dateKey(reservation.checkout),status:'reservada',reason,created_by:user?.id||null});
+      const {error}=await client.from('season_blocks').insert({property_id:reservation.property_id,start_date:startDate,end_date:endDate,status:'reservado',created_by:user?.id||null});
       if(error) throw error;
     }
   }else{
-    const {error}=await client.from('season_blocks').delete().eq('property_id',reservation.property_id).eq('reason',reason);
+    const {error}=await client.from('season_blocks').delete().eq('property_id',reservation.property_id).eq('start_date',startDate).eq('end_date',endDate).eq('status','reservado');
     if(error) throw error;
   }
 }

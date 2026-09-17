@@ -1,0 +1,1 @@
+V51.4 – Corrige erro column season_blocks.reason does not exist. O calendário agora usa apenas colunas existentes (start_date, end_date, status) e o bloqueio automático não depende de reason.
