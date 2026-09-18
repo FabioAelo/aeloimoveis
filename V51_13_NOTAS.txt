@@ -1,0 +1,5 @@
+AELO Imóveis V51.13
+- Corrigido o fluxo do Assistente: Terreno não pergunta quartos.
+- Mantida a proteção: somente reservas marcadas como teste podem ser excluídas.
+- Migração SQL idempotente em aeolo_v51_13_supabase.sql.
+- Cache atualizado para 51.13.
