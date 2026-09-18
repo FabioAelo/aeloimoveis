@@ -1,0 +1,9 @@
+AELO Imóveis V52.0
+- Assistente de temporada com adultos, crianças e bebês.
+- Pergunta sobre pet, quantidade e porte.
+- Pergunta sobre fumante.
+- Dados gravados em season_reservations.
+- Central de Reservas mostra composição e preferências do hóspede.
+- Assistente desktop mantido amplo.
+- Terreno não pergunta quartos.
+- Ícone de temporada em calendário no padrão visual AELO.

@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=51.12">
+<link rel="stylesheet" href="admin.css?v=52.0">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -165,7 +165,7 @@
         <div class="reservation-detail-grid">
           <div><small>Hóspede</small><b id="reservationGuestName">—</b></div><div><small>WhatsApp</small><b id="reservationGuestPhone">—</b></div>
           <div><small>Check-in</small><b id="reservationCheckin">—</b></div><div><small>Check-out</small><b id="reservationCheckout">—</b></div>
-          <div><small>Hóspedes</small><b id="reservationGuests">—</b></div><div><small>Valor estimado</small><b id="reservationTotal">—</b></div>
+          <div><small>Hóspedes</small><b id="reservationGuests">—</b></div><div><small>Valor estimado</small><b id="reservationTotal">—</b></div><div class="reservation-detail-guest-profile"><small>Composição / preferências</small><b id="reservationGuestProfile">—</b></div>
         </div>
         <div class="reservation-detail-note" id="reservationDetailNoteWrap"><small>Observação</small><p id="reservationDetailNote">—</p></div>
         <label class="reservation-detail-status"><span>Status da solicitação</span><select id="reservationDetailStatus"></select></label>
@@ -175,7 +175,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=51.13"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=52.0"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
