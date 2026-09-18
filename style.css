@@ -453,3 +453,12 @@ footer{background:#050607}
     top:14px!important;
   }
 }
+
+/* V51.12 — assistente mais confortável no desktop */
+@media (min-width: 701px){
+  .aelo-chat{width:min(520px,calc(100vw - 40px))!important;height:min(720px,calc(100vh - 95px))!important;}
+  .aelo-chat-messages{padding:20px 18px 12px!important;}
+  .aelo-chat-msg{font-size:14.5px!important;line-height:1.5!important;padding:12px 14px!important;}
+  .aelo-chat-quick{padding:12px 15px!important;gap:8px!important;}
+  .aelo-chat-quick button{font-size:12.5px!important;padding:9px 12px!important;}
+}

@@ -332,17 +332,32 @@ function setMarkedTestReservations(ids){localStorage.setItem(TEST_RESERVATION_KE
 function isTestReservation(r){
   if(!r) return false;
   const hay=[r.guest_name,r.note].filter(Boolean).join(' ').toLowerCase();
-  return getMarkedTestReservations().includes(r.id) || hay.includes('teste');
+  return r.is_test===true || getMarkedTestReservations().includes(r.id) || hay.includes('teste');
 }
-function markReservationAsTest(id){const ids=getMarkedTestReservations();if(!ids.includes(id)){ids.push(id);setMarkedTestReservations(ids)};renderReservations();if(reservationDetailId===id)renderReservationDetailTestActions();}
-function unmarkReservationAsTest(id){setMarkedTestReservations(getMarkedTestReservations().filter(x=>x!==id));renderReservations();if(reservationDetailId===id)renderReservationDetailTestActions();}
+async function markReservationAsTest(id){
+  const r=allReservations.find(x=>x.id===id); if(!r||!client)return;
+  const {error}=await client.from('season_reservations').update({is_test:true}).eq('id',id);
+  if(error){alert(`Não foi possível marcar como teste: ${error.message}`);return;}
+  const ids=getMarkedTestReservations();if(!ids.includes(id)){ids.push(id);setMarkedTestReservations(ids)};r.is_test=true;renderReservations();if(reservationDetailId===id)renderReservationDetailTestActions();
+}
+async function unmarkReservationAsTest(id){
+  const r=allReservations.find(x=>x.id===id); if(!r||!client)return;
+  if(!confirm('Remover a marca de TESTE deste registro? Ele deixará de poder ser excluído como teste.')) return;
+  const {error}=await client.from('season_reservations').update({is_test:false}).eq('id',id);
+  if(error){alert(`Não foi possível remover a marca: ${error.message}`);return;}
+  setMarkedTestReservations(getMarkedTestReservations().filter(x=>x!==id));r.is_test=false;renderReservations();if(reservationDetailId===id)renderReservationDetailTestActions();
+}
 async function deleteTestReservation(id){
   const r=allReservations.find(x=>x.id===id); if(!r||!isTestReservation(r)) return;
   const label=`${r.guest_name||'sem nome'} — ${reservationDate(r.checkin)} → ${reservationDate(r.checkout)}`;
   if(!confirm(`Excluir SOMENTE o registro de TESTE?\n\n${label}\n\nA reserva e o bloqueio automático deste teste serão removidos. O Lead será mantido. Reservas reais não são afetadas.`)) return;
-  const {data:deleted,error}=await client.from('season_reservations').delete().eq('id',id).select('id').maybeSingle();
+  // Converte a antiga marca local em marca persistente no banco antes de excluir.
+  if(!r.is_test){
+    const {error:markError}=await client.from('season_reservations').update({is_test:true}).eq('id',id);
+    if(markError){alert(`Não foi possível preparar a exclusão segura do teste: ${markError.message}`);return;}
+  }
+  const {error}=await client.from('season_reservations').delete().eq('id',id).eq('is_test',true);
   if(error){alert(`Não foi possível excluir o teste: ${error.message}`);return;}
-  if(!deleted){alert('O registro de teste não foi excluído. A sessão administrativa pode não ter permissão para apagar esta reserva.');return;}
   if(r.property_id&&r.checkin&&r.checkout){
     const {error:blockError}=await client.from('season_blocks').delete().eq('property_id',r.property_id).eq('start_date',dateKey(r.checkin)).eq('end_date',dateKey(r.checkout)).eq('status','reservado');
     if(blockError) console.warn('bloqueio do teste não removido',blockError);
@@ -352,6 +367,7 @@ async function deleteTestReservation(id){
   if(reservationDetailId===id) closeReservationDetail();
   renderReservations();
   await refreshReservations();
+  if(allReservations.some(x=>x.id===id)) alert('O teste ainda está no banco. Verifique a política de exclusão no Supabase.');
 }
 function renderReservationDetailTestActions(){
   const box=document.getElementById('reservationDetailTestActions'); if(!box)return;

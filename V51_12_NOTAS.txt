@@ -1,0 +1,9 @@
+AELO Imóveis — V51.12
+
+- Corrige Assistente AELO: Terreno não pergunta quartos.
+- Troca referências de Fábio por "o corretor" no atendimento.
+- Aumenta o assistente no desktop.
+- Ícone de calendário da Temporada usa SVG de linha compatível com os demais ícones.
+- Marca de teste passa a ser persistida em season_reservations.is_test.
+- Exclusão de teste exige is_test=true e proprietário autenticado; reserva real fica protegida.
+- Migração SQL: aeolo_v51_12_migracao.sql
