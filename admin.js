@@ -42,7 +42,7 @@ const SALE_STAGES=[
 ];
 function defaultSaleChecklist(){return SALE_STAGES.map(s=>({stage:s.id,label:s.label,tasks:s.tasks.map(t=>({label:t,done:false}))}));}
 function saleChecklistStats(checklist){const all=(checklist||[]).flatMap(s=>s.tasks||[]);const done=all.filter(t=>t.done).length;return {total:all.length,done,percent:all.length?Math.round(done/all.length*100):0};}
-let saleProcesses=[]; let saleProperties=[];
+let saleProcesses=[]; let saleProperties=[]; let saleSaveNotice='';
 function saleStatusMeta(s){return s==='concluido'?['Concluído','done']:s==='pausado'?['Pausado','paused']:s==='cancelado'?['Cancelado','cancelled']:['Em andamento','active'];}
 function saleMoney(v){return v==null||v===''?'—':Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
 function renderSalePropertyOptions(){const el=$('salePropertySelect');if(!el)return;el.innerHTML='<option value="">Selecione o imóvel</option>'+saleProperties.map(p=>`<option value="${p.id}">${escapeHtml(p.title)}${p.location?' — '+escapeHtml(p.location):''}</option>`).join('');}
@@ -52,14 +52,87 @@ function renderSaleProcessList(){const box=$('saleProcessList'),count=$('salePro
 async function loadSaleProcesses(){if(!client)return;const {data,error}=await client.from('sale_processes').select('*,property:properties(id,title,location)').order('updated_at',{ascending:false});if(error){$('saleProcessList').innerHTML=`<div class="sale-empty">Não foi possível carregar os processos: ${escapeHtml(error.message)}<br><small>Verifique se a tabela <b>sale_processes</b> foi exposta na Data API.</small></div>`;return;}saleProcesses=data||[];renderSaleProcessList();}
 function clearSaleForm(){$('saleProcessId').value='';$('salePropertySelect').value='';$('saleResponsibleName').value='';$('saleBuyerName').value='';$('saleBuyerWhatsapp').value='';$('saleBuyerEmail').value='';$('salePartnerSelect').value='';$('saleAskingPrice').value='';$('saleOfferPrice').value='';$('saleFinancing').checked=false;$('saleExchange').checked=false;$('saleNotes').value='';}
 function openNewSaleProcess(){clearSaleForm();$('saleProcessForm').classList.remove('hidden-section');$('saleProcessDetail').classList.add('hidden-section');$('saleProcessMsg').textContent='';$('salePropertySelect')?.focus();}
-function renderSaleDetail(p){const box=$('saleProcessDetail');if(!box)return;const stats=saleChecklistStats(p.checklist),st=saleStatusMeta(p.status);const current=SALE_STAGES.findIndex(s=>s.id===p.current_stage);box.classList.remove('hidden-section');box.innerHTML=`<div class="sale-detail-head"><div><h3>${escapeHtml(p.property?.title||'Imóvel')}</h3><div class="sale-detail-meta"><span>${escapeHtml(p.property?.location||'')}</span><span>•</span><span>Comprador: ${escapeHtml(p.buyer_name||'não informado')}</span></div></div><span class="sale-status ${st[1]}">${st[0]}</span></div><div class="sale-detail-kpis"><div><small>Progresso</small><b>${stats.percent}%</b></div><div><small>Valor anunciado</small><b>${saleMoney(p.asking_price)}</b></div><div><small>Proposta</small><b>${saleMoney(p.offer_price)}</b></div><div><small>Responsável</small><b>${escapeHtml(p.responsible_name||'AELO')}</b></div></div><div class="sale-stage-progress">${SALE_STAGES.slice(0,7).map((s,i)=>`<div class="sale-stage-step ${i<current?'done ':''}${i===current?'current':''}">${escapeHtml(s.label)}</div>`).join('')}</div><div class="sale-checklist">${(p.checklist||[]).map((stage,si)=>`<section class="sale-stage-card"><header><strong>${si+1}. ${escapeHtml(stage.label)}</strong><span>${(stage.tasks||[]).filter(t=>t.done).length}/${(stage.tasks||[]).length} concluídas</span></header>${(stage.tasks||[]).map((task,ti)=>`<div class="sale-task ${task.done?'done':''}"><input type="checkbox" data-sale-task="${si}:${ti}" ${task.done?'checked':''}><label>${escapeHtml(task.label)}</label></div>`).join('')}</section>`).join('')}</div><div class="sale-detail-actions"><select id="saleDetailStatus" style="max-width:180px"><option value="em_andamento" ${p.status==='em_andamento'?'selected':''}>Em andamento</option><option value="pausado" ${p.status==='pausado'?'selected':''}>Pausado</option><option value="concluido" ${p.status==='concluido'?'selected':''}>Concluído</option><option value="cancelado" ${p.status==='cancelado'?'selected':''}>Cancelado</option></select><button type="button" class="primary" id="saveSaleChecklist">Salvar checklist</button><button type="button" class="ghost" id="closeSaleDetail">Fechar</button></div>`;
-box.querySelectorAll('[data-sale-task]').forEach(el=>el.addEventListener('change',()=>{const [si,ti]=el.dataset.saleTask.split(':').map(Number);p.checklist[si].tasks[ti].done=el.checked;p.current_stage=firstIncompleteSaleStage(p.checklist);renderSaleDetail(p);}));
-$('saveSaleChecklist').onclick=async()=>{const status=$('saleDetailStatus').value;const completed=saleChecklistStats(p.checklist).percent===100;const payload={checklist:p.checklist,current_stage:firstIncompleteSaleStage(p.checklist),status,closed_at:(status==='concluido'||completed)?(p.closed_at||new Date().toISOString()):null};const {error}=await client.from('sale_processes').update(payload).eq('id',p.id);if(error){alert(error.message);return;}await loadSaleProcesses();openSaleProcess(p.id);};
-$('closeSaleDetail').onclick=()=>box.classList.add('hidden-section');
+function renderSaleDetail(p){
+  const box=$('saleProcessDetail');
+  if(!box)return;
+  const stats=saleChecklistStats(p.checklist),st=saleStatusMeta(p.status);
+  const current=SALE_STAGES.findIndex(s=>s.id===p.current_stage);
+  const notice=saleSaveNotice;
+  saleSaveNotice='';
+  box.classList.remove('hidden-section');
+  const property=p.property||{};
+  const stageNav=SALE_STAGES.map((s,i)=>{
+    const stage=(p.checklist||[]).find(x=>x.stage===s.id);
+    const done=(stage?.tasks||[]).filter(t=>t.done).length;
+    const total=(stage?.tasks||[]).length;
+    return `<button type="button" class="sale-stage-nav ${i===current?'current':''} ${total&&done===total?'done':''}" data-sale-stage="${escapeHtml(s.id)}"><span>${i+1}. ${escapeHtml(s.label)}</span><b>${done}/${total}</b></button>`;
+  }).join('');
+  const stagesHtml=(p.checklist||[]).map((stage,si)=>`<section class="sale-stage-card" id="sale-stage-${escapeHtml(stage.stage)}"><header><strong>${si+1}. ${escapeHtml(stage.label)}</strong><span>${(stage.tasks||[]).filter(t=>t.done).length}/${(stage.tasks||[]).length} concluídas</span></header>${(stage.tasks||[]).map((task,ti)=>`<div class="sale-task ${task.done?'done':''}"><input type="checkbox" data-sale-task="${si}:${ti}" ${task.done?'checked':''}><label>${escapeHtml(task.label)}</label>${task.done?'<span class="sale-task-ok">✓</span>':''}</div>`).join('')}</section>`).join('');
+  box.innerHTML=`
+    ${notice?`<div class="sale-save-success" role="status">✓ ${escapeHtml(notice)}</div>`:''}
+    <div class="sale-fixed-header">
+      <div class="sale-property-header">
+        <div class="sale-property-identity">
+          <div>
+            <p class="eyebrow">PROCESSO DE VENDA</p>
+            <h3>${escapeHtml(property.title||'Imóvel')}</h3>
+            <div class="sale-detail-meta"><span>${escapeHtml(property.location||'')}</span><span>•</span><span>Comprador: ${escapeHtml(p.buyer_name||'não informado')}</span></div>
+          </div>
+          <span class="sale-status ${st[1]}">${st[0]}</span>
+        </div>
+        <div class="sale-detail-kpis">
+          <div><small>Progresso</small><b>${stats.percent}%</b><i class="sale-kpi-progress"><em style="width:${stats.percent}%"></em></i></div>
+          <div><small>Valor anunciado</small><b>${saleMoney(p.asking_price)}</b></div>
+          <div><small>Proposta</small><b>${saleMoney(p.offer_price)}</b></div>
+          <div><small>Responsável</small><b>${escapeHtml(p.responsible_name||'AELO')}</b></div>
+        </div>
+        <div class="sale-stage-progress">${SALE_STAGES.slice(0,7).map((s,i)=>`<div class="sale-stage-step ${i<current?'done ':''}${i===current?'current':''}">${escapeHtml(s.label)}</div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="sale-scroll-workspace">
+      <aside class="sale-stage-sidebar">
+        <div class="sale-sidebar-title">ETAPAS DA VENDA</div>
+        <div class="sale-stage-nav-list">${stageNav}</div>
+      </aside>
+      <main class="sale-checklist-scroll">
+        <div class="sale-checklist-inner">
+          <div class="sale-checklist-top"><div><strong>Checklist da venda</strong><span>${stats.done} de ${stats.total} tarefas concluídas</span></div><span class="sale-status ${st[1]}">${st[0]}</span></div>
+          <div class="sale-checklist">${stagesHtml}</div>
+          <div class="sale-detail-actions sale-detail-actions-sticky-end">
+            <select id="saleDetailStatus" style="max-width:180px"><option value="em_andamento" ${p.status==='em_andamento'?'selected':''}>Em andamento</option><option value="pausado" ${p.status==='pausado'?'selected':''}>Pausado</option><option value="concluido" ${p.status==='concluido'?'selected':''}>Concluído</option><option value="cancelado" ${p.status==='cancelado'?'selected':''}>Cancelado</option></select>
+            <button type="button" class="primary" id="saveSaleChecklist">Salvar checklist</button>
+            <button type="button" class="ghost" id="closeSaleDetail">Fechar</button>
+          </div>
+        </div>
+      </main>
+    </div>`;
+  box.querySelectorAll('[data-sale-task]').forEach(el=>el.addEventListener('change',()=>{
+    const [si,ti]=el.dataset.saleTask.split(':').map(Number);
+    p.checklist[si].tasks[ti].done=el.checked;
+    p.current_stage=firstIncompleteSaleStage(p.checklist);
+    renderSaleDetail(p);
+  }));
+  box.querySelectorAll('[data-sale-stage]').forEach(el=>el.addEventListener('click',()=>{
+    const target=box.querySelector('#sale-stage-'+el.dataset.saleStage);
+    if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}
+  }));
+  $('saveSaleChecklist').onclick=async()=>{
+    const btn=$('saveSaleChecklist');
+    const status=$('saleDetailStatus').value;
+    const completed=saleChecklistStats(p.checklist).percent===100;
+    const payload={checklist:p.checklist,current_stage:firstIncompleteSaleStage(p.checklist),status,closed_at:(status==='concluido'||completed)?(p.closed_at||new Date().toISOString()):null};
+    if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Salvando...';}
+    const {error}=await client.from('sale_processes').update(payload).eq('id',p.id);
+    if(error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Salvar checklist';}alert(error.message);return;}
+    saleSaveNotice='Checklist e status salvos com sucesso.';
+    await loadSaleProcesses();
+    openSaleProcess(p.id);
+  };
+  $('closeSaleDetail').onclick=()=>box.classList.add('hidden-section');
 }
 function firstIncompleteSaleStage(checklist){for(const stage of checklist||[]){if((stage.tasks||[]).some(t=>!t.done))return stage.stage;}return 'conclusao';}
 async function openSaleProcess(id){const p=saleProcesses.find(x=>x.id===id);if(p)renderSaleDetail(p);else{const {data}=await client.from('sale_processes').select('*,property:properties(id,title,location)').eq('id',id).single();if(data)renderSaleDetail(data);}}
-async function saveSaleProcess(){const propertyId=$('salePropertySelect').value;if(!propertyId){$('saleProcessMsg').textContent='Selecione o imóvel.';return;}const payload={property_id:propertyId,buyer_name:$('saleBuyerName').value.trim()||null,buyer_whatsapp:$('saleBuyerWhatsapp').value.trim()||null,buyer_email:$('saleBuyerEmail').value.trim()||null,responsible_name:$('saleResponsibleName').value.trim()||null,partner_broker_id:$('salePartnerSelect').value||null,asking_price:Number($('saleAskingPrice').value||0)||null,offer_price:Number($('saleOfferPrice').value||0)||null,financing:$('saleFinancing').checked,exchange_property:$('saleExchange').checked,notes:$('saleNotes').value.trim()||null};const id=$('saleProcessId').value;let result;if(id)result=await client.from('sale_processes').update(payload).eq('id',id);else{payload.checklist=defaultSaleChecklist();payload.current_stage='captacao';result=await client.from('sale_processes').insert(payload);}if(result.error){$('saleProcessMsg').textContent=result.error.message;return;}$('saleProcessMsg').textContent=id?'Processo atualizado.':'Processo criado.';$('saleProcessForm').classList.add('hidden-section');await loadSaleProcesses();}
+async function saveSaleProcess(){const btn=$('saveSaleProcess');const propertyId=$('salePropertySelect').value;if(!propertyId){$('saleProcessMsg').textContent='Selecione o imóvel.';return;}if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Salvando...';}const payload={property_id:propertyId,buyer_name:$('saleBuyerName').value.trim()||null,buyer_whatsapp:$('saleBuyerWhatsapp').value.trim()||null,buyer_email:$('saleBuyerEmail').value.trim()||null,responsible_name:$('saleResponsibleName').value.trim()||null,partner_broker_id:$('salePartnerSelect').value||null,asking_price:Number($('saleAskingPrice').value||0)||null,offer_price:Number($('saleOfferPrice').value||0)||null,financing:$('saleFinancing').checked,exchange_property:$('saleExchange').checked,notes:$('saleNotes').value.trim()||null};const id=$('saleProcessId').value;let result;if(id)result=await client.from('sale_processes').update(payload).eq('id',id);else{payload.checklist=defaultSaleChecklist();payload.current_stage='captacao';result=await client.from('sale_processes').insert(payload);}if(result.error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Salvar processo';}$('saleProcessMsg').textContent=result.error.message;return;}if(btn){btn.textContent='✓ Salvo';}saleSaveNotice=id?'Processo atualizado com sucesso.':'Processo criado com sucesso.';$('saleProcessMsg').textContent=saleSaveNotice;$('saleProcessForm').classList.add('hidden-section');await loadSaleProcesses();}
 function initSaleProcesses(){$('newSaleProcess')?.addEventListener('click',openNewSaleProcess);$('cancelSaleProcess')?.addEventListener('click',()=>{$('saleProcessForm').classList.add('hidden-section');clearSaleForm();});$('saveSaleProcess')?.addEventListener('click',saveSaleProcess);$('refreshSaleProcesses')?.addEventListener('click',async()=>{await loadSaleProperties();await loadSaleProcesses();});loadSaleProperties();loadSaleProcesses();}
 function commercialLabel(p){
   const s=p.commercial_status||'disponivel';

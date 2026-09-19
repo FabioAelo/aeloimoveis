@@ -400,3 +400,45 @@ body.reservation-detail-open{overflow:hidden}
 .sale-process-detail{border:1px solid #dfe4e9;background:#fff;margin-top:14px;padding:18px}.sale-detail-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:1px solid #e8ebee;padding-bottom:13px}.sale-detail-head h3{margin:0;font:700 22px/1.1 "Playfair Display",Georgia,serif;color:#0d2740}.sale-detail-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}.sale-detail-meta span{font-size:10px;color:#667384}.sale-detail-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.sale-detail-kpis>div{border:1px solid #e5e8ec;padding:10px;background:#fcfcfc}.sale-detail-kpis small{display:block;color:#8a929d;font-size:8px;text-transform:uppercase;letter-spacing:.08em}.sale-detail-kpis b{display:block;margin-top:3px;color:#0d2740;font-size:13px}.sale-stage-progress{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 16px}.sale-stage-step{padding:9px;border:1px solid #e1e5ea;background:#fafbfc;border-radius:6px;font-size:9px;color:#667384;text-align:center}.sale-stage-step.current{border-color:#d8a12b;background:#fff8e7;color:#6e4d0a;font-weight:800}.sale-stage-step.done{border-color:#bfe1c9;background:#f3faf5;color:#26723e}.sale-checklist{display:grid;gap:10px}.sale-stage-card{border:1px solid #e4e8ec;background:#fff}.sale-stage-card>header{padding:11px 13px;background:#fbfbfb;border-bottom:1px solid #e4e8ec;display:flex;justify-content:space-between;gap:10px}.sale-stage-card>header strong{font-size:12px;color:#0d2740}.sale-stage-card>header span{font-size:9px;color:#7b8793}.sale-task{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:9px 12px;border-bottom:1px solid #f0f2f4;align-items:start}.sale-task:last-child{border-bottom:0}.sale-task input{margin-top:2px;width:auto}.sale-task label{font-size:10.5px;color:#394b5d;line-height:1.45;cursor:pointer}.sale-task.done label{text-decoration:line-through;color:#8a929d}.sale-detail-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.sale-empty{padding:18px;text-align:center;border:1px dashed #d8dee5;color:#7b8793;font-size:11px}
 @media(max-width:800px){.sale-form-grid{grid-template-columns:1fr 1fr}.sale-detail-kpis{grid-template-columns:1fr 1fr}.sale-stage-progress{grid-template-columns:1fr 1fr}.sale-process-row{grid-template-columns:1fr}.sale-process-actions{justify-content:flex-start}}
 @media(max-width:600px){.sales-process-manager{padding:14px}.sales-process-head{display:block}.sales-process-head .primary{margin-top:12px;width:100%}.sale-form-grid{grid-template-columns:1fr}.sale-form-grid .full{grid-column:auto}.sale-check{padding-top:0}.sale-form-actions{flex-direction:column}.sale-form-actions button{width:100%}.sale-detail-head{display:block}.sale-detail-kpis{grid-template-columns:1fr 1fr}.sale-stage-progress{grid-template-columns:1fr 1fr}}
+
+.sale-save-success{display:flex;align-items:center;gap:8px;padding:11px 13px;margin-bottom:14px;border:1px solid #bfe1c9;background:#f1faf4;color:#26723e;font-size:11px;font-weight:800;border-radius:6px}.sale-detail-actions button:disabled{opacity:.72;cursor:wait}.sale-detail-actions #saveSaleChecklist{min-width:150px}.sale-form-actions button:disabled{opacity:.72;cursor:wait}.sale-form-actions #saveSaleProcess{min-width:145px}
+
+/* V52.4 — Processo de venda: cabeçalho fixo + checklist com rolagem independente */
+.sale-process-detail{padding:0;overflow:hidden;position:relative;background:#fff}
+.sale-fixed-header{position:relative;z-index:3;background:#fff;border-bottom:1px solid #e2e6ea;box-shadow:0 4px 14px rgba(13,39,64,.05)}
+.sale-property-header{padding:18px 20px 12px}
+.sale-property-identity{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.sale-property-identity h3{margin:2px 0 4px;font:700 25px/1.1 "Playfair Display",Georgia,serif;color:#0d2740}
+.sale-property-identity .eyebrow{margin:0;color:#c58e1e;font-size:10px;font-weight:800;letter-spacing:.16em}
+.sale-detail-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 12px}
+.sale-detail-kpis>div{border:1px solid #e5e8ec;padding:10px;background:#fcfcfc;min-width:0}
+.sale-detail-kpis small{display:block;color:#8a929d;font-size:8px;text-transform:uppercase;letter-spacing:.08em}
+.sale-detail-kpis b{display:block;margin-top:3px;color:#0d2740;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sale-kpi-progress{display:block;height:5px;background:#edf0f3;border-radius:99px;overflow:hidden;margin-top:7px}
+.sale-kpi-progress em{display:block;height:100%;background:#c99a2e}
+.sale-stage-progress{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:8px 0 0}
+.sale-stage-step{padding:8px;border:1px solid #e1e5ea;background:#fafbfc;border-radius:6px;font-size:9px;color:#667384;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sale-stage-step.current{border-color:#d8a12b;background:#fff8e7;color:#6e4d0a;font-weight:800}
+.sale-stage-step.done{border-color:#bfe1c9;background:#f3faf5;color:#26723e}
+.sale-scroll-workspace{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:620px;height:70vh;max-height:780px}
+.sale-stage-sidebar{border-right:1px solid #e4e8ec;background:#fbfcfd;padding:16px 10px;overflow-y:auto}
+.sale-sidebar-title{padding:0 10px 10px;color:#7b8793;font-size:10px;font-weight:800;letter-spacing:.08em}
+.sale-stage-nav-list{display:grid;gap:4px}
+.sale-stage-nav{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid transparent;background:transparent;border-radius:6px;padding:10px 10px;text-align:left;color:#42566a;font-size:11px;cursor:pointer}
+.sale-stage-nav b{font-size:9px;color:#8a929d;white-space:nowrap}
+.sale-stage-nav:hover{background:#f2f5f7}
+.sale-stage-nav.current{background:#fff7e5;border-color:#ead39a;color:#6e4d0a;font-weight:800}
+.sale-stage-nav.done{color:#26723e}
+.sale-stage-nav.done b{color:#26723e}
+.sale-checklist-scroll{overflow-y:auto;min-width:0;background:#fff}
+.sale-checklist-inner{padding:16px 18px 24px}
+.sale-checklist-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #edf0f2}
+.sale-checklist-top strong{display:block;color:#0d2740;font-size:13px}
+.sale-checklist-top span:not(.sale-status){display:block;color:#7b8793;font-size:10px;margin-top:3px}
+.sale-stage-card{scroll-margin-top:10px;margin-bottom:10px}
+.sale-task{grid-template-columns:22px 1fr 22px}
+.sale-task-ok{width:18px;height:18px;border-radius:50%;background:#48a96a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.sale-detail-actions-sticky-end{padding-top:14px;border-top:1px solid #e8ebee;margin-top:14px;position:sticky;bottom:0;background:rgba(255,255,255,.96);z-index:2;padding-bottom:4px}
+.sale-save-success{margin:12px 18px 0;padding:10px 12px;background:#eff9f2;border:1px solid #bfe1c9;color:#26723e;border-radius:6px;font-size:11px;font-weight:700}
+@media(max-width:900px){.sale-scroll-workspace{grid-template-columns:190px 1fr}.sale-stage-progress{grid-template-columns:repeat(4,minmax(0,1fr))}.sale-detail-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.sale-property-header{padding:14px}.sale-property-identity{display:block}.sale-property-identity .sale-status{margin-top:8px}.sale-stage-progress{grid-template-columns:1fr 1fr}.sale-scroll-workspace{display:block;height:auto;max-height:none}.sale-stage-sidebar{border-right:0;border-bottom:1px solid #e4e8ec;max-height:220px}.sale-checklist-scroll{max-height:65vh}.sale-checklist-inner{padding:12px}.sale-detail-kpis{grid-template-columns:1fr 1fr}.sale-detail-actions-sticky-end{position:static}}
