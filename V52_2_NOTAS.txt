@@ -1,0 +1,20 @@
+AELO IMOVEIS V52.2
+
+NOVO MODULO: PROCESSOS DE VENDA
+- Cadastro de uma venda vinculado ao imovel.
+- Comprador, WhatsApp, e-mail, responsavel e corretor parceiro.
+- Valor anunciado e valor de proposta.
+- Indicacao de financiamento e permuta.
+- Checklist completo em 13 etapas, da captacao a conclusao.
+- Barra de progresso e etapa atual.
+- Status: Em andamento, Pausado, Concluido, Cancelado.
+- Detalhamento de tarefas e salvamento do checklist.
+- Nao altera a Central de Reservas.
+
+CORRECAO V52.2
+- Integracao de Corretores Parceiros alinhada ao campo is_active criado no Supabase.
+
+SUPABASE
+- Execute aelo_v52_2_processos_venda.sql no SQL Editor.
+- Depois exponha public.sale_processes na Data API.
+- Nao altere reservas reais nem as tabelas de temporada.

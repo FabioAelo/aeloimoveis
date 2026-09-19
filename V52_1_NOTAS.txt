@@ -1,0 +1,5 @@
+AELO Imóveis V52.1
+- Regras da hospedagem por imóvel: crianças, bebês, pets, porte máximo, fumo, festas/eventos e observações.
+- Assistente valida as regras antes de avançar na solicitação de temporada.
+- Regras são exibidas na ficha de temporada.
+- Mantida a experiência da V52.0.

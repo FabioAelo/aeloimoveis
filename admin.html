@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=52.0">
+<link rel="stylesheet" href="admin.css?v=52.2">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -52,6 +52,35 @@
     </div>
     <p id="partnerMsg" class="msg"></p>
     <div id="partnerList" class="partner-list"><div class="reservation-empty">Carregando corretores...</div></div>
+  </div>
+</div>
+<div class="dashboard-head leads-head collapsible-heading">
+  <button class="section-toggle standalone-toggle" type="button" data-target="salesProcessesContent" aria-expanded="false"><span><b>🤝 Processos de venda</b><small>Checklist completo da captação à entrega do imóvel</small></span><strong class="toggle-chevron">⌄</strong></button>
+</div>
+<div id="salesProcessesContent" class="collapsible-content hidden-section">
+  <div class="sales-process-manager">
+    <div class="sales-process-head"><div><p class="eyebrow">GESTÃO DE VENDAS</p><h2>Processos de venda.</h2><p>Acompanhe cada venda por etapas, pendências, comprador e responsável.</p></div><button type="button" class="primary" id="newSaleProcess">+ Nova venda</button></div>
+    <div id="saleProcessForm" class="sale-process-form hidden-section">
+      <input id="saleProcessId" type="hidden">
+      <div class="sale-form-grid">
+        <label>Imóvel<select id="salePropertySelect"><option value="">Selecione o imóvel</option></select></label>
+        <label>Responsável<input id="saleResponsibleName" type="text" placeholder="Corretor responsável"></label>
+        <label>Comprador<input id="saleBuyerName" type="text" placeholder="Nome do comprador"></label>
+        <label>WhatsApp<input id="saleBuyerWhatsapp" type="tel" placeholder="(71) 99999-9999"></label>
+        <label>E-mail<input id="saleBuyerEmail" type="email" placeholder="comprador@email.com"></label>
+        <label>Corretor parceiro<select id="salePartnerSelect"><option value="">Nenhum / AELO</option></select></label>
+        <label>Valor anunciado<input id="saleAskingPrice" type="number" min="0" step="0.01" placeholder="850000"></label>
+        <label>Valor da proposta<input id="saleOfferPrice" type="number" min="0" step="0.01" placeholder="820000"></label>
+        <label class="sale-check"><input id="saleFinancing" type="checkbox"> Haverá financiamento</label>
+        <label class="sale-check"><input id="saleExchange" type="checkbox"> Haverá permuta</label>
+        <label class="full">Observações<textarea id="saleNotes" rows="3" placeholder="Informações importantes da negociação"></textarea></label>
+      </div>
+      <div class="sale-form-actions"><button type="button" class="primary" id="saveSaleProcess">Salvar processo</button><button type="button" class="ghost" id="cancelSaleProcess">Cancelar</button></div>
+      <p id="saleProcessMsg" class="msg"></p>
+    </div>
+    <div class="sale-process-toolbar"><div><strong>Processos em andamento</strong><span id="saleProcessCount">0 processos</span></div><button type="button" class="ghost" id="refreshSaleProcesses">Atualizar</button></div>
+    <div id="saleProcessList" class="sale-process-list"><div class="reservation-empty">Carregando processos...</div></div>
+    <div id="saleProcessDetail" class="sale-process-detail hidden-section"></div>
   </div>
 </div>
 <div class="dashboard-head leads-head collapsible-heading">
@@ -117,6 +146,18 @@
       <label>Máximo de hóspedes<input id="maxGuests" type="number" min="1" step="1" placeholder="8"></label>
       <label>Check-in<input id="checkinTime" type="text" placeholder="15h"></label>
       <label>Check-out<input id="checkoutTime" type="text" placeholder="11h"></label>
+      <div class="season-rules-admin full">
+        <div class="season-admin-head"><strong>📋 Regras da hospedagem</strong><span>Defina o que o imóvel aceita para validação automática do Assistente.</span></div>
+        <div class="season-rules-grid">
+          <label class="check"><input id="allowChildren" type="checkbox" checked> Aceita crianças</label>
+          <label class="check"><input id="allowBabies" type="checkbox" checked> Aceita bebês</label>
+          <label class="check"><input id="allowPets" type="checkbox"> Aceita pets</label>
+          <label>Maior porte permitido<select id="maxPetSize"><option value="">Não se aplica</option><option value="Pequeno">Pequeno</option><option value="Médio">Médio</option><option value="Grande">Grande</option></select></label>
+          <label class="check"><input id="allowSmoking" type="checkbox"> Permite fumar</label>
+          <label class="check"><input id="allowParties" type="checkbox"> Permite festas/eventos</label>
+        </div>
+        <label class="full">Regras e observações da hospedagem<textarea id="seasonRulesText" rows="3" placeholder="Ex.: silêncio após 22h; fumar somente na varanda; não são permitidas festas..."></textarea></label>
+      </div>
     </div>
     <label id="propertyCategoryWrap">Tipo de imóvel<select id="propertyCategory"><option value="">Não informado</option><option value="Casa">Casa</option><option value="Apartamento">Apartamento</option><option value="Terreno">Terreno</option><option value="Comercial">Comercial</option><option value="Chácara">Chácara</option><option value="Outro">Outro</option></select></label>
     <label>Quartos<input id="bedrooms" type="number" min="0" value="0"></label>
@@ -175,7 +216,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=52.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=52.2"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
