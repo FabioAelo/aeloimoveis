@@ -164,7 +164,7 @@ function renderProperties(filter = "todos") {
     <article class="property-card" data-id="${p.id}">
       <div class="property-image">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
-        <span class="badge">${p.type === "temporada" ? "TEMPORADA" : p.badge}</span>${p.commercial_status==='vendido'?`<span class="sold-badge">✓ IMÓVEL VENDIDO</span>`:''}
+        <span class="badge">${p.type === "temporada" ? "TEMPORADA" : p.badge}</span>${p.commercial_status==='vendido'?`<span class="commercial-badge sold">🔴 IMÓVEL VENDIDO</span>`:p.commercial_status==='negociacao'?`<span class="commercial-badge negotiation">🟠 EM NEGOCIAÇÃO</span>`:p.commercial_status==='indisponivel'?`<span class="commercial-badge unavailable">⚫ INDISPONÍVEL</span>`:''}
       </div>
       <div class="property-info">
         <h3>${p.title}</h3>
@@ -307,7 +307,7 @@ function openModal(id) {
   window.AELO_CURRENT_PROPERTY = p;
   currentGallery = p.gallery_urls?.length ? p.gallery_urls : [p.image_url];
   currentGalleryIndex = 0;
-  document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : "");
+  document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : p.commercial_status==='negociacao' ? " • EM NEGOCIAÇÃO" : p.commercial_status==='indisponivel' ? " • INDISPONÍVEL" : "");
   document.getElementById("modal-title").textContent = p.title;
   document.getElementById("modal-location").textContent = p.location;
   document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");

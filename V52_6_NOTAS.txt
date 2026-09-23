@@ -1,0 +1,17 @@
+AELO IMÓVEIS — V52.6
+
+Correção do cadastro de imóveis de temporada.
+
+Esta versão mantém as funcionalidades da V52.5 e inclui a migração necessária para os campos de regras de hospedagem usados pelo cadastro:
+- allow_children
+- allow_babies
+- allow_pets
+- max_pet_size
+- allow_smoking
+- allow_parties
+- season_rules
+
+A migração usa ADD COLUMN IF NOT EXISTS e não remove nem altera os dados existentes.
+Após executar o SQL no Supabase, atualizar o navegador com Ctrl+F5 antes de testar o cadastro.
+
+Não altera reservas, leads, processos de venda ou imóveis existentes além de acrescentar as colunas ausentes.

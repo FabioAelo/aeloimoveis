@@ -1,0 +1,9 @@
+AELO IMÓVEIS — V52.5
+
+Integração do Processo de Venda com a situação comercial pública do imóvel.
+
+- Situação do imóvel no processo: Disponível / Em negociação / Vendido / Indisponível.
+- Ao salvar com a etapa de Negociação, pode marcar o imóvel como Em negociação.
+- Ao concluir a venda/checklist, o imóvel pode ser marcado como Vendido.
+- Cards públicos exibem selo de status: Em negociação, Imóvel vendido ou Indisponível.
+- Não requer SQL novo; utiliza commercial_status já existente em properties.

@@ -462,3 +462,9 @@ footer{background:#050607}
   .aelo-chat-quick{padding:12px 15px!important;gap:8px!important;}
   .aelo-chat-quick button{font-size:12.5px!important;padding:9px 12px!important;}
 }
+
+.commercial-badge{position:absolute;left:12px;right:12px;bottom:12px;padding:10px 12px;border-radius:6px;color:#fff;text-align:center;font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 14px rgba(0,0,0,.16)}
+.commercial-badge.sold{background:rgba(180,25,25,.94)}
+.commercial-badge.negotiation{background:rgba(221,137,18,.96)}
+.commercial-badge.unavailable{background:rgba(35,39,45,.94)}
+.property-card:has(.commercial-badge.sold) .price,.property-card:has(.commercial-badge.unavailable) .price{color:#6f7680}

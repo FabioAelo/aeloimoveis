@@ -45,11 +45,22 @@ function saleChecklistStats(checklist){const all=(checklist||[]).flatMap(s=>s.ta
 let saleProcesses=[]; let saleProperties=[]; let saleSaveNotice='';
 function saleStatusMeta(s){return s==='concluido'?['Concluído','done']:s==='pausado'?['Pausado','paused']:s==='cancelado'?['Cancelado','cancelled']:['Em andamento','active'];}
 function saleMoney(v){return v==null||v===''?'—':Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function salePropertyStatusMeta(s){
+  if(s==='vendido') return ['🔴 Imóvel vendido','sold'];
+  if(s==='negociacao') return ['🟠 Em negociação','negotiation'];
+  if(s==='indisponivel') return ['⚫ Indisponível','unavailable'];
+  return ['🟢 Disponível','available'];
+}
+function saleSuggestedPropertyStatus(p,status,currentStage,completed){
+  if(status==='concluido' || completed) return 'vendido';
+  if(currentStage==='negociacao') return 'negociacao';
+  return p.property?.commercial_status || 'disponivel';
+}
 function renderSalePropertyOptions(){const el=$('salePropertySelect');if(!el)return;el.innerHTML='<option value="">Selecione o imóvel</option>'+saleProperties.map(p=>`<option value="${p.id}">${escapeHtml(p.title)}${p.location?' — '+escapeHtml(p.location):''}</option>`).join('');}
 function renderSalePartnerOptions(){const el=$('salePartnerSelect');if(!el)return;const active=partnerBrokers.filter(p=>p.is_active!==false);el.innerHTML='<option value="">Nenhum / AELO</option>'+active.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}${p.creci?' · '+escapeHtml(p.creci):''}</option>`).join('');}
 async function loadSaleProperties(){if(!client)return;const {data,error}=await client.from('properties').select('id,title,location').order('title');if(!error){saleProperties=data||[];renderSalePropertyOptions();}}
 function renderSaleProcessList(){const box=$('saleProcessList'),count=$('saleProcessCount');if(!box)return;if(count)count.textContent=`${saleProcesses.length} ${saleProcesses.length===1?'processo':'processos'}`;if(!saleProcesses.length){box.innerHTML='<div class="sale-empty">Nenhum processo de venda cadastrado. Clique em “+ Nova venda”.</div>';return;}box.innerHTML=saleProcesses.map(p=>{const st=saleStatusMeta(p.status),stats=saleChecklistStats(p.checklist);return `<article class="sale-process-row"><div class="sale-process-main"><strong>${escapeHtml(p.property?.title||'Imóvel')}</strong><span>${escapeHtml(p.buyer_name||'Comprador ainda não informado')} · ${escapeHtml(p.property?.location||'')} · ${stats.done}/${stats.total} tarefas</span><div class="sale-process-progress"><i style="width:${stats.percent}%"></i></div></div><div class="sale-process-actions"><span class="sale-status ${st[1]}">${st[0]}</span><button type="button" class="ghost mini" data-open-sale="${p.id}">Abrir processo</button></div></article>`}).join('');box.querySelectorAll('[data-open-sale]').forEach(b=>b.onclick=()=>openSaleProcess(b.dataset.openSale));}
-async function loadSaleProcesses(){if(!client)return;const {data,error}=await client.from('sale_processes').select('*,property:properties(id,title,location)').order('updated_at',{ascending:false});if(error){$('saleProcessList').innerHTML=`<div class="sale-empty">Não foi possível carregar os processos: ${escapeHtml(error.message)}<br><small>Verifique se a tabela <b>sale_processes</b> foi exposta na Data API.</small></div>`;return;}saleProcesses=data||[];renderSaleProcessList();}
+async function loadSaleProcesses(){if(!client)return;const {data,error}=await client.from('sale_processes').select('*,property:properties(id,title,location,commercial_status,sold_by,partner_name)').order('updated_at',{ascending:false});if(error){$('saleProcessList').innerHTML=`<div class="sale-empty">Não foi possível carregar os processos: ${escapeHtml(error.message)}<br><small>Verifique se a tabela <b>sale_processes</b> foi exposta na Data API.</small></div>`;return;}saleProcesses=data||[];renderSaleProcessList();}
 function clearSaleForm(){$('saleProcessId').value='';$('salePropertySelect').value='';$('saleResponsibleName').value='';$('saleBuyerName').value='';$('saleBuyerWhatsapp').value='';$('saleBuyerEmail').value='';$('salePartnerSelect').value='';$('saleAskingPrice').value='';$('saleOfferPrice').value='';$('saleFinancing').checked=false;$('saleExchange').checked=false;$('saleNotes').value='';}
 function openNewSaleProcess(){clearSaleForm();$('saleProcessForm').classList.remove('hidden-section');$('saleProcessDetail').classList.add('hidden-section');$('saleProcessMsg').textContent='';$('salePropertySelect')?.focus();}
 function renderSaleDetail(p){
@@ -78,7 +89,15 @@ function renderSaleDetail(p){
             <h3>${escapeHtml(property.title||'Imóvel')}</h3>
             <div class="sale-detail-meta"><span>${escapeHtml(property.location||'')}</span><span>•</span><span>Comprador: ${escapeHtml(p.buyer_name||'não informado')}</span></div>
           </div>
-          <span class="sale-status ${st[1]}">${st[0]}</span>
+          <div class="sale-property-status-control">
+            <small>SITUAÇÃO DO IMÓVEL</small>
+            <select id="salePropertyCommercialStatus">
+              <option value="disponivel" ${property.commercial_status==='disponivel'||!property.commercial_status?'selected':''}>🟢 Disponível</option>
+              <option value="negociacao" ${property.commercial_status==='negociacao'?'selected':''}>🟠 Em negociação</option>
+              <option value="vendido" ${property.commercial_status==='vendido'?'selected':''}>🔴 Imóvel vendido</option>
+              <option value="indisponivel" ${property.commercial_status==='indisponivel'?'selected':''}>⚫ Indisponível</option>
+            </select>
+          </div>
         </div>
         <div class="sale-detail-kpis">
           <div><small>Progresso</small><b>${stats.percent}%</b><i class="sale-kpi-progress"><em style="width:${stats.percent}%"></em></i></div>
@@ -120,18 +139,29 @@ function renderSaleDetail(p){
     const btn=$('saveSaleChecklist');
     const status=$('saleDetailStatus').value;
     const completed=saleChecklistStats(p.checklist).percent===100;
-    const payload={checklist:p.checklist,current_stage:firstIncompleteSaleStage(p.checklist),status,closed_at:(status==='concluido'||completed)?(p.closed_at||new Date().toISOString()):null};
+    const currentStage=firstIncompleteSaleStage(p.checklist);
+    const requestedPropertyStatus=$('salePropertyCommercialStatus')?.value || p.property?.commercial_status || 'disponivel';
+    const autoPropertyStatus=saleSuggestedPropertyStatus(p,status,currentStage,completed);
+    const propertyStatus=(requestedPropertyStatus==='disponivel' && autoPropertyStatus==='vendido') ? 'vendido' : (requestedPropertyStatus==='disponivel' && autoPropertyStatus==='negociacao' ? 'negociacao' : requestedPropertyStatus);
+    const payload={checklist:p.checklist,current_stage:currentStage,status,closed_at:(status==='concluido'||completed)?(p.closed_at||new Date().toISOString()):null};
     if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Salvando...';}
-    const {error}=await client.from('sale_processes').update(payload).eq('id',p.id);
-    if(error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Salvar checklist';}alert(error.message);return;}
-    saleSaveNotice='Checklist e status salvos com sucesso.';
+    const result=await client.from('sale_processes').update(payload).eq('id',p.id);
+    if(result.error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Salvar checklist';}alert(result.error.message);return;}
+    if(p.property_id && propertyStatus!==p.property?.commercial_status){
+      const propertyPayload={commercial_status:propertyStatus};
+      if(propertyStatus==='vendido'){propertyPayload.sold_at=new Date().toISOString();propertyPayload.sold_by='aelo';}
+      else if(propertyStatus!=='vendido'){propertyPayload.sold_at=null;}
+      const propResult=await client.from('properties').update(propertyPayload).eq('id',p.property_id);
+      if(propResult.error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Salvar checklist';}alert('O processo foi salvo, mas não foi possível atualizar a situação pública do imóvel: '+propResult.error.message);return;}
+    }
+    saleSaveNotice=propertyStatus==='vendido'?'✓ Venda concluída e imóvel marcado como VENDIDO.':propertyStatus==='negociacao'?'✓ Processo salvo e imóvel marcado como EM NEGOCIAÇÃO.':'Checklist, status e situação do imóvel salvos com sucesso.';
     await loadSaleProcesses();
     openSaleProcess(p.id);
   };
   $('closeSaleDetail').onclick=()=>box.classList.add('hidden-section');
 }
 function firstIncompleteSaleStage(checklist){for(const stage of checklist||[]){if((stage.tasks||[]).some(t=>!t.done))return stage.stage;}return 'conclusao';}
-async function openSaleProcess(id){const p=saleProcesses.find(x=>x.id===id);if(p)renderSaleDetail(p);else{const {data}=await client.from('sale_processes').select('*,property:properties(id,title,location)').eq('id',id).single();if(data)renderSaleDetail(data);}}
+async function openSaleProcess(id){const p=saleProcesses.find(x=>x.id===id);if(p)renderSaleDetail(p);else{const {data}=await client.from('sale_processes').select('*,property:properties(id,title,location,commercial_status,sold_by,partner_name)').eq('id',id).single();if(data)renderSaleDetail(data);}}
 async function saveSaleProcess(){const btn=$('saveSaleProcess');const propertyId=$('salePropertySelect').value;if(!propertyId){$('saleProcessMsg').textContent='Selecione o imóvel.';return;}if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Salvando...';}const payload={property_id:propertyId,buyer_name:$('saleBuyerName').value.trim()||null,buyer_whatsapp:$('saleBuyerWhatsapp').value.trim()||null,buyer_email:$('saleBuyerEmail').value.trim()||null,responsible_name:$('saleResponsibleName').value.trim()||null,partner_broker_id:$('salePartnerSelect').value||null,asking_price:Number($('saleAskingPrice').value||0)||null,offer_price:Number($('saleOfferPrice').value||0)||null,financing:$('saleFinancing').checked,exchange_property:$('saleExchange').checked,notes:$('saleNotes').value.trim()||null};const id=$('saleProcessId').value;let result;if(id)result=await client.from('sale_processes').update(payload).eq('id',id);else{payload.checklist=defaultSaleChecklist();payload.current_stage='captacao';result=await client.from('sale_processes').insert(payload);}if(result.error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Salvar processo';}$('saleProcessMsg').textContent=result.error.message;return;}if(btn){btn.textContent='✓ Salvo';}saleSaveNotice=id?'Processo atualizado com sucesso.':'Processo criado com sucesso.';$('saleProcessMsg').textContent=saleSaveNotice;$('saleProcessForm').classList.add('hidden-section');await loadSaleProcesses();}
 function initSaleProcesses(){$('newSaleProcess')?.addEventListener('click',openNewSaleProcess);$('cancelSaleProcess')?.addEventListener('click',()=>{$('saleProcessForm').classList.add('hidden-section');clearSaleForm();});$('saveSaleProcess')?.addEventListener('click',saveSaleProcess);$('refreshSaleProcesses')?.addEventListener('click',async()=>{await loadSaleProperties();await loadSaleProcesses();});loadSaleProperties();loadSaleProcesses();}
 function commercialLabel(p){
