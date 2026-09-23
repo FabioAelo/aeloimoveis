@@ -1,0 +1,5 @@
+V52.17 — Correção definitiva do mapa de localização.
+
+O iframe do Google Maps estava com o ID #aelo-map-frame, enquanto o CSS aplicava largura/altura à classe .aelo-map-frame. Isso fazia o navegador manter o iframe em 300x150 no canto superior esquerdo.
+
+Correção: CSS agora usa #aelo-map-frame e cache-busters de CSS/JS foram atualizados para 52.17. O círculo transparente permanece centralizado sobre o mapa. Nenhum SQL novo é necessário.
