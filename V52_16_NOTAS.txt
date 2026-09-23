@@ -1,0 +1,3 @@
+AELO Imóveis V52.16
+
+Melhoria da tela de localização: destaque visual da localização aproximada com círculo transparente dourado, ponto central e legenda. Mantidos CEP, mapa e links de mercados/escolas/farmácias. Cache do script atualizado para 52.16.
