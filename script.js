@@ -202,31 +202,6 @@ function renderProperties(filter = "todos") {
   const seasonPanel=document.getElementById("season-search");
   if(seasonPanel && filter !== "temporada") seasonPanel.hidden=true;
   document.querySelectorAll(".mini-choice").forEach(btn=>btn.onclick=()=>{ const target=btn.dataset.filterChoice; const filterBtn=document.querySelector(`.filter[data-filter="${target}"]`); if(filterBtn) filterBtn.click(); });
-  // Clique explícito e robusto: imagem, card e qualquer área do imóvel abrem a ficha.
-  // O listener fica no document para funcionar também quando o catálogo é re-renderizado.
-  if (!document.documentElement.dataset.aeloPropertyOpenBound) {
-    document.documentElement.dataset.aeloPropertyOpenBound = "1";
-    document.addEventListener("click", (event) => {
-      const target = event.target.closest("[data-open-property], .property-card, .season-result-card");
-      if (!target) return;
-      const card = target.closest(".property-card");
-      const id = target.getAttribute("data-open-property") || card?.dataset.id || target.querySelector?.("[data-open-property]")?.getAttribute("data-open-property") || target.querySelector?.("[data-id]")?.getAttribute("data-id");
-      if (!id) return;
-      event.preventDefault();
-      event.stopPropagation();
-      openModal(id);
-    }, true);
-    document.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      const target = document.activeElement?.closest("[data-open-property], .property-card, .season-result-card");
-      if (!target) return;
-      const card = target.closest(".property-card");
-      const id = target.getAttribute("data-open-property") || card?.dataset.id || target.querySelector?.("[data-open-property]")?.getAttribute("data-open-property") || target.querySelector?.("[data-id]")?.getAttribute("data-id");
-      if (!id) return;
-      event.preventDefault();
-      openModal(id);
-    });
-  }
 }
 
 let currentGallery = [];
@@ -340,72 +315,86 @@ function initSeasonBooking(p){
 }
 
 function openModal(idOrProperty) {
-  // Temporada: alguns resultados são objetos normalizados independentes do catálogo.
-  // Aceita tanto o ID quanto o próprio objeto para garantir a abertura da ficha.
   const p = (idOrProperty && typeof idOrProperty === "object")
     ? normalizeProperty(idOrProperty)
     : properties.find(item => String(item.id) === String(idOrProperty));
-  if (!p) return;
-  if (p.type === "temporada") {
-    console.debug("AELO temporada: abrindo imóvel", p.id, p.title);
-  }
-  window.AELO_CURRENT_PROPERTY = p;
-  // Normaliza a galeria: imóveis de temporada podem trazer gallery_urls como JSON/texto.
-  let gallery = p.gallery_urls;
-  if (typeof gallery === 'string') {
-    try { gallery = JSON.parse(gallery); } catch (_) { gallery = gallery ? [gallery] : []; }
-  }
-  if (!Array.isArray(gallery)) gallery = [];
-  gallery = gallery.filter(Boolean).map(String);
-  if (!gallery.length && p.image_url) gallery = [String(p.image_url)];
-  currentGallery = gallery;
-  currentGalleryIndex = 0;
-  document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : p.commercial_status==='negociacao' ? " • EM NEGOCIAÇÃO" : p.commercial_status==='indisponivel' ? " • INDISPONÍVEL" : "");
-  document.getElementById("modal-title").textContent = p.title;
-  document.getElementById("modal-location").textContent = p.location;
-  document.getElementById("modal-meta").innerHTML = p.meta.join(" • ");
-  const seasonSummary=document.getElementById("modal-season-summary");
-  if(seasonSummary){
-    if(p.type === "temporada"){
-      const rows=[];
-      const normalNightly = Number(p.nightly_price) > 0 ? Number(p.nightly_price) : Number(p.price || 0);
-      if(normalNightly > 0) rows.push(`<span><b>Diária normal</b>${formatPrice(normalNightly,"temporada")}</span>`);
-      if(Number(p.weekend_price)>0) rows.push(`<span><b>Fim de semana</b>${formatPrice(p.weekend_price,"temporada")}</span>`);
-      if(Number(p.high_season_price)>0) rows.push(`<span><b>Alta temporada</b>${formatPrice(p.high_season_price,"temporada")}</span>`);
-      if(Number(p.cleaning_fee)>0) rows.push(`<span><b>Taxa de limpeza</b>${Number(p.cleaning_fee).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</span>`);
-      if(p.checkin_time) rows.push(`<span><b>Check-in</b>${p.checkin_time}</span>`);
-      if(p.checkout_time) rows.push(`<span><b>Check-out</b>${p.checkout_time}</span>`);
-      seasonSummary.innerHTML=rows.join("");
-      seasonSummary.classList.toggle("hidden",!rows.length);
-    }else{seasonSummary.classList.add("hidden");seasonSummary.innerHTML="";}
-  }
-  const seasonRulesBox=document.getElementById("modal-season-rules");
-  if(seasonRulesBox){
-    if(p.type === "temporada") {
-      const rules=[];
-      rules.push(`<span>👥 até ${Number(p.max_guests||0)>0?Number(p.max_guests):"consultar"} hóspedes</span>`);
-      rules.push(`<span>${p.allow_children===false?'🚫 Crianças não permitidas':'🧒 Crianças permitidas'}</span>`);
-      rules.push(`<span>${p.allow_babies===false?'🚫 Bebês não permitidos':'👶 Bebês permitidos'}</span>`);
-      rules.push(`<span>${p.allow_pets===true?'🐾 Pets permitidos'+(p.max_pet_size?` até ${esc(p.max_pet_size)}`:''):'🚫 Pets não permitidos'}</span>`);
-      rules.push(`<span>${p.allow_smoking===true?'🚬 Fumo permitido':'🚭 Não é permitido fumar'}</span>`);
-      rules.push(`<span>${p.allow_parties===true?'🎉 Eventos permitidos':'🎉 Não são permitidas festas/eventos'}</span>`);
-      if(p.season_rules) rules.push(`<div style="margin-top:7px"><b>Observações:</b> ${esc(p.season_rules)}</div>`);
-      seasonRulesBox.innerHTML=`<strong>Regras da hospedagem</strong>${rules.join('')}`;
-      seasonRulesBox.classList.remove('hidden');
-    } else { seasonRulesBox.classList.add('hidden'); seasonRulesBox.innerHTML=''; }
-  }
-  const desc = String(p.description || p.descricao || p.details || "").trim();
-  const descEl = document.getElementById("modal-description");
-  if (descEl) {
-    descEl.textContent = desc || "Entre em contato com a AELO para mais informações sobre este imóvel.";
-    descEl.classList.toggle("is-empty", !desc);
-  }
-  renderGalleryThumbs();
-  showGalleryImage();
-  initSeasonBooking(p);
-  modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
-}
+  if (!p || !modal) return false;
 
+  window.AELO_CURRENT_PROPERTY = p;
+
+  // A ficha deve aparecer primeiro. Qualquer erro secundário de galeria/calendário
+  // não pode impedir a abertura do imóvel.
+  try {
+    document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : p.commercial_status==='negociacao' ? " • EM NEGOCIAÇÃO" : p.commercial_status==='indisponivel' ? " • INDISPONÍVEL" : "");
+    document.getElementById("modal-title").textContent = p.title || "Imóvel AELO";
+    document.getElementById("modal-location").textContent = p.location || "";
+    document.getElementById("modal-meta").innerHTML = (p.meta || []).join(" • ");
+    const desc = String(p.description || p.descricao || p.details || "").trim();
+    const descEl = document.getElementById("modal-description");
+    if (descEl) {
+      descEl.textContent = desc || "Entre em contato com a AELO para mais informações sobre este imóvel.";
+      descEl.classList.toggle("is-empty", !desc);
+    }
+
+    let gallery = p.gallery_urls;
+    if (typeof gallery === 'string') {
+      try { gallery = JSON.parse(gallery); } catch (_) { gallery = gallery ? [gallery] : []; }
+    }
+    if (!Array.isArray(gallery)) gallery = [];
+    gallery = gallery.filter(Boolean).map(String);
+    if (!gallery.length && p.image_url) gallery = [String(p.image_url)];
+    currentGallery = gallery;
+    currentGalleryIndex = 0;
+
+    // Abre imediatamente, antes de qualquer operação opcional.
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+
+    try { renderGalleryThumbs(); } catch(e) { console.debug("AELO galeria:", e); }
+    try { showGalleryImage(); } catch(e) { console.debug("AELO imagem:", e); }
+
+    const seasonSummary=document.getElementById("modal-season-summary");
+    if(seasonSummary){
+      if(p.type === "temporada"){
+        const rows=[];
+        const normalNightly = Number(p.nightly_price) > 0 ? Number(p.nightly_price) : Number(p.price || 0);
+        if(normalNightly > 0) rows.push(`<span><b>Diária normal</b>${formatPrice(normalNightly,"temporada")}</span>`);
+        if(Number(p.weekend_price)>0) rows.push(`<span><b>Fim de semana</b>${formatPrice(p.weekend_price,"temporada")}</span>`);
+        if(Number(p.high_season_price)>0) rows.push(`<span><b>Alta temporada</b>${formatPrice(p.high_season_price,"temporada")}</span>`);
+        if(Number(p.cleaning_fee)>0) rows.push(`<span><b>Taxa de limpeza</b>${Number(p.cleaning_fee).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</span>`);
+        if(p.checkin_time) rows.push(`<span><b>Check-in</b>${p.checkin_time}</span>`);
+        if(p.checkout_time) rows.push(`<span><b>Check-out</b>${p.checkout_time}</span>`);
+        seasonSummary.innerHTML=rows.join("");
+        seasonSummary.classList.toggle("hidden",!rows.length);
+      }else{seasonSummary.classList.add("hidden");seasonSummary.innerHTML="";}
+    }
+    const seasonRulesBox=document.getElementById("modal-season-rules");
+    if(seasonRulesBox){
+      if(p.type === "temporada") {
+        const rules=[];
+        rules.push(`<span>👥 até ${Number(p.max_guests||0)>0?Number(p.max_guests):"consultar"} hóspedes</span>`);
+        rules.push(`<span>${p.allow_children===false?'🚫 Crianças não permitidas':'🧒 Crianças permitidas'}</span>`);
+        rules.push(`<span>${p.allow_babies===false?'🚫 Bebês não permitidos':'👶 Bebês permitidos'}</span>`);
+        rules.push(`<span>${p.allow_pets===true?'🐾 Pets permitidos'+(p.max_pet_size?` até ${esc(p.max_pet_size)}`:''):'🚫 Pets não permitidos'}</span>`);
+        rules.push(`<span>${p.allow_smoking===true?'🚬 Fumo permitido':'🚭 Não é permitido fumar'}</span>`);
+        rules.push(`<span>${p.allow_parties===true?'🎉 Eventos permitidos':'🎉 Não são permitidas festas/eventos'}</span>`);
+        if(p.season_rules) rules.push(`<div style="margin-top:7px"><b>Observações:</b> ${esc(p.season_rules)}</div>`);
+        seasonRulesBox.innerHTML=`<strong>Regras da hospedagem</strong>${rules.join('')}`;
+        seasonRulesBox.classList.remove('hidden');
+      } else { seasonRulesBox.classList.add('hidden'); seasonRulesBox.innerHTML=''; }
+    }
+    try { initSeasonBooking(p); } catch(e) { console.debug("AELO temporada:", e); }
+    return true;
+  } catch(e) {
+    console.error("AELO: erro ao abrir ficha", e);
+    // Mesmo em caso de erro inesperado, tenta manter a ficha visível.
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    return true;
+  }
+}
 window.openModal = openModal;
 
 function closeModal() {
