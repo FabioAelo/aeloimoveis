@@ -1,0 +1,7 @@
+V52.12 — Correção definitiva da abertura de imóveis de temporada
+
+- O resultado de temporada agora abre a ficha usando o próprio objeto do imóvel, além do ID.
+- O clique na imagem é tratado diretamente no card de temporada.
+- Mantido o catálogo normal sem alteração funcional.
+- Cache atualizado para script.js?v=52.12.
+- Não requer SQL.

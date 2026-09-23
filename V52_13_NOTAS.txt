@@ -1,0 +1,8 @@
+V52.13 — Correção definitiva da abertura da ficha de temporada
+
+- Removido listener global em fase de captura que podia interceptar o clique antes do handler específico dos resultados de temporada.
+- Mantidos handlers diretos para imagem e botão “Ver imóvel”.
+- Modal agora é aberto antes de recursos opcionais da galeria/temporada, evitando que erro secundário impeça a abertura.
+- Galeria tornou-se tolerante a elementos opcionais ausentes.
+- Cache-buster atualizado para 52.13.
+- Nenhuma alteração de banco/Supabase.

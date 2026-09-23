@@ -140,11 +140,11 @@ function renderSeasonSearchResults(list,ctx={}){
     return;
   }
   list.slice(0,8).forEach(p=>{
-    const card=document.createElement("article"); card.className="season-result-card";
+    const card=document.createElement("article"); card.className="season-result-card"; card.dataset.propertyId=p.id;
     const guests=Number(p.max_guests||0)>0?`até ${Number(p.max_guests)} hóspedes`:"consulte hóspedes";
     card.innerHTML=`<div class="season-result-image" data-open-property="${esc(p.id)}" role="button" tabindex="0" aria-label="Ver fotos de ${esc(p.title)}"><img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy"></div><div class="season-result-body"><p class="eyebrow">TEMPORADA</p><h4>${esc(p.title)}</h4><p class="season-result-location">${esc(p.location)}</p><div class="season-result-meta"><span>👨‍👩‍👧 ${guests}</span>${Number(p.min_nights||0)>0?`<span>🌙 mínimo ${Number(p.min_nights)} noites</span>`:''}</div><strong class="season-result-price">${esc(p.price_label||formatPrice(p.nightly_price||p.price,'temporada'))}</strong><button type="button" class="season-result-view" data-id="${esc(p.id)}">Ver imóvel</button></div>`;
     results.appendChild(card);
-    const openSeasonCard=()=>openModal(p.id);
+    const openSeasonCard=(ev)=>{ if(ev){ev.preventDefault(); ev.stopPropagation();} openModal(p); };
     card.querySelector(".season-result-view")?.addEventListener("click",openSeasonCard);
     card.querySelector(".season-result-image")?.addEventListener("click",openSeasonCard);
     card.querySelector(".season-result-image")?.addEventListener("keydown",e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSeasonCard();}});
@@ -339,9 +339,16 @@ function initSeasonBooking(p){
   refresh();
 }
 
-function openModal(id) {
-  const p = properties.find(item => String(item.id) === String(id));
+function openModal(idOrProperty) {
+  // Temporada: alguns resultados são objetos normalizados independentes do catálogo.
+  // Aceita tanto o ID quanto o próprio objeto para garantir a abertura da ficha.
+  const p = (idOrProperty && typeof idOrProperty === "object")
+    ? normalizeProperty(idOrProperty)
+    : properties.find(item => String(item.id) === String(idOrProperty));
   if (!p) return;
+  if (p.type === "temporada") {
+    console.debug("AELO temporada: abrindo imóvel", p.id, p.title);
+  }
   window.AELO_CURRENT_PROPERTY = p;
   // Normaliza a galeria: imóveis de temporada podem trazer gallery_urls como JSON/texto.
   let gallery = p.gallery_urls;
