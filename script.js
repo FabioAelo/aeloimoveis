@@ -17,7 +17,18 @@ function normalizeProperty(p) {
   if (p.area_m2) meta.push(`${Number(p.area_m2).toLocaleString("pt-BR")} m²`);
   if (p.type === "temporada" && Number(p.max_guests) > 0) meta.push(`até ${p.max_guests} hóspedes`);
   if (p.type === "temporada" && Number(p.min_nights) > 0) meta.push(`${p.min_nights} noite${Number(p.min_nights)===1?"":"s"} mín.`);
-  const gallery_urls = Array.isArray(p.gallery_urls) && p.gallery_urls.length ? p.gallery_urls : (p.image_url ? [p.image_url] : []);
+  let gallery_urls = [];
+  if (Array.isArray(p.gallery_urls)) {
+    gallery_urls = p.gallery_urls.filter(Boolean);
+  } else if (typeof p.gallery_urls === "string" && p.gallery_urls.trim()) {
+    try {
+      const parsed = JSON.parse(p.gallery_urls);
+      gallery_urls = Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    } catch (e) {
+      gallery_urls = p.gallery_urls.split(',').map(v => v.trim()).filter(Boolean);
+    }
+  }
+  if (!gallery_urls.length && p.image_url) gallery_urls = [p.image_url];
   const seasonPrice = Number(p.nightly_price) > 0 ? Number(p.nightly_price) : Number(p.price || 0);
   const normalized = { ...p, gallery_urls, image_url: gallery_urls[0] || p.image_url || "logo.png", badge: p.badge || String(p.type || "").toUpperCase(), price_label: p.price_label || formatPrice(p.type === "temporada" ? seasonPrice : p.price, p.type), meta };
   normalized.nightly_price = seasonPrice;
@@ -162,7 +173,7 @@ function renderProperties(filter = "todos") {
   const list = filter === "todos" ? properties : properties.filter(p => p.type === filter);
   grid.innerHTML = list.map(p => `
     <article class="property-card" data-id="${p.id}">
-      <div class="property-image">
+      <div class="property-image" role="button" tabindex="0" aria-label="Ver fotos de ${p.title}">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
         <span class="badge">${p.type === "temporada" ? "TEMPORADA" : p.badge}</span>${p.commercial_status==='vendido'?`<span class="commercial-badge sold">🔴 IMÓVEL VENDIDO</span>`:p.commercial_status==='negociacao'?`<span class="commercial-badge negotiation">🟠 EM NEGOCIAÇÃO</span>`:p.commercial_status==='indisponivel'?`<span class="commercial-badge unavailable">⚫ INDISPONÍVEL</span>`:''}
       </div>
@@ -188,7 +199,15 @@ function renderProperties(filter = "todos") {
   const seasonPanel=document.getElementById("season-search");
   if(seasonPanel && filter !== "temporada") seasonPanel.hidden=true;
   document.querySelectorAll(".mini-choice").forEach(btn=>btn.onclick=()=>{ const target=btn.dataset.filterChoice; const filterBtn=document.querySelector(`.filter[data-filter="${target}"]`); if(filterBtn) filterBtn.click(); });
-  document.querySelectorAll(".property-card").forEach(card => card.addEventListener("click", () => openModal(card.dataset.id)));
+  // Clique delegado: imagem, card e qualquer área do imóvel abrem a ficha.
+  if (!grid.dataset.modalClickBound) {
+    grid.dataset.modalClickBound = "1";
+    grid.addEventListener("click", (event) => {
+      const card = event.target.closest(".property-card");
+      if (!card || !grid.contains(card)) return;
+      openModal(card.dataset.id);
+    });
+  }
 }
 
 let currentGallery = [];
