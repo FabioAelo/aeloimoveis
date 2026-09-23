@@ -142,7 +142,7 @@ function renderSeasonSearchResults(list,ctx={}){
   list.slice(0,8).forEach(p=>{
     const card=document.createElement("article"); card.className="season-result-card";
     const guests=Number(p.max_guests||0)>0?`até ${Number(p.max_guests)} hóspedes`:"consulte hóspedes";
-    card.innerHTML=`<div class="season-result-image"><img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy"></div><div class="season-result-body"><p class="eyebrow">TEMPORADA</p><h4>${esc(p.title)}</h4><p class="season-result-location">${esc(p.location)}</p><div class="season-result-meta"><span>👨‍👩‍👧 ${guests}</span>${Number(p.min_nights||0)>0?`<span>🌙 mínimo ${Number(p.min_nights)} noites</span>`:''}</div><strong class="season-result-price">${esc(p.price_label||formatPrice(p.nightly_price||p.price,'temporada'))}</strong><button type="button" class="season-result-view" data-id="${esc(p.id)}">Ver imóvel</button></div>`;
+    card.innerHTML=`<div class="season-result-image" data-open-property="${esc(p.id)}" role="button" tabindex="0" aria-label="Ver fotos de ${esc(p.title)}"><img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy"></div><div class="season-result-body"><p class="eyebrow">TEMPORADA</p><h4>${esc(p.title)}</h4><p class="season-result-location">${esc(p.location)}</p><div class="season-result-meta"><span>👨‍👩‍👧 ${guests}</span>${Number(p.min_nights||0)>0?`<span>🌙 mínimo ${Number(p.min_nights)} noites</span>`:''}</div><strong class="season-result-price">${esc(p.price_label||formatPrice(p.nightly_price||p.price,'temporada'))}</strong><button type="button" class="season-result-view" data-id="${esc(p.id)}">Ver imóvel</button></div>`;
     results.appendChild(card);
     card.querySelector(".season-result-view").addEventListener("click",()=>openModal(p.id));
   });
@@ -173,7 +173,7 @@ function renderProperties(filter = "todos") {
   const list = filter === "todos" ? properties : properties.filter(p => p.type === filter);
   grid.innerHTML = list.map(p => `
     <article class="property-card" data-id="${p.id}">
-      <div class="property-image" role="button" tabindex="0" aria-label="Ver fotos de ${p.title}">
+      <div class="property-image" data-open-property="${p.id}" role="button" tabindex="0" aria-label="Ver fotos de ${p.title}">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
         <span class="badge">${p.type === "temporada" ? "TEMPORADA" : p.badge}</span>${p.commercial_status==='vendido'?`<span class="commercial-badge sold">🔴 IMÓVEL VENDIDO</span>`:p.commercial_status==='negociacao'?`<span class="commercial-badge negotiation">🟠 EM NEGOCIAÇÃO</span>`:p.commercial_status==='indisponivel'?`<span class="commercial-badge unavailable">⚫ INDISPONÍVEL</span>`:''}
       </div>
@@ -199,13 +199,29 @@ function renderProperties(filter = "todos") {
   const seasonPanel=document.getElementById("season-search");
   if(seasonPanel && filter !== "temporada") seasonPanel.hidden=true;
   document.querySelectorAll(".mini-choice").forEach(btn=>btn.onclick=()=>{ const target=btn.dataset.filterChoice; const filterBtn=document.querySelector(`.filter[data-filter="${target}"]`); if(filterBtn) filterBtn.click(); });
-  // Clique delegado: imagem, card e qualquer área do imóvel abrem a ficha.
-  if (!grid.dataset.modalClickBound) {
-    grid.dataset.modalClickBound = "1";
-    grid.addEventListener("click", (event) => {
-      const card = event.target.closest(".property-card");
-      if (!card || !grid.contains(card)) return;
-      openModal(card.dataset.id);
+  // Clique explícito e robusto: imagem, card e qualquer área do imóvel abrem a ficha.
+  // O listener fica no document para funcionar também quando o catálogo é re-renderizado.
+  if (!document.documentElement.dataset.aeloPropertyOpenBound) {
+    document.documentElement.dataset.aeloPropertyOpenBound = "1";
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-open-property], .property-card");
+      if (!target) return;
+      const card = target.closest(".property-card");
+      const id = target.getAttribute("data-open-property") || card?.dataset.id;
+      if (!id) return;
+      event.preventDefault();
+      event.stopPropagation();
+      openModal(id);
+    }, true);
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const target = document.activeElement?.closest("[data-open-property], .property-card");
+      if (!target) return;
+      const card = target.closest(".property-card");
+      const id = target.getAttribute("data-open-property") || card?.dataset.id;
+      if (!id) return;
+      event.preventDefault();
+      openModal(id);
     });
   }
 }

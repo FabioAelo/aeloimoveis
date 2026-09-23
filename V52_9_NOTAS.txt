@@ -1,4 +1,5 @@
-AELO IMOVEIS V52.9
-- Corrige cache-buster do admin/index para carregar a versao nova.
-- Normaliza explicitamente campos booleanos de preferencias para nunca enviar null.
-- Mantem estrutura do Supabase da V52.6/V52.7.
+V52.9 — Correção definitiva da abertura da ficha/galeria por clique na imagem.
+- Listener global em captura para funcionar após re-render do catálogo.
+- data-open-property explícito na imagem e nos resultados de temporada.
+- Suporte a Enter/Espaço.
+- Cache-buster atualizado para script.js?v=52.9.
