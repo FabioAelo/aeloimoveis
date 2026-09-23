@@ -1,0 +1,4 @@
+AELO IMOVEIS V52.8
+- Corrige cache-buster do admin/index para carregar a versao nova.
+- Normaliza explicitamente campos booleanos de preferencias para nunca enviar null.
+- Mantem estrutura do Supabase da V52.6/V52.7.
