@@ -1,0 +1,4 @@
+AELO Imóveis V53.0
+Assistente conversacional no próprio site, sem integração paga com WhatsApp.
+Inclui campo de texto livre, contexto do imóvel, refinamento por intenção e encaminhamento para WhatsApp com resumo.
+V52.17 permanece como versão estável de segurança.
