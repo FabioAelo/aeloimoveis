@@ -1,0 +1,7 @@
+AELO IMÓVEIS — V52.7
+Correção do cadastro de imóveis/temporada.
+
+- Corrigido envio de campos booleanos NOT NULL: allow_children, allow_babies, allow_pets, allow_smoking e allow_parties nunca mais são enviados como null.
+- Ao editar imóvel, as preferências de temporada agora são carregadas corretamente nos campos do formulário.
+- Mantida a compatibilidade com a estrutura criada na V52.6.
+- Não requer novo SQL se a migração V52.6 já foi executada.
