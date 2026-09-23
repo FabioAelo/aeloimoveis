@@ -1,0 +1,9 @@
+AELO IMÓVEIS V52.11
+Correção específica da abertura dos imóveis de temporada.
+
+- Corrige clique direto na foto nos resultados de temporada.
+- Normaliza gallery_urls quando vier como JSON/texto do Supabase.
+- Usa image_url como fallback quando a galeria estiver vazia.
+- Mantém a abertura dos imóveis de venda/aluguel.
+- Atualiza cache do script para 52.11.
+- Não requer SQL.

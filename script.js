@@ -144,7 +144,10 @@ function renderSeasonSearchResults(list,ctx={}){
     const guests=Number(p.max_guests||0)>0?`até ${Number(p.max_guests)} hóspedes`:"consulte hóspedes";
     card.innerHTML=`<div class="season-result-image" data-open-property="${esc(p.id)}" role="button" tabindex="0" aria-label="Ver fotos de ${esc(p.title)}"><img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy"></div><div class="season-result-body"><p class="eyebrow">TEMPORADA</p><h4>${esc(p.title)}</h4><p class="season-result-location">${esc(p.location)}</p><div class="season-result-meta"><span>👨‍👩‍👧 ${guests}</span>${Number(p.min_nights||0)>0?`<span>🌙 mínimo ${Number(p.min_nights)} noites</span>`:''}</div><strong class="season-result-price">${esc(p.price_label||formatPrice(p.nightly_price||p.price,'temporada'))}</strong><button type="button" class="season-result-view" data-id="${esc(p.id)}">Ver imóvel</button></div>`;
     results.appendChild(card);
-    card.querySelector(".season-result-view").addEventListener("click",()=>openModal(p.id));
+    const openSeasonCard=()=>openModal(p.id);
+    card.querySelector(".season-result-view")?.addEventListener("click",openSeasonCard);
+    card.querySelector(".season-result-image")?.addEventListener("click",openSeasonCard);
+    card.querySelector(".season-result-image")?.addEventListener("keydown",e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSeasonCard();}});
   });
 }
 function runSeasonSearch(){
@@ -204,10 +207,10 @@ function renderProperties(filter = "todos") {
   if (!document.documentElement.dataset.aeloPropertyOpenBound) {
     document.documentElement.dataset.aeloPropertyOpenBound = "1";
     document.addEventListener("click", (event) => {
-      const target = event.target.closest("[data-open-property], .property-card");
+      const target = event.target.closest("[data-open-property], .property-card, .season-result-card");
       if (!target) return;
       const card = target.closest(".property-card");
-      const id = target.getAttribute("data-open-property") || card?.dataset.id;
+      const id = target.getAttribute("data-open-property") || card?.dataset.id || target.querySelector?.("[data-open-property]")?.getAttribute("data-open-property") || target.querySelector?.("[data-id]")?.getAttribute("data-id");
       if (!id) return;
       event.preventDefault();
       event.stopPropagation();
@@ -215,10 +218,10 @@ function renderProperties(filter = "todos") {
     }, true);
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
-      const target = document.activeElement?.closest("[data-open-property], .property-card");
+      const target = document.activeElement?.closest("[data-open-property], .property-card, .season-result-card");
       if (!target) return;
       const card = target.closest(".property-card");
-      const id = target.getAttribute("data-open-property") || card?.dataset.id;
+      const id = target.getAttribute("data-open-property") || card?.dataset.id || target.querySelector?.("[data-open-property]")?.getAttribute("data-open-property") || target.querySelector?.("[data-id]")?.getAttribute("data-id");
       if (!id) return;
       event.preventDefault();
       openModal(id);
@@ -340,7 +343,15 @@ function openModal(id) {
   const p = properties.find(item => String(item.id) === String(id));
   if (!p) return;
   window.AELO_CURRENT_PROPERTY = p;
-  currentGallery = p.gallery_urls?.length ? p.gallery_urls : [p.image_url];
+  // Normaliza a galeria: imóveis de temporada podem trazer gallery_urls como JSON/texto.
+  let gallery = p.gallery_urls;
+  if (typeof gallery === 'string') {
+    try { gallery = JSON.parse(gallery); } catch (_) { gallery = gallery ? [gallery] : []; }
+  }
+  if (!Array.isArray(gallery)) gallery = [];
+  gallery = gallery.filter(Boolean).map(String);
+  if (!gallery.length && p.image_url) gallery = [String(p.image_url)];
+  currentGallery = gallery;
   currentGalleryIndex = 0;
   document.getElementById("modal-type").textContent = p.badge + (p.commercial_status==='vendido' ? (p.sold_by==='terceiro' ? " • VENDIDO POR TERCEIRO" : " • VENDIDO PELA AELO") : p.commercial_status==='negociacao' ? " • EM NEGOCIAÇÃO" : p.commercial_status==='indisponivel' ? " • INDISPONÍVEL" : "");
   document.getElementById("modal-title").textContent = p.title;
