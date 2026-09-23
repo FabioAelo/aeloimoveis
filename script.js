@@ -768,6 +768,16 @@ const seasonSubmitLead=async(p,ctx)=>{
 };
 window.aeloStartPropertyInterest=propertyInterest;
 launcher.onclick=open;close.onclick=shut;
+// V53.1 — entrada livre do Assistente: usa o interpretador de linguagem natural.
+if(form){
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const value=input?.value?.trim()||'';
+    if(!value)return;
+    input.value='';
+    text(value);
+  });
+}
 })();
 
 

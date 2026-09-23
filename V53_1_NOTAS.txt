@@ -1,0 +1,1 @@
+V53.1 — Corrige o envio de mensagens digitadas no Assistente AELO. O formulário agora intercepta o submit e encaminha o texto ao interpretador de linguagem natural, incluindo intenções como vender/anunciar imóvel, avaliação, perícia e compra/aluguel/temporada. Cache atualizado para 53.1. Nenhuma alteração no Supabase.
