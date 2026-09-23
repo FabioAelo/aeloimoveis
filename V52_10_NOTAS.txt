@@ -1,0 +1,6 @@
+AELO IMÓVEIS V52.10 — ABERTURA DIRETA DOS IMÓVEIS
+
+Correção específica para o catálogo: clique direto na foto, na área do card ou no teclado abre a ficha/galeria do imóvel.
+A abertura foi colocada diretamente no elemento renderizado e openModal também foi exposto em window para evitar conflitos com listeners.
+Cache-buster atualizado para script.js?v=52.10.
+Sem alterações no banco de dados.

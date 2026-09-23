@@ -172,9 +172,9 @@ function initSeasonSearch(){
 function renderProperties(filter = "todos") {
   const list = filter === "todos" ? properties : properties.filter(p => p.type === filter);
   grid.innerHTML = list.map(p => `
-    <article class="property-card" data-id="${p.id}">
-      <div class="property-image" data-open-property="${p.id}" role="button" tabindex="0" aria-label="Ver fotos de ${p.title}">
-        <img src="${p.image_url}" alt="${p.title}" loading="lazy">
+    <article class="property-card" data-id="${p.id}" role="button" tabindex="0" onclick="openModal('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal('${p.id}')}" style="cursor:pointer">
+      <div class="property-image" data-open-property="${p.id}" role="button" tabindex="-1" aria-label="Ver fotos de ${p.title}" onclick="event.stopPropagation();openModal('${p.id}')" style="cursor:pointer">
+        <img src="${p.image_url}" alt="${p.title}" loading="lazy" style="cursor:pointer">
         <span class="badge">${p.type === "temporada" ? "TEMPORADA" : p.badge}</span>${p.commercial_status==='vendido'?`<span class="commercial-badge sold">🔴 IMÓVEL VENDIDO</span>`:p.commercial_status==='negociacao'?`<span class="commercial-badge negotiation">🟠 EM NEGOCIAÇÃO</span>`:p.commercial_status==='indisponivel'?`<span class="commercial-badge unavailable">⚫ INDISPONÍVEL</span>`:''}
       </div>
       <div class="property-info">
@@ -387,6 +387,8 @@ function openModal(id) {
   initSeasonBooking(p);
   modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
 }
+
+window.openModal = openModal;
 
 function closeModal() {
   modal.classList.remove("open");
