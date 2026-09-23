@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=50.7">
+  <link rel="stylesheet" href="style.css?v=52.15">
 
 <style id="aelo-gallery-v48-6">
 /* Galeria V48.6 — modelo aprovado: foto inteira + miniaturas + detalhes com rolagem própria */
@@ -907,7 +907,7 @@ window.AELO_SITE_VERSION='49.3';
 
   <footer class="site-footer">
     <div class="footer-brand"><img src="header-logo.png" alt="Aelo Imóveis"></div>
-    <div class="footer-info"><span>© 2026 Aelo Imóveis</span><span>Corretor de Imóveis • CRECI 31.100 • CNAI 56.127</span><a class="footer-instagram" href="https://www.instagram.com/fabioaeloimoveis/" target="_blank" rel="noopener noreferrer" aria-label="Instagram Fabio Aelo"><span class="instagram-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><defs><linearGradient id="igGradient" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f58529"/><stop offset="0.5" stop-color="#dd2a7b"/><stop offset="1" stop-color="#8134af"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="url(#igGradient)" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="url(#igGradient)" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2" fill="#f58529"/></svg></span><span>@fabioaeloimoveis</span></a><span class="footer-developer">Sistema desenvolvido por <a href="https://www.tcpsolucoes.com" target="_blank" rel="noopener noreferrer">TCP Soluções em TI</a></span></div>
+    <div class="footer-info"><span>© 2026 Aelo Imóveis</span><span>Corretor de Imóveis • CRECI 31.100 • CNAI 56.127</span><a class="footer-instagram" href="https://www.instagram.com/fabioaeloimoveis/" target="_blank" rel="noopener noreferrer" aria-label="Instagram Fabio Aelo"><span class="instagram-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><defs><linearGradient id="igGradient" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f58529"/><stop offset="0.5" stop-color="#dd2a7b"/><stop offset="1" stop-color="#8134af"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="url(#igGradient)" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="url(#igGradient)" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2" fill="#f58529"/></svg></span><span>@fabioaeloimoveis</span></a><span class="footer-visitors" id="public-visitor-counter" aria-live="polite">👥 Visitantes: —</span><span class="footer-developer">Sistema desenvolvido por <a href="https://www.tcpsolucoes.com" target="_blank" rel="noopener noreferrer">TCP Soluções em TI</a></span></div>
   </footer>
 
   <div class="modal" id="property-modal" aria-hidden="true">
@@ -926,7 +926,7 @@ window.AELO_SITE_VERSION='49.3';
       <div class="modal-body">
         <div class="modal-type-row"><p class="eyebrow" id="modal-type"></p><button class="modal-assistant" id="modal-assistant" type="button"><span class="modal-assistant-icon">✦</span><span>Assistente AELO</span></button></div>
         <h2 id="modal-title"></h2>
-        <p id="modal-location"></p>
+        <p id="modal-location"></p><button type="button" id="modal-map-button" class="modal-map-button hidden">📍 Ver localização e arredores</button>
         <div class="modal-meta" id="modal-meta"></div>
         <div class="season-summary hidden" id="modal-season-summary"></div>
         <div class="season-rules-box hidden" id="modal-season-rules"></div>
@@ -949,6 +949,14 @@ window.AELO_SITE_VERSION='49.3';
   </div>
 
 
+  <div class="aelo-map-modal" id="aelo-map-modal" aria-hidden="true">
+    <div class="aelo-map-card">
+      <button type="button" class="aelo-map-close" id="aelo-map-close" aria-label="Fechar mapa">×</button>
+      <div class="aelo-map-head"><div><p class="eyebrow">LOCALIZAÇÃO</p><h3 id="aelo-map-title">Localização do imóvel</h3><p id="aelo-map-address">Carregando localização...</p></div></div>
+      <div class="aelo-map-body"><div class="aelo-map-frame-wrap"><iframe id="aelo-map-frame" title="Mapa da localização do imóvel" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div><div class="aelo-map-pois"><strong>O que há por perto</strong><p>Abra diretamente no Google Maps para pesquisar estabelecimentos ao redor desta localização.</p><a id="map-supermarkets" target="_blank" rel="noopener noreferrer">🛒 Mercados próximos</a><a id="map-schools" target="_blank" rel="noopener noreferrer">🎓 Escolas próximas</a><a id="map-pharmacies" target="_blank" rel="noopener noreferrer">💊 Farmácias próximas</a><small>O ponto é baseado no CEP informado no cadastro. Ele representa a área da localização e não necessariamente o número exato do imóvel.</small></div></div>
+    </div>
+  </div>
+
   <!-- Assistente AELO -->
   <button class="aelo-chat-launcher" id="aelo-chat-launcher" type="button" aria-label="Abrir Assistente AELO"><span class="aelo-chat-icon">✦</span><span class="aelo-chat-label">Assistente AELO</span></button>
   <section class="aelo-chat" id="aelo-chat" aria-hidden="true" aria-label="Assistente AELO">
@@ -960,7 +968,7 @@ window.AELO_SITE_VERSION='49.3';
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=52.14"></script>
+  <script src="script.js?v=52.15"></script>
 
 <style id="aelo-v48-14-chat">
 /* V48.14 — Assistente AELO guiado por opções e responsivo */

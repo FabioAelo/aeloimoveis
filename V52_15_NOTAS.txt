@@ -1,0 +1,8 @@
+AELO Imóveis — V52.15
+
+1. Contador público discreto no rodapé: mostra visitantes únicos estimados usando a mesma identificação anônima já utilizada pelo analytics.
+2. Campo dedicado CEP no cadastro do imóvel. O CEP é salvo em public.properties. Ao sair do campo, o ViaCEP pode completar bairro/cidade quando a localização estiver vazia.
+3. Ficha do imóvel: botão “📍 Ver localização e arredores” aparece quando há CEP válido. Abre mapa baseado no CEP/localização e atalhos para mercados, escolas e farmácias próximos no Google Maps.
+4. A localização do mapa é baseada no CEP, sem expor número exato do imóvel.
+5. Migração necessária: aelo_v52_15_supabase.sql (coluna cep + função pública segura de contador).
+6. Não altera reservas, leads, processos de venda ou regras existentes.

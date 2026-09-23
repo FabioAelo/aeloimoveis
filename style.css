@@ -468,3 +468,15 @@ footer{background:#050607}
 .commercial-badge.negotiation{background:rgba(221,137,18,.96)}
 .commercial-badge.unavailable{background:rgba(35,39,45,.94)}
 .property-card:has(.commercial-badge.sold) .price,.property-card:has(.commercial-badge.unavailable) .price{color:#6f7680}
+
+/* V52.15 — contador público e mapa de localização */
+.footer-visitors{font-size:11px;opacity:.72;letter-spacing:.01em}
+.modal-map-button{display:inline-flex;align-items:center;gap:7px;margin:0 0 14px;padding:9px 13px;border:1px solid #d9dee5;border-radius:999px;background:#fff;color:#102a43;font:600 12px/1 inherit;cursor:pointer;box-shadow:0 2px 8px rgba(16,42,67,.05)}
+.modal-map-button:hover{border-color:#b88924;color:#8b6718}
+.aelo-map-modal{position:fixed;inset:0;z-index:5000;background:rgba(5,10,16,.72);display:none;align-items:center;justify-content:center;padding:22px}
+.aelo-map-modal.open{display:flex}
+.aelo-map-card{position:relative;width:min(1180px,96vw);height:min(760px,92vh);background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.3);display:flex;flex-direction:column}
+.aelo-map-close{position:absolute;right:16px;top:12px;z-index:2;width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#102a43;font-size:26px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14)}
+.aelo-map-head{padding:22px 62px 15px 24px;border-bottom:1px solid #e7eaee}.aelo-map-head h3{margin:2px 0 4px;font-family:'Playfair Display',serif;font-size:27px;color:#102a43}.aelo-map-head p:last-child{margin:0;color:#68727d;font-size:13px}
+.aelo-map-body{min-height:0;flex:1;display:grid;grid-template-columns:minmax(0,1fr) 300px}.aelo-map-frame-wrap{min-height:0;background:#eef1f4}.aelo-map-frame{width:100%;height:100%;border:0}.aelo-map-pois{padding:24px 20px;display:flex;flex-direction:column;gap:10px;border-left:1px solid #e7eaee}.aelo-map-pois strong{font-size:16px;color:#102a43}.aelo-map-pois p{font-size:12px;line-height:1.5;color:#68727d;margin:0 0 5px}.aelo-map-pois a{display:block;text-decoration:none;padding:11px 12px;border:1px solid #dfe4e9;border-radius:10px;color:#102a43;font-size:13px;font-weight:600;background:#fff}.aelo-map-pois a:hover{border-color:#b88924}.aelo-map-pois small{margin-top:auto;font-size:10.5px;line-height:1.45;color:#89929c}
+@media(max-width:760px){.aelo-map-modal{padding:8px}.aelo-map-card{width:100%;height:94vh;border-radius:14px}.aelo-map-body{grid-template-columns:1fr}.aelo-map-frame-wrap{min-height:48vh}.aelo-map-pois{border-left:0;border-top:1px solid #e7eaee;padding:14px}.aelo-map-pois small{margin-top:3px}.aelo-map-head{padding:18px 56px 12px 16px}.aelo-map-head h3{font-size:23px}.footer-visitors{display:block}}

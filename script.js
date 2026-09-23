@@ -68,6 +68,37 @@ async function trackAeloEvent(eventType, details={}, attempt=0){
     else console.debug('Analytics AELO:',e);
   }
 }
+async function loadPublicVisitorCounter(){
+  const el=document.getElementById('public-visitor-counter'); if(!el) return;
+  try{
+    const c=getSupabaseClient(); if(!c) return;
+    const {data,error}=await c.rpc('get_public_visitor_count');
+    if(error || data===null || data===undefined) return;
+    el.textContent=`👥 Visitantes: ${Number(data).toLocaleString('pt-BR')}`;
+  }catch(e){ console.debug('Contador público AELO:',e); }
+}
+
+function openAeloLocationMap(p){
+  const cep=String(p?.cep||'').replace(/\D/g,''); if(cep.length!==8) return;
+  const modal=document.getElementById('aelo-map-modal'), frame=document.getElementById('aelo-map-frame'); if(!modal||!frame) return;
+  const title=document.getElementById('aelo-map-title'); const address=document.getElementById('aelo-map-address');
+  if(title) title.textContent=p.title||'Localização do imóvel';
+  if(address) address.textContent=(p.location||'')+` • CEP ${cep.slice(0,5)}-${cep.slice(5)}`;
+  const baseAddress=(p.location||'')+' '+cep+' Brasil';
+  frame.src=`https://www.google.com/maps?q=${encodeURIComponent(baseAddress)}&output=embed`;
+  const links={supermarkets:'map-supermarkets',schools:'map-schools',pharmacies:'map-pharmacies'};
+  const terms={supermarkets:'supermercados',schools:'escolas',pharmacies:'farmácias'};
+  Object.keys(links).forEach(k=>{const a=document.getElementById(links[k]); if(a) a.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(terms[k]+' perto de '+baseAddress)}`;});
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+  fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r=>r.json()).then(d=>{
+    if(d.erro) return;
+    const full=[d.logradouro,d.bairro,d.localidade,d.uf,d.cep].filter(Boolean).join(', '); if(address) address.textContent=full;
+    const exactish=[d.logradouro,d.bairro,d.localidade,d.uf,d.cep,'Brasil'].filter(Boolean).join(', ');
+    frame.src=`https://www.google.com/maps?q=${encodeURIComponent(exactish)}&output=embed`;
+    Object.keys(links).forEach(k=>{const a=document.getElementById(links[k]); if(a) a.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(terms[k]+' perto de '+exactish)}`;});
+  }).catch(()=>{});
+}
+function closeAeloLocationMap(){const modal=document.getElementById('aelo-map-modal');if(modal){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}document.body.style.overflow='';}
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',()=>trackAeloEvent('page_view',{page:location.pathname}),{once:true});
 }else{
@@ -321,6 +352,7 @@ function openModal(idOrProperty) {
   if (!p || !modal) return false;
 
   window.AELO_CURRENT_PROPERTY = p;
+  setupAeloMapButton();
 
   // A ficha deve aparecer primeiro. Qualquer erro secundário de galeria/calendário
   // não pode impedir a abertura do imóvel.
@@ -396,6 +428,13 @@ function openModal(idOrProperty) {
   }
 }
 window.openModal = openModal;
+function setupAeloMapButton(){
+  const b=document.getElementById('modal-map-button'); if(!b) return;
+  b.onclick=()=>openAeloLocationMap(window.AELO_CURRENT_PROPERTY);
+  const p=window.AELO_CURRENT_PROPERTY;
+  b.classList.toggle('hidden',!(p&&String(p.cep||'').replace(/\D/g,'').length===8));
+}
+
 
 function closeModal() {
   modal.classList.remove("open");
@@ -714,3 +753,10 @@ window.aeloStartPropertyInterest=propertyInterest;
 launcher.onclick=open;close.onclick=shut;
 })();
 
+
+(function(){
+  const b=document.getElementById('aelo-map-close'); if(b) b.addEventListener('click',closeAeloLocationMap);
+  const mm=document.getElementById('aelo-map-modal'); if(mm) mm.addEventListener('click',e=>{if(e.target===mm)closeAeloLocationMap();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape') closeAeloLocationMap();});
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',loadPublicVisitorCounter,{once:true}); else loadPublicVisitorCounter();
+})();

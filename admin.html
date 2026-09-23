@@ -124,6 +124,7 @@
     <label>Título<input id="title" required placeholder="Ex.: Casa Áurea"></label>
     <label>Tipo<select id="type"><option value="venda">Venda</option><option value="aluguel">Aluguel residencial</option><option value="temporada">📅 Aluguel por temporada</option><option value="investimento">Investimento</option></select></label>
     <label>Localização<input id="location" required placeholder="Bairro • Cidade, UF"></label>
+    <label>CEP da localização<input id="cep" type="text" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"></label>
     <label id="priceLabelWrap"><span id="priceFieldLabel">Preço</span><input id="price" type="number" min="0" step="0.01" placeholder="2480000"></label>
     <label>Texto do preço<input id="priceLabel" placeholder="Opcional — ex.: R$ 2.480.000"></label>
     <div id="seasonFields" class="season-fields full hidden">
@@ -216,7 +217,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=52.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=52.15"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
