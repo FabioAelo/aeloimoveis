@@ -1,0 +1,7 @@
+AELO Imóveis V54.1 — correção do módulo Usuários e Permissões
+
+1) Corrige o erro "permission denied for table user_profiles" com grants explícitos para authenticated.
+2) O campo de e-mail fica somente leitura de propósito: ele é o e-mail real da conta no Supabase Auth.
+3) Ao criar uma conta em Supabase > Authentication > Users, o sistema cria automaticamente user_profiles e user_permissions para ela, como Consulta/ativa.
+4) Depois basta abrir Usuários e permissões, clicar no usuário e ajustar perfil/permissões.
+5) O primeiro administrador ainda precisa ser definido uma vez pelo bootstrap do SQL, usando o e-mail do administrador.

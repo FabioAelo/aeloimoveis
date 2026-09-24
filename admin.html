@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=54.0">
+<link rel="stylesheet" href="admin.css?v=54.1">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -92,7 +92,7 @@
     <div class="user-form-grid">
       <input id="userProfileId" type="hidden">
       <label>Nome<input id="userProfileName" type="text" placeholder="Nome do usuário"></label>
-      <label>E-mail<input id="userProfileEmail" type="email" placeholder="usuario@email.com" readonly></label>
+      <label>E-mail da conta<input id="userProfileEmail" type="email" placeholder="usuario@email.com" readonly><small class="field-help">Vem do Supabase Auth. Crie a conta em Authentication → Users; ela aparecerá aqui.</small></label>
       <label>Perfil<select id="userProfileRole"><option value="admin">Administrador</option><option value="gerente">Gerente</option><option value="corretor">Corretor</option><option value="atendimento">Atendimento</option><option value="financeiro">Financeiro</option><option value="consulta">Consulta</option></select></label>
       <label class="user-active-check"><input id="userProfileActive" type="checkbox" checked> Usuário ativo</label>
     </div>
@@ -105,7 +105,7 @@
     <div class="user-form-actions"><button type="button" class="primary" id="saveUserProfile">Salvar permissões</button><button type="button" class="ghost" id="clearUserProfile">Limpar</button></div>
     <p id="userProfileMsg" class="msg"></p>
     <div id="userProfileList" class="user-profile-list"><div class="reservation-empty">Carregando usuários...</div></div>
-    <div class="users-note"><strong>Como criar um novo acesso?</strong><span>A conta e a senha são criadas em Supabase → Authentication → Users. Depois, use este painel para atribuir o perfil e as permissões.</span></div>
+    <div class="users-note"><strong>Como criar um novo acesso?</strong><span>A conta e a senha são criadas em Supabase → Authentication → Users. Depois de criada, a conta aparece automaticamente aqui para você definir perfil e permissões.</span></div>
   </div>
 </div>
 <div class="dashboard-head leads-head collapsible-heading">
@@ -242,7 +242,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=54.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=54.1"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

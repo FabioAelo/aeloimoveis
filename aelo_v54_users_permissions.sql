@@ -78,3 +78,39 @@ notify pgrst, 'reload schema';
 -- insert into public.user_permissions(user_id, manage_users, view_analytics)
 -- select id, true, true from auth.users where email='SEU_EMAIL_AQUI'
 -- on conflict (user_id) do update set manage_users=true, view_analytics=true;
+
+
+-- V54.1 — grants explícitos para o Data API e criação automática do perfil após o cadastro no Auth.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.user_profiles to authenticated;
+grant select, insert, update, delete on public.user_permissions to authenticated;
+grant select, insert on public.audit_log to authenticated;
+
+create or replace function public.aelo_handle_new_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.user_profiles(user_id, full_name, email, role, is_active)
+  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', split_part(coalesce(new.email,''),'@',1)), new.email, 'consulta', true)
+  on conflict (user_id) do update
+    set email=excluded.email,
+        full_name=coalesce(nullif(public.user_profiles.full_name,''), excluded.full_name),
+        updated_at=now();
+
+  insert into public.user_permissions(user_id)
+  values (new.id)
+  on conflict (user_id) do nothing;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_aelo on auth.users;
+create trigger on_auth_user_created_aelo
+after insert on auth.users
+for each row execute function public.aelo_handle_new_auth_user();
+
+notify pgrst, 'reload schema';
