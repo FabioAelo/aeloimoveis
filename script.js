@@ -509,26 +509,9 @@ loadProperties();
 /* V49.3 — Busca de temporada + Assistente AELO Inteligente, guiado por botões e catálogo real */
 /* V32.1 — Assistente AELO: qualificação na ordem região > tipo > quartos > valor > prazo */
 (function initAeloAssistant(){
-const launcher=document.getElementById('aelo-chat-launcher'),panel=document.getElementById('aelo-chat'),close=document.getElementById('aelo-chat-close'),messages=document.getElementById('aelo-chat-messages'),quick=document.getElementById('aelo-chat-quick'),form=document.getElementById('aelo-chat-form'),input=document.getElementById('aelo-chat-input'); if(!launcher||!panel)return; let started=false; let activeProperty=null; let chatContext={};
+const launcher=document.getElementById('aelo-chat-launcher'),panel=document.getElementById('aelo-chat'),close=document.getElementById('aelo-chat-close'),messages=document.getElementById('aelo-chat-messages'),quick=document.getElementById('aelo-chat-quick'); if(!launcher||!panel)return; let started=false;
 const add=(text,who='bot',html=false)=>{const e=document.createElement('div');e.className='aelo-chat-msg '+who;html?e.innerHTML=text:e.textContent=text;messages.appendChild(e);messages.scrollTop=messages.scrollHeight};
 const buttons=items=>{quick.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.type='button';b.textContent=x.label;b.onclick=()=>{add(x.label,'user');x.action()};quick.appendChild(b)})};
-const chatNorm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-const handoff=()=>{const p=activeProperty;const base=p?`Tenho interesse no imóvel ${p.title}${p.location?` em ${p.location}`:''}${p.price_label?` — ${p.price_label}`:''}.`:'';const ctxParts=[];if(chatContext.intent)ctxParts.push(`Interesse: ${chatContext.intent}`);if(chatContext.budget)ctxParts.push(`Faixa: ${chatContext.budget}`);if(chatContext.guests)ctxParts.push(`Hóspedes: ${chatContext.guests}`);if(chatContext.dates)ctxParts.push(`Período: ${chatContext.dates}`);wa(`Olá! Vim pelo site AELO. ${base} ${ctxParts.join('. ')} Gostaria de continuar o atendimento pelo WhatsApp.`)};
-const answerText=(raw)=>{const t=chatNorm(raw).trim(); if(!t)return; add(raw,'user');
-  if(/^(oi|ola|olá|bom dia|boa tarde|boa noite|oii|ola!)/.test(t)){add('Olá! 😊 Pode me contar o que você está procurando. Posso ajudar com compra, aluguel, temporada, valores, localização ou visita.');buttons([{label:'🔎 Procurar imóvel',action:buy},{label:'📅 Temporada',action:seasonRent},{label:'📱 Falar com o corretor',action:handoff}]);return;}
-  if(activeProperty){const p=activeProperty; if(/(preco|valor|quanto custa|diaria|mensalidade)/.test(t)){add(`O anúncio informa <strong>${esc(p.price_label||formatPrice(p.price,p.type))}</strong>.${p.type==='temporada'?' O valor final da hospedagem depende do período e das condições da reserva.':' Posso registrar seu interesse e encaminhar para confirmação.'}`,'bot',true);buttons([{label:'📋 Tenho interesse',action:()=>collectLead(p.type==='temporada'?'Temporada':(p.type==='aluguel'?'Aluguel':'Compra'),{propertyId:p.id,propertyTitle:p.title,region:p.location||'',budgetLabel:p.price_label||''})},{label:'📱 Continuar no WhatsApp',action:handoff}]);return;}
-    if(/(localiz|onde fica|bairro|endereco|cep|proxim)/.test(t)){add(`O imóvel está anunciado em <strong>${esc(p.location||'localização informada no anúncio')}</strong>. Posso abrir a localização aproximada e mostrar mercados, escolas e farmácias próximas.`,'bot',true);buttons([{label:'📍 Ver localização',action:()=>{shut();openModal(p.id)}},{label:'📱 Continuar no WhatsApp',action:handoff}]);return;}
-    if(/(quarto|suite|banheiro|vaga|area|metragem)/.test(t)){add(`Posso consultar as características cadastradas deste anúncio. ${esc((p.meta||[]).filter(Boolean).join(' • '))}`,'bot',true);buttons([{label:'📋 Quero mais informações',action:()=>collectLead(p.type==='temporada'?'Temporada':(p.type==='aluguel'?'Aluguel':'Compra'),{propertyId:p.id,propertyTitle:p.title,region:p.location||'',propertyType:p.meta?.[0]||''})},{label:'📱 Falar com o corretor',action:handoff}]);return;}
-    if(/(visita|conhecer|agendar)/.test(t)){add('Claro. Posso registrar seu interesse em uma visita e deixar o corretor com o contexto deste imóvel.');buttons([{label:'📅 Solicitar visita',action:()=>collectLead('Agendamento de visita',{propertyId:p.id,propertyTitle:p.title,region:p.location||'',timeframe:'Solicitação de visita'})},{label:'📱 WhatsApp',action:handoff}]);return;}
-    if(/(temporada|hosped|check.?in|check.?out|hospede|pet|crianca)/.test(t) && p.type==='temporada'){add('Entendi. Posso continuar refinando sua hospedagem por período, quantidade de hóspedes, crianças, bebês, pets e regras do imóvel.');buttons([{label:'🏡 Continuar solicitação',action:()=>seasonClosingStart(p,{...chatContext})},{label:'💬 Tirar dúvida',action:()=>seasonQuestionStep(p,{...chatContext})},{label:'📱 WhatsApp',action:handoff}]);return;}
-    add('Entendi. Posso continuar por aqui e ir refinando o que você procura. Se preferir, também posso encaminhar este atendimento para o WhatsApp já com o contexto do imóvel.');buttons([{label:'📋 Deixar meu contato',action:()=>collectLead(p.type==='temporada'?'Temporada':(p.type==='aluguel'?'Aluguel':'Compra'),{propertyId:p.id,propertyTitle:p.title,region:p.location||'',message:raw})},{label:'📱 Continuar no WhatsApp',action:handoff}]);return;}
-  if(/(temporada|hospedagem|reveillon|ferias)/.test(t)){chatContext.intent='Temporada';add('Perfeito. Vamos refinar sua hospedagem. Em qual região você procura e para quais datas?');buttons([{label:'📅 Começar busca de temporada',action:seasonRent},{label:'📱 Falar com o corretor',action:handoff}]);return;}
-  if(/(comprar|compra|investir|apartamento|casa|terreno)/.test(t)){chatContext.intent='Compra';add('Perfeito. Posso filtrar por região, tipo, quartos, faixa de valor e prazo.');buttons([{label:'🔎 Começar busca',action:buy},{label:'📱 Falar com o corretor',action:handoff}]);return;}
-  if(/(alugar|aluguel|locacao|locação)/.test(t)){chatContext.intent='Aluguel';add('Certo. Posso procurar uma locação por região, tipo, quartos e valor mensal.');buttons([{label:'🔑 Procurar aluguel',action:rent},{label:'📱 Falar com o corretor',action:handoff}]);return;}
-  if(/(whatsapp|corretor|falar com alguem|humano)/.test(t)){add('Claro. Vou levar para o WhatsApp o contexto que já temos para você não precisar repetir tudo.');buttons([{label:'📱 Continuar no WhatsApp',action:handoff}]);return;}
-  add('Posso entender melhor. Me diga, por exemplo: “quero comprar um apartamento em Salvador até R$ 800 mil”, “quero uma casa para temporada em Itacaré” ou “quero saber o valor deste imóvel”.');buttons([{label:'🔎 Encontrar imóvel',action:buy},{label:'📅 Temporada',action:seasonRent},{label:'📱 Corretor',action:handoff}]);
-};
-
 const open=()=>{panel.classList.add('open');panel.setAttribute('aria-hidden','false');launcher.style.display='none';launcher.style.visibility='hidden';launcher.style.opacity='0';if(!started){started=true;add('Olá! Sou o Assistente AELO. 👋\nPosso ajudar você a encontrar um imóvel, anunciar sua propriedade ou solicitar uma avaliação imobiliária. Escolha uma opção abaixo para começarmos.');main()}};
 const shut=()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true');const l=document.getElementById('aelo-chat-launcher');if(l && !document.getElementById('property-modal')?.classList.contains('open')){l.style.display='flex';l.style.visibility='visible';l.style.opacity='1'}};
 const main=()=>buttons([{label:'🔎 Encontrar imóvel',action:buy},{label:'🔑 Alugar imóvel',action:rent},{label:'📅 Aluguel por temporada',action:seasonRent},{label:'💰 Anunciar imóvel',action:sell},{label:'📊 Avaliação / PTAM',action:valuation},{label:'⚖️ Perícia / assistência',action:expert},{label:'📱 Falar com o corretor',action:contact}]);
@@ -654,7 +637,7 @@ const getSeasonBookingContext=()=>{
   return {checkin:ci,checkout:co,guests,totalText,estimatedTotal,valid};
 };
 const propertyInterest=(p)=>{
-  if(!p) return; activeProperty=p; chatContext={};
+  if(!p) return;
   const interest = p.type==='temporada' ? 'Temporada' : (p.type==='aluguel' ? 'Aluguel' : 'Compra');
   const booking=p.type==='temporada'?getSeasonBookingContext():{};
   const ctx={interest,type:p.type||'venda',region:p.location||'',propertyType:p.meta?.[0]||'',bedrooms:Number(p.bedrooms||0),budgetLabel:p.price_label||'',propertyId:p.id,timeframe:null,propertyTitle:p.title,propertyLocation:p.location,propertyPrice:p.price_label||'',checkin:booking.checkin||'',checkout:booking.checkout||'',guests:booking.guests||0,estimatedTotal:booking.estimatedTotal||null,estimatedTotalLabel:booking.totalText||''};
@@ -768,16 +751,6 @@ const seasonSubmitLead=async(p,ctx)=>{
 };
 window.aeloStartPropertyInterest=propertyInterest;
 launcher.onclick=open;close.onclick=shut;
-// V53.1 — entrada livre do Assistente: usa o interpretador de linguagem natural.
-if(form){
-  form.addEventListener('submit',e=>{
-    e.preventDefault();
-    const value=input?.value?.trim()||'';
-    if(!value)return;
-    input.value='';
-    text(value);
-  });
-}
 })();
 
 

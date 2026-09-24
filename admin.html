@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=52.2">
+<link rel="stylesheet" href="admin.css?v=54.0">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -81,6 +81,31 @@
     <div class="sale-process-toolbar"><div><strong>Processos em andamento</strong><span id="saleProcessCount">0 processos</span></div><button type="button" class="ghost" id="refreshSaleProcesses">Atualizar</button></div>
     <div id="saleProcessList" class="sale-process-list"><div class="reservation-empty">Carregando processos...</div></div>
     <div id="saleProcessDetail" class="sale-process-detail hidden-section"></div>
+  </div>
+</div>
+<div class="dashboard-head leads-head collapsible-heading">
+  <button class="section-toggle standalone-toggle" type="button" data-target="usersContent" aria-expanded="false"><span><b>👥 Usuários e permissões</b><small>Controle quem pode consultar e alterar cada área do AELO</small></span><strong class="toggle-chevron">⌄</strong></button>
+</div>
+<div id="usersContent" class="collapsible-content hidden-section">
+  <div class="users-manager">
+    <div class="users-manager-head"><div><p class="eyebrow">SEGURANÇA</p><h2>Usuários e permissões.</h2><p>Gerencie perfis, permissões e histórico de ações. A criação da conta/senha continua sendo feita pelo Supabase Auth.</p></div><button type="button" class="ghost" id="refreshUsers">Atualizar</button></div>
+    <div class="user-form-grid">
+      <input id="userProfileId" type="hidden">
+      <label>Nome<input id="userProfileName" type="text" placeholder="Nome do usuário"></label>
+      <label>E-mail<input id="userProfileEmail" type="email" placeholder="usuario@email.com" readonly></label>
+      <label>Perfil<select id="userProfileRole"><option value="admin">Administrador</option><option value="gerente">Gerente</option><option value="corretor">Corretor</option><option value="atendimento">Atendimento</option><option value="financeiro">Financeiro</option><option value="consulta">Consulta</option></select></label>
+      <label class="user-active-check"><input id="userProfileActive" type="checkbox" checked> Usuário ativo</label>
+    </div>
+    <div class="permission-grid">
+      <label><input id="permViewProperties" type="checkbox"> 👁️ Consultar imóveis</label><label><input id="permEditProperties" type="checkbox"> ✏️ Editar imóveis</label><label><input id="permPublishProperties" type="checkbox"> 📢 Publicar imóveis</label>
+      <label><input id="permViewLeads" type="checkbox"> 👁️ Consultar leads</label><label><input id="permEditLeads" type="checkbox"> ✏️ Gerenciar leads</label><label><input id="permViewReservations" type="checkbox"> 👁️ Consultar reservas</label>
+      <label><input id="permEditReservations" type="checkbox"> ✏️ Gerenciar reservas</label><label><input id="permViewSales" type="checkbox"> 👁️ Consultar vendas</label><label><input id="permEditSales" type="checkbox"> ✏️ Gerenciar vendas</label>
+      <label><input id="permViewAnalytics" type="checkbox"> 📊 Ver analytics</label><label><input id="permManageUsers" type="checkbox"> 🔐 Administrar usuários</label>
+    </div>
+    <div class="user-form-actions"><button type="button" class="primary" id="saveUserProfile">Salvar permissões</button><button type="button" class="ghost" id="clearUserProfile">Limpar</button></div>
+    <p id="userProfileMsg" class="msg"></p>
+    <div id="userProfileList" class="user-profile-list"><div class="reservation-empty">Carregando usuários...</div></div>
+    <div class="users-note"><strong>Como criar um novo acesso?</strong><span>A conta e a senha são criadas em Supabase → Authentication → Users. Depois, use este painel para atribuir o perfil e as permissões.</span></div>
   </div>
 </div>
 <div class="dashboard-head leads-head collapsible-heading">
@@ -217,7 +242,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=52.15"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=54.0"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');
