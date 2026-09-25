@@ -1,0 +1,22 @@
+AELO IMÓVEIS — V54.7
+
+Base: V54.6.
+
+NOVO:
+- Central de usuários dentro do AELO.
+- Criar usuário Auth sem abrir Supabase.
+- Alterar nome, e-mail, perfil e permissões.
+- Alterar senha.
+- Ativar/desativar usuário.
+- Excluir usuário permanentemente.
+- Auditoria das ações administrativas.
+- Service role não fica no navegador.
+
+ANTES DE USAR:
+1. Execute aelo_v54_7_users_admin.sql no SQL Editor do Supabase.
+2. Faça deploy da Edge Function: supabase functions deploy admin-manage-user
+3. Publique os arquivos do site.
+
+IMPORTANTE:
+A Edge Function precisa do secret SUPABASE_SERVICE_ROLE_KEY no ambiente seguro do Supabase. Nunca copie essa chave para supabase-config.js, admin.js ou index.html.
+Para preservar histórico, prefira desativar em vez de excluir.

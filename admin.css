@@ -485,3 +485,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .lead-assignment select{min-width:240px;padding:9px 10px;border:1px solid #ccd3dd;border-radius:8px;background:#fff}
 .lead-assignment-read{font-size:14px}
 .lead-ownership-note{margin:10px 0 14px;padding:10px 12px;border:1px solid #e2e6ec;border-radius:9px;background:#fbfcfe;font-size:13px}
+/* V54.7 — Central de usuários */
+.users-manager-head{align-items:flex-end;gap:10px;flex-wrap:wrap}.users-manager-head>div{flex:1 1 100%;}.users-manager-head button{white-space:nowrap}
+#userProfilePassword{letter-spacing:.08em}.user-form-grid label{min-width:0}.danger{color:#b42318!important;border-color:#f2b8b5!important}.user-profile-row{gap:12px}.user-profile-row button{margin-left:auto}
