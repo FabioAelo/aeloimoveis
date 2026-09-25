@@ -1,0 +1,6 @@
+V54.5 — perfis e permissões
+- Ao alterar o perfil no formulário, as permissões padrão daquele perfil são aplicadas imediatamente.
+- Corretor: consultar imóveis + criar imóveis + consultar leads; demais permissões desligadas.
+- Administrador e Gerente mantêm seus conjuntos padrão.
+- O usuário pode ajustar manualmente as permissões depois de escolher o perfil e salvar.
+- Corrige o problema em que um perfil existente mantinha permissões antigas ao trocar de função.

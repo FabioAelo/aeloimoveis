@@ -477,3 +477,5 @@ body.reservation-detail-open{overflow:hidden}
 .permission-hidden{display:none!important}
 button:disabled{opacity:.45;cursor:not-allowed}
 .user-profile-row small{font-size:14px}
+
+.user-form-actions{font-size:15px}.permission-grid label{font-size:14px;min-height:52px}.user-role-pill{font-size:14px}
