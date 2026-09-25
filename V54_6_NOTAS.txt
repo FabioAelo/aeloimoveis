@@ -1,0 +1,8 @@
+V54.6 — Distribuição de leads
+- Adiciona leads.assigned_user_id.
+- Corretor vê somente leads atribuídos a ele.
+- Administrador e gerente veem todos.
+- Atendimento vê/gerencia todos conforme suas permissões.
+- Admin/gerente/atendimento com Gerenciar leads podem atribuir responsáveis.
+- Histórico de interações segue a mesma regra do lead.
+- Filtro e seletor de responsável na central de leads.
