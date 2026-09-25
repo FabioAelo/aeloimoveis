@@ -210,7 +210,7 @@ async function refresh() {
     <article class="admin-row">
       <img src="${p.image_url || 'logo.png'}" alt="">
       <div><h3>${p.title}</h3><p>${p.location} • ${p.type==='temporada'?'Temporada':p.type==='aluguel'?'Aluguel residencial':p.type} • ${p.is_published ? 'Publicado' : 'Rascunho'}</p><p>${commercialLabel(p)}${p.price_label ? ' • '+p.price_label : ''}</p></div>
-      <div class="row-actions"><button class="ghost" onclick="editProperty('${p.id}')">Editar</button><button class="ghost danger" onclick="deleteProperty('${p.id}')">Excluir</button></div>
+      <div class="row-actions">${can('edit_properties')?`<button class="ghost" onclick="editProperty('${p.id}')">Editar</button><button class="ghost danger" onclick="deleteProperty('${p.id}')">Excluir</button>`:''}</div>
     </article>`).join("") : `<div class="card"><p>Nenhum imóvel cadastrado ainda. Clique em “+ Novo imóvel”.</p></div>`;
 }
 
@@ -552,6 +552,7 @@ function renderReservations(){
   }
 }
 async function refreshReservations(){
+  if(!can('view_reservations')) return;
   const box=document.getElementById('reservationList'); if(!box) return;
   const {data,error}=await client.from('season_reservations').select('*, property:properties(title,location,nightly_price,weekend_price,cleaning_fee)').order('created_at',{ascending:false}).limit(200);
   if(error){box.innerHTML=`<div class="reservation-empty">Não foi possível carregar as reservas: ${escapeHtml(error.message)}</div>`;return;}
@@ -764,6 +765,7 @@ document.getElementById('reservationDetailWhatsApp')?.addEventListener('click',(
 });
 
 async function refreshLeads(){
+  if(!can('view_leads')) return;
   const box=document.getElementById('leadList'); if(!box) return;
   const [leadRes, interactionRes] = await Promise.all([
     client.from('leads').select('*').order('created_at',{ascending:false}).limit(100),
@@ -894,17 +896,60 @@ window.saveLead = async id => {
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
 
 
-const ROLE_DEFAULTS={
- admin:{view_properties:true,edit_properties:true,publish_properties:true,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:true,view_sales:true,edit_sales:true,view_analytics:true,manage_users:true},
- gerente:{view_properties:true,edit_properties:true,publish_properties:true,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:true,view_sales:true,edit_sales:true,view_analytics:true,manage_users:false},
- corretor:{view_properties:true,edit_properties:false,publish_properties:false,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:false,view_sales:true,edit_sales:true,view_analytics:false,manage_users:false},
- atendimento:{view_properties:true,edit_properties:false,publish_properties:false,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:true,view_sales:true,edit_sales:false,view_analytics:false,manage_users:false},
- financeiro:{view_properties:true,edit_properties:false,publish_properties:false,view_leads:false,edit_leads:false,view_reservations:true,edit_reservations:false,view_sales:true,edit_sales:false,view_analytics:true,manage_users:false},
- consulta:{view_properties:true,edit_properties:false,publish_properties:false,view_leads:true,edit_leads:false,view_reservations:true,edit_reservations:false,view_sales:true,edit_sales:false,view_analytics:false,manage_users:false}
+let CURRENT_PERMISSIONS = {
+  view_properties:false, create_properties:false, edit_properties:false, publish_properties:false,
+  view_leads:false, edit_leads:false, view_reservations:false, edit_reservations:false,
+  view_sales:false, edit_sales:false, view_analytics:false, manage_users:false
 };
-const USER_PERM_IDS=['viewProperties','editProperties','publishProperties','viewLeads','editLeads','viewReservations','editReservations','viewSales','editSales','viewAnalytics','manageUsers'];
-function applyRoleDefaults(role){const d=ROLE_DEFAULTS[role]||ROLE_DEFAULTS.consulta; Object.entries(d).forEach(([k,v])=>{const el=$('perm'+k.replace(/^[a-z]/,m=>m.toUpperCase())); if(el) el.checked=!!v;});}
-function getUserPermissionPayload(){return {view_properties:$('permViewProperties').checked,edit_properties:$('permEditProperties').checked,publish_properties:$('permPublishProperties').checked,view_leads:$('permViewLeads').checked,edit_leads:$('permEditLeads').checked,view_reservations:$('permViewReservations').checked,edit_reservations:$('permEditReservations').checked,view_sales:$('permViewSales').checked,edit_sales:$('permEditSales').checked,view_analytics:$('permViewAnalytics').checked,manage_users:$('permManageUsers').checked};}
+
+const ROLE_DEFAULTS={
+ admin:{view_properties:true,create_properties:true,edit_properties:true,publish_properties:true,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:true,view_sales:true,edit_sales:true,view_analytics:true,manage_users:true},
+ gerente:{view_properties:true,create_properties:true,edit_properties:true,publish_properties:true,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:true,view_sales:true,edit_sales:true,view_analytics:true,manage_users:false},
+ corretor:{view_properties:true,create_properties:true,edit_properties:false,publish_properties:false,view_leads:true,edit_leads:false,view_reservations:false,edit_reservations:false,view_sales:false,edit_sales:false,view_analytics:false,manage_users:false},
+ atendimento:{view_properties:true,create_properties:false,edit_properties:false,publish_properties:false,view_leads:true,edit_leads:true,view_reservations:true,edit_reservations:true,view_sales:false,edit_sales:false,view_analytics:false,manage_users:false},
+ financeiro:{view_properties:true,create_properties:false,edit_properties:false,publish_properties:false,view_leads:false,edit_leads:false,view_reservations:true,edit_reservations:false,view_sales:true,edit_sales:false,view_analytics:true,manage_users:false},
+ consulta:{view_properties:true,create_properties:false,edit_properties:false,publish_properties:false,view_leads:true,edit_leads:false,view_reservations:false,edit_reservations:false,view_sales:false,edit_sales:false,view_analytics:false,manage_users:false}
+};
+
+function can(permission){ return CURRENT_PERMISSIONS[permission] === true; }
+
+function setHiddenByPermission(id, allowed){
+  const el=document.getElementById(id);
+  if(el) el.classList.toggle('permission-hidden', !allowed);
+}
+
+async function loadCurrentPermissions(){
+  CURRENT_PERMISSIONS = {
+    view_properties:false, create_properties:false, edit_properties:false, publish_properties:false,
+    view_leads:false, edit_leads:false, view_reservations:false, edit_reservations:false,
+    view_sales:false, edit_sales:false, view_analytics:false, manage_users:false
+  };
+  const {data:{user}} = await client.auth.getUser();
+  if(!user) return;
+  const {data:profile} = await client.from('user_profiles').select('role,is_active').eq('user_id',user.id).maybeSingle();
+  const {data:perm} = await client.from('user_permissions').select('*').eq('user_id',user.id).maybeSingle();
+  if(!profile || profile.is_active === false) return;
+  if(perm){
+    Object.keys(CURRENT_PERMISSIONS).forEach(k=>{
+      if(Object.prototype.hasOwnProperty.call(perm,k)) CURRENT_PERMISSIONS[k] = perm[k] === true;
+    });
+  } else if(profile.role && ROLE_DEFAULTS[profile.role]){
+    CURRENT_PERMISSIONS = {...CURRENT_PERMISSIONS, ...ROLE_DEFAULTS[profile.role]};
+  }
+}
+
+function applyPermissionUI(){
+  setHiddenByPermission('propertyList', can('view_properties'));
+  setHiddenByPermission('analyticsPanel', can('view_analytics'));
+  setHiddenByPermission('reservationsContent', can('view_reservations'));
+  setHiddenByPermission('salesProcessesContent', can('view_sales'));
+  setHiddenByPermission('usersContent', can('manage_users'));
+  setHiddenByPermission('opportunitiesContent', can('view_leads'));
+  const newBtn=document.getElementById('newBtn');
+  if(newBtn) newBtn.disabled = !can('create_properties');
+}
+function applyRoleDefaults(role){const d=ROLE_DEFAULTS[role]||ROLE_DEFAULTS.consulta; Object.entries(d).forEach(([k,v])=>{const id='perm'+k.split('_').map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(''); const el=$(id); if(el) el.checked=!!v;});}
+function getUserPermissionPayload(){return {view_properties:$('permViewProperties').checked,create_properties:$('permCreateProperties').checked,edit_properties:$('permEditProperties').checked,publish_properties:$('permPublishProperties').checked,view_leads:$('permViewLeads').checked,edit_leads:$('permEditLeads').checked,view_reservations:$('permViewReservations').checked,edit_reservations:$('permEditReservations').checked,view_sales:$('permViewSales').checked,edit_sales:$('permEditSales').checked,view_analytics:$('permViewAnalytics').checked,manage_users:$('permManageUsers').checked};}
 function setUserForm(profile,perm){$('userProfileId').value=profile?.user_id||'';$('userProfileName').value=profile?.full_name||'';$('userProfileEmail').value=profile?.email||'';$('userProfileRole').value=profile?.role||'consulta';$('userProfileActive').checked=profile?.is_active!==false;const d=perm||ROLE_DEFAULTS[profile?.role]||ROLE_DEFAULTS.consulta;Object.entries(d).forEach(([k,v])=>{const id='perm'+k.split('_').map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join('');const el=$(id);if(el)el.checked=!!v;});}
 async function refreshUsers(){const msg=$('userProfileList');if(!msg||!client)return;msg.innerHTML='<div class="reservation-empty">Carregando usuários...</div>';const {data,error}=await client.from('user_profiles').select('*').order('full_name',{ascending:true});if(error){msg.innerHTML='<div class="reservation-empty"><strong>Não foi possível carregar os usuários.</strong><br>'+escapeHtml(error.message)+'<br><small>Se aparecer "permission denied for table user_profiles", execute o SQL da V54.1 no Supabase SQL Editor.</small></div>';return;}const ids=(data||[]).map(x=>x.user_id);let perms=[];if(ids.length){const r=await client.from('user_permissions').select('*').in('user_id',ids);perms=r.data||[];}const pm=new Map(perms.map(x=>[x.user_id,x]));msg.innerHTML=(data||[]).length?(data||[]).map(u=>{const roleLabels={admin:'Administrador',gerente:'Gerente',corretor:'Corretor',atendimento:'Atendimento',financeiro:'Financeiro',consulta:'Consulta'};return `<article class="user-profile-row"><div><strong>${escapeHtml(u.full_name||'Sem nome')}</strong><small>${escapeHtml(u.email||'')}</small></div><span class="user-role-pill">${roleLabels[u.role]||u.role}</span><span class="user-active-pill ${u.is_active?'on':'off'}">${u.is_active?'● Ativo':'● Bloqueado'}</span><small>${Object.values(pm.get(u.user_id)||{}).filter(v=>v===true).length} permissões</small><button type="button" class="ghost mini" onclick="editUserProfile('${u.user_id}')">Editar</button></article>`}).join(''):'<div class="reservation-empty">Nenhum perfil cadastrado.</div>';}
 window.editUserProfile=async id=>{const a=await client.from('user_profiles').select('*').eq('user_id',id).single();const b=await client.from('user_permissions').select('*').eq('user_id',id).maybeSingle();if(a.error)return showMsg('userProfileMsg',a.error.message);setUserForm(a.data,b.data||null);};
@@ -919,23 +964,40 @@ async function start() {
   showSession(session);
   client.auth.onAuthStateChange((_event, session) => showSession(session));
 }
-function showSession(session) {
-  if (session) { $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); refresh(); refreshLeads(); refreshReservations(); loadPartnerBrokers(); initSaleProcesses(); initUsersManager(); }
-  else { $("dashboard").classList.add("hidden"); $("editor").classList.add("hidden"); $("loginCard").classList.remove("hidden"); $("logoutBtn").classList.add("hidden"); }
+async function showSession(session) {
+  if (session) {
+    $("loginCard").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    $("logoutBtn").classList.remove("hidden");
+    await loadCurrentPermissions();
+    applyPermissionUI();
+    if (can("view_properties")) refresh();
+    if (can("view_leads")) refreshLeads();
+    if (can("view_reservations")) refreshReservations();
+    if (can("view_sales")) initSaleProcesses();
+    if (can("view_properties") || can("create_properties") || can("edit_properties")) loadPartnerBrokers();
+    if (can("manage_users")) initUsersManager();
+    if (can("view_analytics")) loadAnalytics(30);
+  } else {
+    $("dashboard").classList.add("hidden");
+    $("editor").classList.add("hidden");
+    $("loginCard").classList.remove("hidden");
+    $("logoutBtn").classList.add("hidden");
+  }
 }
 function showMsg(id,text){$(id).textContent=text||""}
 
 $("loginForm").addEventListener("submit", async e => { e.preventDefault(); showMsg("loginMsg","Entrando..."); const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value}); showMsg("loginMsg",error?error.message:""); });
 $("logoutBtn").addEventListener("click",()=>client.auth.signOut());
-$("newBtn").addEventListener("click",()=>openEditor());
+$("newBtn").addEventListener("click",()=>{if(!can("create_properties")) return showMsg("saveMsg","Seu usuário não possui permissão para criar imóveis."); openEditor();});
 $("cancelBtn").addEventListener("click",()=>$("editor").classList.add("hidden"));
 
 function openEditor(p=null){
   $("editor").classList.remove("hidden"); $("dashboard").classList.add("hidden"); $("editorTitle").textContent=p?"Editar imóvel":"Novo imóvel"; $("propertyId").value=p?.id||"";
   $("title").value=p?.title||""; $("type").value=p?.type||"venda"; $("location").value=p?.location||""; $("cep").value=p?.cep||""; $("allowChildren").checked=p?.allow_children!==false; $("allowBabies").checked=p?.allow_babies!==false; $("allowPets").checked=p?.allow_pets===true; $("maxPetSize").value=p?.max_pet_size||""; $("allowSmoking").checked=p?.allow_smoking===true; $("allowParties").checked=p?.allow_parties===true; $("seasonRulesText").value=p?.season_rules||""; $("price").value=p?.price||""; $("priceLabel").value=p?.price_label||""; $("bedrooms").value=p?.bedrooms||0; $("suites").value=p?.suites||0; $("parking").value=p?.parking||0; $("area").value=p?.area_m2||""; $("propertyCategory").value=p?.property_category||""; $("nightlyPrice").value=p?.type==='temporada'?(p?.price||''):(p?.nightly_price||''); $("weekendPrice").value=p?.weekend_price||''; $("highSeasonPrice").value=p?.high_season_price||''; $("cleaningFee").value=p?.cleaning_fee||''; $("minNights").value=p?.min_nights||1; $("maxGuests").value=p?.max_guests||''; $("checkinTime").value=p?.checkin_time||''; $("checkoutTime").value=p?.checkout_time||''; $("description").value=p?.description||""; $("published").checked=p?.is_published!==false; $("commercialStatus").value=p?.commercial_status||"disponivel"; $("soldBy").value=p?.sold_by||"aelo"; $("partnerName").value=p?.partner_name||""; $("partnerCreci").value=p?.partner_creci||""; renderPartnerSelect(); const matchedPartner=partnerBrokers.find(x=>x.name===p?.partner_name && (x.creci||"")===(p?.partner_creci||"")); $("partnerBrokerSelect").value=matchedPartner?.id||((p?.partner_name||p?.partner_creci)?"__manual__":""); syncSoldFields(); syncSeasonFields(); $("imageFile").value=""; const existingGallery=Array.isArray(p?.gallery_urls)?p.gallery_urls:(p?.image_url?[p.image_url]:[]); $("currentImage").textContent=existingGallery.length?`${existingGallery.length} foto(s) cadastrada(s). Escolha novas para substituir a galeria.`:""; $("propertyForm").dataset.imageUrl=p?.image_url||""; $("propertyForm").dataset.galleryUrls=JSON.stringify(existingGallery); renderPhotoPreviews([]); loadSeasonManagers(p?.id||""); window.scrollTo({top:0,behavior:"smooth"});
 }
-window.editProperty = async id => { const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
-window.deleteProperty = async id => { if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
+window.editProperty = async id => { if(!can("edit_properties")) return alert("Seu usuário não possui permissão para editar imóveis."); const {data,error}=await client.from("properties").select("*").eq("id",id).single(); if(error) return alert(error.message); openEditor(data); };
+window.deleteProperty = async id => { if(!can("edit_properties")) return alert("Seu usuário não possui permissão para excluir imóveis."); if(!confirm("Excluir este imóvel?")) return; const {error}=await client.from("properties").delete().eq("id",id); if(error) alert(error.message); else refresh(); };
 
 function loadImageFromFile(file){
   return new Promise((resolve,reject)=>{
@@ -1030,7 +1092,14 @@ $("cep")?.addEventListener("blur",async e=>{
 });
 
 $("propertyForm").addEventListener("submit",async e=>{
- e.preventDefault(); showMsg("saveMsg","Salvando...");
+ e.preventDefault();
+ const existingId=$("propertyId").value;
+ if(existingId ? !can("edit_properties") : !can("create_properties")) {
+   showMsg("saveMsg", existingId ? "Seu usuário não possui permissão para editar imóveis." : "Seu usuário não possui permissão para criar imóveis.");
+   return;
+ }
+ if($("published").checked && !can("publish_properties")) $("published").checked=false;
+ showMsg("saveMsg","Salvando...");
  const {data:{user}}=await client.auth.getUser(); if(!user){showMsg("saveMsg","Sessão expirada.");return;}
  try{
   const galleryUrls=await uploadImages($("imageFile").files,user.id);
@@ -1044,4 +1113,4 @@ $("commercialStatus")?.addEventListener("change",syncSoldFields); $("soldBy")?.a
 start();
 syncSeasonFields();
 
-loadAnalytics(30);
+if(can("view_analytics")) loadAnalytics(30);

@@ -5,7 +5,7 @@
 <title>Painel | Aelo Imóveis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=54.1">
+<link rel="stylesheet" href="admin.css?v=54.4">
 </head>
 <body>
 <header class="admin-header"><a href="index.html" class="back">← Site</a><a class="admin-brand" href="index.html" aria-label="Aelo Imóveis"><img src="header-logo.png" alt="Aelo Imóveis — Negócios Imobiliários"><span>PAINEL ADMINISTRATIVO</span></a><button id="logoutBtn" class="ghost hidden">Sair</button></header>
@@ -97,7 +97,7 @@
       <label class="user-active-check"><input id="userProfileActive" type="checkbox" checked> Usuário ativo</label>
     </div>
     <div class="permission-grid">
-      <label><input id="permViewProperties" type="checkbox"> 👁️ Consultar imóveis</label><label><input id="permEditProperties" type="checkbox"> ✏️ Editar imóveis</label><label><input id="permPublishProperties" type="checkbox"> 📢 Publicar imóveis</label>
+      <label><input id="permViewProperties" type="checkbox"> 👁️ Consultar imóveis</label><label><input id="permCreateProperties" type="checkbox"> ➕ Criar imóveis</label><label><input id="permEditProperties" type="checkbox"> ✏️ Editar imóveis</label><label><input id="permPublishProperties" type="checkbox"> 📢 Publicar imóveis</label>
       <label><input id="permViewLeads" type="checkbox"> 👁️ Consultar leads</label><label><input id="permEditLeads" type="checkbox"> ✏️ Gerenciar leads</label><label><input id="permViewReservations" type="checkbox"> 👁️ Consultar reservas</label>
       <label><input id="permEditReservations" type="checkbox"> ✏️ Gerenciar reservas</label><label><input id="permViewSales" type="checkbox"> 👁️ Consultar vendas</label><label><input id="permEditSales" type="checkbox"> ✏️ Gerenciar vendas</label>
       <label><input id="permViewAnalytics" type="checkbox"> 📊 Ver analytics</label><label><input id="permManageUsers" type="checkbox"> 🔐 Administrar usuários</label>
@@ -242,7 +242,7 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=54.3"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js?v=54.4"></script>
 <script>
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.section-toggle');

@@ -473,3 +473,7 @@ body.reservation-detail-open{overflow:hidden}
 .users-note{font-size:13px;line-height:1.5}
 #userProfileMsg{font-size:14px}
 @media(max-width:850px){.users-manager{padding:18px}}
+
+.permission-hidden{display:none!important}
+button:disabled{opacity:.45;cursor:not-allowed}
+.user-profile-row small{font-size:14px}

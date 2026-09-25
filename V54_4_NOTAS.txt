@@ -1,0 +1,7 @@
+V54.4 — Permissões efetivas
+- As permissões deixam de ser apenas visuais e passam a limitar o painel.
+- Nova permissão: Criar imóveis.
+- Corretor padrão: consultar imóveis + criar imóveis + consultar leads.
+- Sem acesso a reservas, vendas, analytics ou usuários, salvo se o administrador marcar.
+- SQL adiciona aelo_has_permission() e políticas RLS restritivas.
+- O fluxo público anônimo de criação de leads/reservas continua permitido.
