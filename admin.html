@@ -88,7 +88,7 @@
 </div>
 <div id="usersContent" class="collapsible-content hidden-section">
   <div class="users-manager">
-    <div class="users-manager-head"><div><p class="eyebrow">SEGURANÇA</p><h2>Usuários e permissões.</h2><p>Gerencie perfis, permissões e histórico de ações. A criação da conta/senha continua sendo feita pelo Supabase Auth.</p></div><button type="button" class="ghost" id="refreshUsers">Atualizar</button></div>
+    <div class="users-manager-head"><div><p class="eyebrow">SEGURANÇA</p><h2>Usuários e permissões.</h2><p>Gerencie perfis, permissões e histórico de ações. A criação da conta/senha continua sendo feita pelo Supabase Auth.</p></div><button type="button" class="ghost" id="refreshUsers">Atualizar</button><button type="button" class="ghost" id="syncUsers">Sincronizar contas</button></div>
     <div class="user-form-grid">
       <input id="userProfileId" type="hidden">
       <label>Nome<input id="userProfileName" type="text" placeholder="Nome do usuário"></label>
@@ -105,7 +105,7 @@
     <div class="user-form-actions"><button type="button" class="primary" id="saveUserProfile">Salvar permissões</button><button type="button" class="ghost" id="clearUserProfile">Limpar</button></div>
     <p id="userProfileMsg" class="msg"></p>
     <div id="userProfileList" class="user-profile-list"><div class="reservation-empty">Carregando usuários...</div></div>
-    <div class="users-note"><strong>Como criar um novo acesso?</strong><span>A conta e a senha são criadas em Supabase → Authentication → Users. Depois de criada, a conta aparece automaticamente aqui para você definir perfil e permissões.</span></div>
+    <div class="users-note"><strong>Como criar um novo acesso?</strong><span>A conta e a senha são criadas em Supabase → Authentication → Users. Contas novas aparecem automaticamente. Para contas já existentes, use “Sincronizar contas”.</span></div>
   </div>
 </div>
 <div class="dashboard-head leads-head collapsible-heading">

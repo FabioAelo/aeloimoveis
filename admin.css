@@ -451,3 +451,25 @@ body.reservation-detail-open{overflow:hidden}
 /* V54.1 — ajuda do campo de e-mail */
 .user-form-grid .field-help{display:block;margin-top:5px;font-size:11px;line-height:1.35;color:#7b8798;font-weight:400}
 .user-form-grid label{min-width:0}
+
+/* V54.2 — leitura confortável */
+.users-manager{padding:24px}
+.users-manager-head h2{font-size:24px}
+.users-manager-head p{font-size:14px;line-height:1.5}
+.user-form-grid{gap:14px}
+.user-form-grid label,.permission-grid label{font-size:13px}
+.user-form-grid input,.user-form-grid select{padding:12px;font-size:15px;min-height:44px}
+.field-help{font-size:12px;line-height:1.35;color:#6b7785}
+.permission-grid{gap:10px;padding:16px}
+.permission-grid label{padding:14px;font-size:14px;line-height:1.25;min-height:52px}
+.permission-grid input{width:18px;height:18px;flex:0 0 auto}
+.user-form-actions button{font-size:14px;padding:12px 18px}
+.user-profile-list{gap:10px}
+.user-profile-row{padding:14px;gap:12px}
+.user-profile-row strong{font-size:14px}
+.user-profile-row small{font-size:12px;line-height:1.35}
+.user-role-pill{font-size:12px;padding:7px 10px}
+.user-active-pill{font-size:12px}
+.users-note{font-size:13px;line-height:1.5}
+#userProfileMsg{font-size:14px}
+@media(max-width:850px){.users-manager{padding:18px}}
